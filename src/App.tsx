@@ -17,6 +17,7 @@ import FinancialEducationPage from "@/pages/FinancialEducationPage";
 import DebtsPage from "@/pages/DebtsPage";
 import SubscriptionManagementPage from "@/pages/SubscriptionManagementPage"; // Importar nova página
 import BehavioralAnalysisPage from "@/pages/BehavioralAnalysisPage"; // Importar nova página
+import MonthlyReviewPage from "@/pages/MonthlyReviewPage"; // Importar nova página
 import ProfilePage from "@/pages/ProfilePage";
 import LoginPage from "@/pages/LoginPage";
 import SignupPage from "@/pages/SignupPage";
@@ -46,8 +47,9 @@ function App() {
                     <Route path="/goals" element={<GoalsPage />} />
                     <Route path="/education" element={<FinancialEducationPage />} />
                     <Route path="/debts" element={<DebtsPage />} />
-                    <Route path="/subscriptions" element={<SubscriptionManagementPage />} /> {/* Nova rota */}
-                    <Route path="/behavioral-analysis" element={<BehavioralAnalysisPage />} /> {/* Nova rota */}
+                    <Route path="/subscriptions" element={<SubscriptionManagementPage />} />
+                    <Route path="/behavioral-analysis" element={<BehavioralAnalysisPage />} />
+                    <Route path="/monthly-review" element={<MonthlyReviewPage />} /> {/* Nova rota */}
                     <Route path="/profile" element={<ProfilePage />} />
                   </Route>
                 </Route>

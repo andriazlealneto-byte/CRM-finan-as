@@ -4,11 +4,30 @@ import React from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { DollarSign, TrendingUp, TrendingDown, CalendarClock, ShoppingBag, Utensils, Target, ArrowUp, ArrowDown } from "lucide-react"; // Import new icons
 import { useTransactionContext } from "@/context/TransactionContext"; // Import the context hook
-import { format, subMonths, startOfMonth, endOfMonth, parseISO } from "date-fns";
+import { format, subMonths, startOfMonth, endOfMonth, parseISO, differenceInMonths } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { Progress } from "@/components/ui/progress"; // Import Progress component
 import DashboardCharts from "@/components/DashboardCharts"; // Import DashboardCharts
 import { cn } from "@/lib/utils"; // Importar a função cn
+
+// Função para calcular o valor futuro de uma série de pagamentos (anuidade)
+const calculateFutureValue = (
+  currentInvestments: number,
+  monthlyContribution: number,
+  annualReturnRate: number,
+  months: number
+) => {
+  const monthlyRate = annualReturnRate / 100 / 12;
+  let futureValue = currentInvestments;
+
+  if (monthlyRate === 0) {
+    futureValue += monthlyContribution * months;
+  } else {
+    futureValue = currentInvestments * Math.pow(1 + monthlyRate, months) +
+                  monthlyContribution * ((Math.pow(1 + monthlyRate, months) - 1) / monthlyRate) * (1 + monthlyRate);
+  }
+  return futureValue;
+};
 
 const Index = () => {
   const {
@@ -67,6 +86,33 @@ const Index = () => {
     expenseComparisonMessage = "Você teve gastos este mês, mas não no mês passado.";
   }
 
+  // Encontrar a meta de liberdade financeira
+  const financialFreedomGoal = goals.find(g => g.is_financial_freedom_goal);
+
+  let ffProgress = 0;
+  let ffTargetCapital = 0;
+  let ffProjectedValue = 0;
+  let ffMonthsRemaining = 0;
+  let ffIsAchieved = false;
+
+  if (financialFreedomGoal && financialFreedomGoal.target_monthly_income && financialFreedomGoal.annual_return_rate) {
+    ffTargetCapital = (financialFreedomGoal.target_monthly_income * 12) / (financialFreedomGoal.annual_return_rate / 100);
+    ffMonthsRemaining = differenceInMonths(parseISO(financialFreedomGoal.due_date), new Date());
+    
+    if (ffMonthsRemaining > 0) {
+      ffProjectedValue = calculateFutureValue(
+        financialFreedomGoal.current_investments || 0,
+        financialFreedomGoal.monthly_contribution || 0,
+        financialFreedomGoal.annual_return_rate,
+        ffMonthsRemaining
+      );
+    } else {
+      ffProjectedValue = financialFreedomGoal.current_investments || 0;
+    }
+    
+    ffProgress = (ffProjectedValue / ffTargetCapital) * 100;
+    ffIsAchieved = ffProjectedValue >= ffTargetCapital;
+  }
 
   return (
     <div className="space-y-6">
@@ -131,9 +177,9 @@ const Index = () => {
             <Target className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{goals.filter(g => g.current_amount < g.target_amount && new Date(g.due_date) >= new Date()).length}</div>
+            <div className="text-2xl font-bold">{goals.filter(g => (g.current_amount || 0) < (g.target_amount || 0) && parseISO(g.due_date) >= new Date()).length}</div>
             <p className="text-xs text-muted-foreground">
-              {goals.filter(g => g.current_amount < g.target_amount && new Date(g.due_date) >= new Date()).length === 1 ? "meta ativa" : "metas ativas"}
+              {goals.filter(g => (g.current_amount || 0) < (g.target_amount || 0) && parseISO(g.due_date) >= new Date()).length === 1 ? "meta ativa" : "metas ativas"}
             </p>
           </CardContent>
         </Card>
@@ -150,6 +196,24 @@ const Index = () => {
             </p>
           </CardContent>
         </Card>
+
+        {financialFreedomGoal && (
+          <Card className="lg:col-span-2">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Liberdade Financeira: {financialFreedomGoal.name}</CardTitle>
+              <TrendingUp className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">
+                {ffProjectedValue.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })} / {ffTargetCapital.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
+              </div>
+              <Progress value={Math.min(100, ffProgress)} className="mt-2" indicatorClassName={getProgressBarColor(ffProgress)} />
+              <p className="text-xs text-muted-foreground mt-1">
+                {ffIsAchieved ? "Meta de Liberdade Financeira Atingida!" : `${ffMonthsRemaining > 0 ? ffMonthsRemaining : 0} meses restantes para a data limite.`}
+              </p>
+            </CardContent>
+          </Card>
+        )}
       </div>
 
       <h2 className="text-2xl font-bold mt-8 mb-4">Orçamentos Atuais</h2>

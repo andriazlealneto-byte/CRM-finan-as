@@ -55,6 +55,11 @@ interface Goal {
   due_date: string;
   created_at: string;
   updated_at: string;
+  is_financial_freedom_goal?: boolean; // Novo campo
+  target_monthly_income?: number | null; // Novo campo
+  current_investments?: number | null; // Novo campo
+  annual_return_rate?: number | null; // Novo campo
+  monthly_contribution?: number | null; // Novo campo
 }
 
 interface Debt {

@@ -2,7 +2,7 @@
 
 import React from "react";
 import { Link } from "react-router-dom";
-import { Home, DollarSign, ListChecks, LogOut, Wallet, Target, BookOpen, CreditCard, User, Repeat, Brain } from "lucide-react"; // Importar novos ícones
+import { Home, DollarSign, ListChecks, LogOut, Wallet, Target, BookOpen, CreditCard, User, Repeat, Brain, CalendarCheck } from "lucide-react"; // Importar novos ícones
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/context/AuthContext";
@@ -55,6 +55,11 @@ const Sidebar = ({ className, isMobile, onLinkClick }: SidebarProps) => {
       name: "Análise Comportamental", // Novo item de navegação
       href: "/behavioral-analysis",
       icon: <Brain className="mr-2 h-4 w-4" />,
+    },
+    {
+      name: "Reflexão Mensal", // Novo item de navegação
+      href: "/monthly-review",
+      icon: <CalendarCheck className="mr-2 h-4 w-4" />,
     },
     {
       name: "Educação Financeira",
