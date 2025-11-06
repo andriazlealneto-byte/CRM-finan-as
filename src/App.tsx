@@ -14,7 +14,7 @@ import { TransactionProvider } from "./context/TransactionContext";
 import { AuthProvider } from "./context/AuthContext";
 import LoginPage from "./pages/LoginPage";
 import ProtectedRoute from "./components/ProtectedRoute";
-import { SessionProvider } from "./context/SessionContext"; // Import SessionProvider
+import { SessionProvider } from "./context/SessionContext";
 
 const queryClient = new QueryClient();
 
@@ -25,20 +25,22 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter>
-          <SessionProvider> {/* Wrap with SessionProvider */}
+          <SessionProvider>
             <AuthProvider>
-              <Routes>
-                <Route path="/login" element={<LoginPage />} />
-                <Route element={<ProtectedRoute />}>
-                  <Route path="/" element={<Layout />}>
-                    <Route index element={<Index />} />
-                    <Route path="transactions" element={<TransactionsPage />} />
-                    <Route path="categories" element={<CategoryManagementPage />} />
-                    <Route path="budgets" element={<BudgetManagementPage />} />
-                    <Route path="*" element={<NotFound />} />
+              <TransactionProvider> {/* Adicionado TransactionProvider aqui */}
+                <Routes>
+                  <Route path="/login" element={<LoginPage />} />
+                  <Route element={<ProtectedRoute />}>
+                    <Route path="/" element={<Layout />}>
+                      <Route index element={<Index />} />
+                      <Route path="transactions" element={<TransactionsPage />} />
+                      <Route path="categories" element={<CategoryManagementPage />} />
+                      <Route path="budgets" element={<BudgetManagementPage />} />
+                      <Route path="*" element={<NotFound />} />
+                    </Route>
                   </Route>
-                </Route>
-              </Routes>
+                </Routes>
+              </TransactionProvider> {/* Fechamento do TransactionProvider */}
             </AuthProvider>
           </SessionProvider>
         </BrowserRouter>
