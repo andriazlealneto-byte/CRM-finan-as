@@ -6,7 +6,7 @@ import { Toaster } from "sonner";
 
 import Layout from "@/components/Layout";
 import ProtectedRoute from "@/components/ProtectedRoute";
-import ThemeManager from "@/components/ThemeManager"; // Importar ThemeManager
+import ThemeManager from "@/components/ThemeManager";
 
 import Index from "@/pages/Index";
 import TransactionsPage from "@/pages/TransactionsPage";
@@ -15,6 +15,8 @@ import BudgetManagementPage from "@/pages/BudgetManagementPage";
 import GoalsPage from "@/pages/GoalsPage";
 import FinancialEducationPage from "@/pages/FinancialEducationPage";
 import DebtsPage from "@/pages/DebtsPage";
+import SubscriptionManagementPage from "@/pages/SubscriptionManagementPage"; // Importar nova página
+import BehavioralAnalysisPage from "@/pages/BehavioralAnalysisPage"; // Importar nova página
 import ProfilePage from "@/pages/ProfilePage";
 import LoginPage from "@/pages/LoginPage";
 import SignupPage from "@/pages/SignupPage";
@@ -31,7 +33,7 @@ function App() {
       <SessionProvider>
         <AuthProvider>
           <TransactionProvider>
-            <ThemeManager> {/* Envolver o aplicativo com ThemeManager */}
+            <ThemeManager>
               <Routes>
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/signup" element={<SignupPage />} />
@@ -44,6 +46,8 @@ function App() {
                     <Route path="/goals" element={<GoalsPage />} />
                     <Route path="/education" element={<FinancialEducationPage />} />
                     <Route path="/debts" element={<DebtsPage />} />
+                    <Route path="/subscriptions" element={<SubscriptionManagementPage />} /> {/* Nova rota */}
+                    <Route path="/behavioral-analysis" element={<BehavioralAnalysisPage />} /> {/* Nova rota */}
                     <Route path="/profile" element={<ProfilePage />} />
                   </Route>
                 </Route>

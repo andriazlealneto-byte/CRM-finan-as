@@ -2,7 +2,7 @@
 
 import React from "react";
 import { Link } from "react-router-dom";
-import { Home, DollarSign, ListChecks, LogOut, Wallet, Target, BookOpen, CreditCard, User } from "lucide-react"; // Importar novos ícones
+import { Home, DollarSign, ListChecks, LogOut, Wallet, Target, BookOpen, CreditCard, User, Repeat, Brain } from "lucide-react"; // Importar novos ícones
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/context/AuthContext";
@@ -42,17 +42,27 @@ const Sidebar = ({ className, isMobile, onLinkClick }: SidebarProps) => {
       icon: <Target className="mr-2 h-4 w-4" />,
     },
     {
-      name: "Dívidas", // Novo item de navegação
+      name: "Dívidas",
       href: "/debts",
       icon: <CreditCard className="mr-2 h-4 w-4" />,
     },
     {
-      name: "Educação Financeira", // Novo item de navegação
+      name: "Assinaturas", // Novo item de navegação
+      href: "/subscriptions",
+      icon: <Repeat className="mr-2 h-4 w-4" />,
+    },
+    {
+      name: "Análise Comportamental", // Novo item de navegação
+      href: "/behavioral-analysis",
+      icon: <Brain className="mr-2 h-4 w-4" />,
+    },
+    {
+      name: "Educação Financeira",
       href: "/education",
       icon: <BookOpen className="mr-2 h-4 w-4" />,
     },
     {
-      name: "Perfil", // Novo item de navegação
+      name: "Perfil",
       href: "/profile",
       icon: <User className="mr-2 h-4 w-4" />,
     },

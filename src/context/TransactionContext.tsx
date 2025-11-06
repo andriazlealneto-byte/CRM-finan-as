@@ -71,6 +71,15 @@ interface Debt {
   updated_at: string;
 }
 
+interface Subscription { // Nova interface para assinaturas
+  id: string;
+  user_id: string;
+  name: string;
+  amount: number;
+  next_due_date: string | null;
+  created_at: string;
+}
+
 interface UserProfile {
   id: string;
   first_name: string | null;
@@ -118,6 +127,11 @@ interface TransactionContextType {
   updateDebt: (id: string, updates: Partial<Omit<Debt, "id" | "user_id" | "created_at">>) => void;
   deleteDebt: (id: string) => void;
 
+  subscriptions: Subscription[]; // Novo estado para assinaturas
+  addSubscription: (subscription: Omit<Subscription, "id" | "user_id" | "created_at">) => void;
+  updateSubscription: (id: string, updates: Partial<Omit<Subscription, "id" | "user_id" | "created_at">>) => void;
+  deleteSubscription: (id: string) => void;
+
   userProfile: UserProfile | null;
   updateUserProfile: (updates: Partial<Omit<UserProfile, "id">>) => void;
 }
@@ -134,6 +148,7 @@ export const TransactionProvider = ({ children }: { children: ReactNode }) => {
   const [foodCategories, setFoodCategoriesState] = useState<string[]>([]);
   const [goals, setGoals] = useState<Goal[]>([]); // Novo estado para metas
   const [debts, setDebts] = useState<Debt[]>([]); // Novo estado para dívidas
+  const [subscriptions, setSubscriptions] = useState<Subscription[]>([]); // Novo estado para assinaturas
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null); // Novo estado para perfil do usuário
   const [loading, setLoading] = useState(true);
 
@@ -265,6 +280,22 @@ export const TransactionProvider = ({ children }: { children: ReactNode }) => {
     setLoading(false);
   }, [user?.id]);
 
+  const fetchSubscriptions = useCallback(async () => { // Nova função para buscar assinaturas
+    if (!user?.id) {
+      setSubscriptions([]);
+      return;
+    }
+    setLoading(true);
+    const { data, error } = await supabase.from('subscriptions').select('*').eq('user_id', user.id);
+    if (error) {
+      toast.error("Erro ao carregar assinaturas: " + error.message);
+      console.error("Erro ao carregar assinaturas:", error);
+    } else {
+      setSubscriptions(data || []);
+    }
+    setLoading(false);
+  }, [user?.id]);
+
   const fetchUserProfile = useCallback(async () => {
     if (!user?.id) {
       setUserProfile(null);
@@ -310,8 +341,9 @@ export const TransactionProvider = ({ children }: { children: ReactNode }) => {
       fetchSavedCategories();
       fetchBudgets();
       fetchGoals();
-      fetchDebts(); // Chamar fetchDebts
-      fetchUserProfile(); // Chamar fetchUserProfile
+      fetchDebts();
+      fetchSubscriptions(); // Chamar fetchSubscriptions
+      fetchUserProfile();
     } else if (!sessionLoading && !user?.id) {
       // Clear data if user logs out
       setTransactions([]);
@@ -322,11 +354,12 @@ export const TransactionProvider = ({ children }: { children: ReactNode }) => {
       setMiscCategoriesState([]);
       setFoodCategoriesState([]);
       setGoals([]);
-      setDebts([]); // Limpar dívidas ao deslogar
-      setUserProfile(null); // Limpar perfil ao deslogar
+      setDebts([]);
+      setSubscriptions([]); // Limpar assinaturas ao deslogar
+      setUserProfile(null);
       setLoading(false);
     }
-  }, [sessionLoading, user?.id, fetchTransactions, fetchFutureExpenses, fetchSavedCategories, fetchBudgets, fetchGoals, fetchDebts, fetchUserProfile]);
+  }, [sessionLoading, user?.id, fetchTransactions, fetchFutureExpenses, fetchSavedCategories, fetchBudgets, fetchGoals, fetchDebts, fetchSubscriptions, fetchUserProfile]);
 
   const addTransaction = async (transaction: Omit<Transaction, "id" | "user_id">) => {
     if (!user?.id) {
@@ -615,6 +648,51 @@ export const TransactionProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  const addSubscription = async (subscription: Omit<Subscription, "id" | "user_id" | "created_at">) => {
+    if (!user?.id) {
+      toast.error("Você precisa estar logado para adicionar assinaturas.");
+      return;
+    }
+    const { data, error } = await supabase.from('subscriptions').insert({ ...subscription, user_id: user.id }).select();
+    if (error) {
+      toast.error("Erro ao adicionar assinatura: " + error.message);
+      console.error("Erro ao adicionar assinatura:", error);
+    } else if (data) {
+      setSubscriptions((prev) => [...prev, data[0] as Subscription]);
+      toast.success("Assinatura adicionada com sucesso!");
+    }
+  };
+
+  const updateSubscription = async (id: string, updates: Partial<Omit<Subscription, "id" | "user_id" | "created_at">>) => {
+    if (!user?.id) {
+      toast.error("Você precisa estar logado para atualizar assinaturas.");
+      return;
+    }
+    const { error } = await supabase.from('subscriptions').update(updates).eq('id', id).eq('user_id', user.id);
+    if (error) {
+      toast.error("Erro ao atualizar assinatura: " + error.message);
+      console.error("Erro ao atualizar assinatura:", error);
+    } else {
+      setSubscriptions((prev) => prev.map((s) => (s.id === id ? { ...s, ...updates } : s)));
+      toast.success("Assinatura atualizada com sucesso!");
+    }
+  };
+
+  const deleteSubscription = async (id: string) => {
+    if (!user?.id) {
+      toast.error("Você precisa estar logado para excluir assinaturas.");
+      return;
+    }
+    const { error } = await supabase.from('subscriptions').delete().eq('id', id).eq('user_id', user.id);
+    if (error) {
+      toast.error("Erro ao excluir assinatura: " + error.message);
+      console.error("Erro ao excluir assinatura:", error);
+    } else {
+      setSubscriptions((prev) => prev.filter((s) => s.id !== id));
+      toast.success("Assinatura excluída com sucesso!");
+    }
+  };
+
   const updateUserProfile = async (updates: Partial<Omit<UserProfile, "id">>) => {
     if (!user?.id) {
       toast.error("Você precisa estar logado para atualizar seu perfil.");
@@ -679,12 +757,16 @@ export const TransactionProvider = ({ children }: { children: ReactNode }) => {
         addGoal,
         updateGoal,
         deleteGoal,
-        debts, // Adicionado debts
-        addDebt, // Adicionado addDebt
-        updateDebt, // Adicionado updateDebt
-        deleteDebt, // Adicionado deleteDebt
-        userProfile, // Adicionado userProfile
-        updateUserProfile, // Adicionado updateUserProfile
+        debts,
+        addDebt,
+        updateDebt,
+        deleteDebt,
+        subscriptions, // Adicionado subscriptions
+        addSubscription, // Adicionado addSubscription
+        updateSubscription, // Adicionado updateSubscription
+        deleteSubscription, // Adicionado deleteSubscription
+        userProfile,
+        updateUserProfile,
       }}
     >
       {children}
