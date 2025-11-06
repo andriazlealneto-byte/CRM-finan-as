@@ -129,12 +129,12 @@ const LandingPage = () => {
       </header>
 
       {/* Hero Section */}
-      <section className="relative h-[calc(100vh-64px)] flex items-center justify-center text-center bg-gradient-to-br from-primary to-purple-700 text-white p-8">
-        <div className="max-w-3xl space-y-6">
-          <h1 className="text-5xl font-extrabold leading-tight">
+      <section className="relative h-[calc(100vh-64px)] flex items-center justify-center text-center bg-gradient-to-br from-primary to-purple-600 text-white p-8">
+        <div className="max-w-4xl space-y-8"> {/* Increased max-width and space-y */}
+          <h1 className="text-6xl font-extrabold leading-tight tracking-tight"> {/* Increased text size and added tracking */}
             Assuma o Controle das Suas Finanças Pessoais
           </h1>
-          <p className="text-xl opacity-90">
+          <p className="text-2xl opacity-90 max-w-3xl mx-auto"> {/* Increased text size and added max-width */}
             O GPF é a sua ferramenta completa para gerenciar receitas, despesas, metas e dívidas.
             Comece hoje a construir um futuro financeiro sólido!
           </p>
