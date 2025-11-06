@@ -9,12 +9,12 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { useAuth } from "@/context/AuthContext";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link, useSearchParams } from "react-router-dom";
 import { MadeWithDyad } from "@/components/made-with-dyad";
-// import { ThemeToggle } from "@/components/ThemeToggle"; // REMOVIDO
 import { useSession } from "@/context/SessionContext";
 import { toast } from "sonner";
 import { Eye, EyeOff } from "lucide-react";
+import { ThemeToggle } from "@/components/ThemeToggle"; // Importar ThemeToggle
 
 const signupFormSchema = z.object({
   email: z.string().email("Digite um email válido.").min(1, "O email é obrigatório."),
@@ -29,6 +29,8 @@ const SignupPage = () => {
   const { signup } = useAuth();
   const { loading, session } = useSession();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const plan = searchParams.get("plan");
   const [showPassword, setShowPassword] = React.useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = React.useState(false);
 
@@ -43,7 +45,7 @@ const SignupPage = () => {
 
   React.useEffect(() => {
     if (!loading && session) {
-      navigate("/");
+      navigate("/app");
     }
   }, [loading, session, navigate]);
 
@@ -51,7 +53,11 @@ const SignupPage = () => {
     const success = await signup(values.email, values.password);
     if (success) {
       toast.success("Cadastro realizado com sucesso! Verifique seu e-mail para confirmar a conta.");
-      navigate("/login");
+      if (plan) {
+        navigate(`/payment?plan=${plan}`);
+      } else {
+        navigate("/login"); // Fallback se não houver plano
+      }
     }
   };
 
@@ -65,9 +71,9 @@ const SignupPage = () => {
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-background p-4">
-      {/* <div className="absolute top-4 right-4">
-        <ThemeToggle /> // REMOVIDO
-      </div> */}
+      <div className="absolute top-4 right-4">
+        <ThemeToggle />
+      </div>
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl">Criar Nova Conta</CardTitle>

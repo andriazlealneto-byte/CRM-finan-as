@@ -6,6 +6,7 @@ import { Home, DollarSign, ListChecks, LogOut, Wallet, Target, BookOpen, CreditC
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/context/AuthContext";
+import { useTransactionContext } from "@/context/TransactionContext"; // Importar o contexto de transações
 
 interface SidebarProps extends React.HTMLAttributes<HTMLDivElement> {
   isMobile: boolean;
@@ -14,58 +15,63 @@ interface SidebarProps extends React.HTMLAttributes<HTMLDivElement> {
 
 const Sidebar = ({ className, isMobile, onLinkClick }: SidebarProps) => {
   const { logout } = useAuth();
+  const { userProfile } = useTransactionContext();
 
   const navItems = [
     {
       name: "Painel",
-      href: "/",
+      href: "/app",
       icon: <Home className="mr-2 h-4 w-4" />,
+      show: true, // Painel sempre visível
     },
     {
       name: "Transações",
-      href: "/transactions",
+      href: "/app/transactions",
       icon: <DollarSign className="mr-2 h-4 w-4" />,
+      show: true, // Transações sempre visíveis
     },
     {
       name: "Categorias",
-      href: "/categories",
+      href: "/app/categories",
       icon: <ListChecks className="mr-2 h-4 w-4" />,
+      show: true, // Categorias sempre visíveis
     },
     {
       name: "Orçamentos",
-      href: "/budgets",
+      href: "/app/budgets",
       icon: <Wallet className="mr-2 h-4 w-4" />,
+      show: userProfile?.show_budgets ?? true,
     },
     {
       name: "Metas",
-      href: "/goals",
+      href: "/app/goals",
       icon: <Target className="mr-2 h-4 w-4" />,
+      show: userProfile?.show_goals ?? true,
     },
     {
       name: "Dívidas",
-      href: "/debts",
+      href: "/app/debts",
       icon: <CreditCard className="mr-2 h-4 w-4" />,
+      show: userProfile?.show_debts ?? true,
     },
     {
-      name: "Assinaturas", // Novo item de navegação
-      href: "/subscriptions",
+      name: "Assinaturas",
+      href: "/app/subscriptions",
       icon: <Repeat className="mr-2 h-4 w-4" />,
+      show: userProfile?.show_subscriptions ?? true,
     },
+    // REMOVIDO: Análise Comportamental
     {
-      name: "Análise Comportamental", // Novo item de navegação
-      href: "/behavioral-analysis",
-      icon: <Brain className="mr-2 h-4 w-4" />,
-    },
-    {
-      name: "Reflexão Mensal", // Novo item de navegação
-      href: "/monthly-review",
+      name: "Reflexão Mensal",
+      href: "/app/monthly-review",
       icon: <CalendarCheck className="mr-2 h-4 w-4" />,
+      show: userProfile?.show_monthly_review ?? true,
     },
-    // REMOVIDO: Educação Financeira
     {
       name: "Perfil",
-      href: "/profile",
+      href: "/app/profile",
       icon: <User className="mr-2 h-4 w-4" />,
+      show: true, // Perfil sempre visível
     },
   ];
 
@@ -77,7 +83,7 @@ const Sidebar = ({ className, isMobile, onLinkClick }: SidebarProps) => {
             GPF (Gestão Pessoal de Finanças)
           </h2>
           <div className="space-y-1">
-            {navItems.map((item) => (
+            {navItems.filter(item => item.show).map((item) => (
               <Button
                 key={item.name}
                 variant="ghost"

@@ -97,7 +97,7 @@ const goalFormSchema = z.object({
 });
 
 const GoalsPage = () => {
-  const { goals, addGoal, updateGoal, deleteGoal } = useTransactionContext();
+  const { goals, addGoal, updateGoal, deleteGoal, userProfile } = useTransactionContext();
   const [isAddDialogOpen, setIsAddDialogOpen] = React.useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = React.useState(false);
   const [editingGoal, setEditingGoal] = React.useState<z.infer<typeof goalFormSchema> & { id: string } | null>(null);
@@ -225,6 +225,18 @@ const GoalsPage = () => {
       </div>
     );
   };
+
+  if (!userProfile?.show_goals) {
+    return (
+      <div className="flex flex-col items-center justify-center h-full text-center space-y-4">
+        <h1 className="text-3xl font-bold">Metas Desativadas</h1>
+        <p className="text-muted-foreground">
+          Esta seção está desativada nas suas configurações de perfil.
+          Ative-a na página de Perfil para gerenciar suas metas.
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">

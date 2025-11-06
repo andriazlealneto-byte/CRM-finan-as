@@ -90,9 +90,15 @@ interface UserProfile {
   first_name: string | null;
   last_name: string | null;
   avatar_url: string | null;
-  primary_color_hsl: string | null; // Nova propriedade
-  background_color_hsl: string | null; // Nova propriedade
   avatar_style: string | null; // Nova propriedade
+  is_premium: boolean; // Novo campo para status de assinatura
+  subscription_type: 'monthly' | 'annual' | null; // Tipo de assinatura
+  subscription_end_date: string | null; // Data de término da assinatura
+  show_budgets: boolean; // Novo campo para visibilidade do menu
+  show_goals: boolean; // Novo campo para visibilidade do menu
+  show_debts: boolean; // Novo campo para visibilidade do menu
+  show_subscriptions: boolean; // Novo campo para visibilidade do menu
+  show_monthly_review: boolean; // Novo campo para visibilidade do menu
 }
 
 interface TransactionContextType {
@@ -317,9 +323,15 @@ export const TransactionProvider = ({ children }: { children: ReactNode }) => {
             id: user.id, 
             first_name: user.user_metadata.first_name || null, 
             last_name: user.user_metadata.last_name || null,
-            primary_color_hsl: '250 80% 60%', // Default value
-            background_color_hsl: '220 10% 10%', // Default value
             avatar_style: 'User', // Default value
+            is_premium: false, // Default to non-premium
+            subscription_type: null,
+            subscription_end_date: null,
+            show_budgets: true, // Default to true
+            show_goals: true, // Default to true
+            show_debts: true, // Default to true
+            show_subscriptions: true, // Default to true
+            show_monthly_review: true, // Default to true
           })
           .select()
           .single();

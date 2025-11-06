@@ -41,6 +41,9 @@ const Index = () => {
     foodExpensesLimit,
     currentFoodExpenses,
     goals, // Obter metas do contexto
+    debts, // Obter dívidas do contexto
+    subscriptions, // Obter assinaturas do contexto
+    userProfile, // Obter perfil do usuário para visibilidade
   } = useTransactionContext();
 
   const miscProgress = (currentMiscExpenses / miscExpensesLimit) * 100;
@@ -171,18 +174,20 @@ const Index = () => {
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Metas Ativas</CardTitle>
-            <Target className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{goals.filter(g => (g.current_amount || 0) < (g.target_amount || 0) && parseISO(g.due_date) >= new Date()).length}</div>
-            <p className="text-xs text-muted-foreground">
-              {goals.filter(g => (g.current_amount || 0) < (g.target_amount || 0) && parseISO(g.due_date) >= new Date()).length === 1 ? "meta ativa" : "metas ativas"}
-            </p>
-          </CardContent>
-        </Card>
+        {userProfile?.show_goals && (
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Metas Ativas</CardTitle>
+              <Target className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{goals.filter(g => (g.current_amount || 0) < (g.target_amount || 0) && parseISO(g.due_date) >= new Date()).length}</div>
+              <p className="text-xs text-muted-foreground">
+                {goals.filter(g => (g.current_amount || 0) < (g.target_amount || 0) && parseISO(g.due_date) >= new Date()).length === 1 ? "meta ativa" : "metas ativas"}
+              </p>
+            </CardContent>
+          </Card>
+        )}
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -197,7 +202,7 @@ const Index = () => {
           </CardContent>
         </Card>
 
-        {financialFreedomGoal && (
+        {userProfile?.show_goals && financialFreedomGoal && (
           <Card className="lg:col-span-2">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Liberdade Financeira: {financialFreedomGoal.name}</CardTitle>
@@ -216,36 +221,40 @@ const Index = () => {
         )}
       </div>
 
-      <h2 className="text-2xl font-bold mt-8 mb-4">Orçamentos Atuais</h2>
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-2">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Gastos Bestas</CardTitle>
-            <ShoppingBag className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">R${currentMiscExpenses.toFixed(2)} / R${miscExpensesLimit.toFixed(2)}</div>
-            <Progress value={miscProgress} className="mt-2" indicatorClassName={getProgressBarColor(miscProgress)} />
-            <p className="text-xs text-muted-foreground mt-1">
-              {miscProgress > 100 ? "Limite excedido!" : `${(miscExpensesLimit - currentMiscExpenses).toFixed(2)} restantes`}
-            </p>
-          </CardContent>
-        </Card>
+      {userProfile?.show_budgets && (
+        <>
+          <h2 className="text-2xl font-bold mt-8 mb-4">Orçamentos Atuais</h2>
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-2">
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Gastos Bestas</CardTitle>
+                <ShoppingBag className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">R${currentMiscExpenses.toFixed(2)} / R${miscExpensesLimit.toFixed(2)}</div>
+                <Progress value={miscProgress} className="mt-2" indicatorClassName={getProgressBarColor(miscProgress)} />
+                <p className="text-xs text-muted-foreground mt-1">
+                  {miscProgress > 100 ? "Limite excedido!" : `${(miscExpensesLimit - currentMiscExpenses).toFixed(2)} restantes`}
+                </p>
+              </CardContent>
+            </Card>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Gastos com Comida</CardTitle>
-            <Utensils className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">R${currentFoodExpenses.toFixed(2)} / R${foodExpensesLimit.toFixed(2)}</div>
-            <Progress value={foodProgress} className="mt-2" indicatorClassName={getProgressBarColor(foodProgress)} />
-            <p className="text-xs text-muted-foreground mt-1">
-              {foodProgress > 100 ? "Limite excedido!" : `${(foodExpensesLimit - currentFoodExpenses).toFixed(2)} restantes`}
-            </p>
-          </CardContent>
-        </Card>
-      </div>
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Gastos com Comida</CardTitle>
+                <Utensils className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">R${currentFoodExpenses.toFixed(2)} / R${foodExpensesLimit.toFixed(2)}</div>
+                <Progress value={foodProgress} className="mt-2" indicatorClassName={getProgressBarColor(foodProgress)} />
+                <p className="text-xs text-muted-foreground mt-1">
+                  {foodProgress > 100 ? "Limite excedido!" : `${(foodExpensesLimit - currentFoodExpenses).toFixed(2)} restantes`}
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+        </>
+      )}
 
       <h2 className="text-2xl font-bold mt-8 mb-4">Análise de Gastos</h2>
       <DashboardCharts />

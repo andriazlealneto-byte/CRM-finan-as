@@ -20,6 +20,7 @@ import { format, parseISO } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { cn } from "@/lib/utils";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useNavigate } from "react-router-dom";
 
 const subscriptionFormSchema = z.object({
   name: z.string().min(1, "O nome da assinatura é obrigatório.").max(100, "O nome não pode ter mais de 100 caracteres."),
@@ -28,10 +29,11 @@ const subscriptionFormSchema = z.object({
 });
 
 const SubscriptionManagementPage = () => {
-  const { subscriptions, addSubscription, updateSubscription, deleteSubscription } = useTransactionContext();
+  const { subscriptions, addSubscription, updateSubscription, deleteSubscription, userProfile, updateUserProfile } = useTransactionContext();
   const [isAddDialogOpen, setIsAddDialogOpen] = React.useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = React.useState(false);
   const [editingSubscription, setEditingSubscription] = React.useState<z.infer<typeof subscriptionFormSchema> & { id: string } | null>(null);
+  const navigate = useNavigate();
 
   const addForm = useForm<z.infer<typeof subscriptionFormSchema>>({
     resolver: zodResolver(subscriptionFormSchema),
@@ -87,7 +89,29 @@ const SubscriptionManagementPage = () => {
     await deleteSubscription(id);
   };
 
+  const handleCancelSubscription = async () => {
+    await updateUserProfile({
+      is_premium: false,
+      subscription_type: null,
+      subscription_end_date: null,
+    });
+    toast.success("Sua assinatura foi cancelada com sucesso.");
+    navigate("/subscribe");
+  };
+
   const totalMonthlySubscriptions = subscriptions.reduce((sum, sub) => sum + sub.amount, 0);
+
+  if (!userProfile?.show_subscriptions) {
+    return (
+      <div className="flex flex-col items-center justify-center h-full text-center space-y-4">
+        <h1 className="text-3xl font-bold">Assinaturas Desativadas</h1>
+        <p className="text-muted-foreground">
+          Esta seção está desativada nas suas configurações de perfil.
+          Ative-a na página de Perfil para gerenciar suas assinaturas.
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -96,14 +120,70 @@ const SubscriptionManagementPage = () => {
 
       <Card>
         <CardHeader>
-          <CardTitle>Gasto Total Mensal com Assinaturas</CardTitle>
+          <CardTitle>Status da Sua Assinatura GPF</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-2">
+          {userProfile?.is_premium ? (
+            <>
+              <p>
+                Você está no plano{" "}
+                <span className="font-semibold">
+                  {userProfile.subscription_type === "monthly" ? "Mensal" : "Anual"}
+                </span>
+                .
+              </p>
+              {userProfile.subscription_end_date && (
+                <p>
+                  Sua assinatura é válida até{" "}
+                  <span className="font-semibold">
+                    {format(parseISO(userProfile.subscription_end_date), "dd/MM/yyyy", { locale: ptBR })}
+                  </span>
+                  .
+                </p>
+              )}
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button variant="destructive" className="mt-4">
+                    Cancelar Assinatura
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Tem certeza que deseja cancelar?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      Ao cancelar, você perderá o acesso aos recursos premium do GPF após a data de vencimento da sua assinatura.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Não, Manter Assinatura</AlertDialogCancel>
+                    <AlertDialogAction onClick={handleCancelSubscription}>
+                      Sim, Cancelar
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            </>
+          ) : (
+            <>
+              <p>Você não possui uma assinatura ativa do GPF Premium.</p>
+              <Button className="mt-4" onClick={() => navigate("/subscribe")}>
+                Assinar Agora
+              </Button>
+            </>
+          )}
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Gasto Total Mensal com Outras Assinaturas</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">
             {totalMonthlySubscriptions.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
           </div>
           <p className="text-sm text-muted-foreground">
-            Este é o valor total que você gasta por mês com todas as suas assinaturas.
+            Este é o valor total que você gasta por mês com todas as suas assinaturas externas.
           </p>
         </CardContent>
       </Card>

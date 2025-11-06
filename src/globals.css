@@ -45,6 +45,47 @@
 
     color-scheme: dark; /* Definir esquema de cores padrão como escuro */
   }
+
+  .light {
+    --background: 0 0% 100%; /* White */
+    --foreground: 222.2 84% 4.9%; /* Black */
+
+    --card: 0 0% 100%; /* White */
+    --card-foreground: 222.2 84% 4.9%; /* Black */
+
+    --popover: 0 0% 100%; /* White */
+    --popover-foreground: 222.2 84% 4.9%; /* Black */
+
+    --primary: 250 80% 60%; /* Softer purple */
+    --primary-foreground: 210 40% 98%; /* Off-white */
+
+    --secondary: 210 40% 96.1%; /* Light gray */
+    --secondary-foreground: 222.2 47.4% 11.2%; /* Darker gray */
+
+    --muted: 210 40% 96.1%; /* Light gray */
+    --muted-foreground: 215.4 16.3% 46.9%; /* Medium gray */
+
+    --accent: 210 40% 96.1%; /* Light gray */
+    --accent-foreground: 222.2 47.4% 11.2%; /* Darker gray */
+
+    --destructive: 0 100% 50%; /* Red */
+    --destructive-foreground: 210 40% 98%; /* Off-white */
+
+    --border: 214.3 31.8% 91.4%; /* Light gray border */
+    --input: 214.3 31.8% 91.4%; /* Light gray input */
+    --ring: 250 80% 60%; /* Primary purple */
+
+    --sidebar-background: 0 0% 98%; /* Very light gray */
+    --sidebar-foreground: 222.2 84% 4.9%; /* Black */
+    --sidebar-primary: 250 80% 60%; /* Softer purple */
+    --sidebar-primary-foreground: 0 0% 100%; /* White */
+    --sidebar-accent: 210 40% 96.1%; /* Light gray */
+    --sidebar-accent-foreground: 222.2 47.4% 11.2%; /* Darker gray */
+    --sidebar-border: 214.3 31.8% 91.4%; /* Light gray border */
+    --sidebar-ring: 250 80% 60%; /* Primary purple */
+
+    color-scheme: light;
+  }
 }
 
 @layer base {

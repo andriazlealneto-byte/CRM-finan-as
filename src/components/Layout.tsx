@@ -9,6 +9,7 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Menu } from "lucide-react";
 import UserAvatar from "./UserAvatar"; // Importar UserAvatar
+import { ThemeToggle } from "./ThemeToggle"; // Importar ThemeToggle
 
 const Layout = () => {
   const isMobile = useIsMobile();
@@ -39,7 +40,8 @@ const Layout = () => {
         </aside>
       )}
       <main className="flex-1 flex flex-col">
-        <header className="flex justify-end p-4 pb-0">
+        <header className="flex justify-end items-center p-4 pb-0 gap-4"> {/* Adicionado items-center e gap-4 */}
+          <ThemeToggle /> {/* Adicionar ThemeToggle aqui */}
           <UserAvatar /> {/* Avatar no canto superior direito */}
         </header>
         <div className="flex-1 p-8 pt-4 sm:pt-4"> {/* Ajustar padding-top para acomodar o avatar */}

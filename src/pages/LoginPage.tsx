@@ -11,10 +11,10 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { useAuth } from "@/context/AuthContext";
 import { useNavigate, Link } from "react-router-dom";
 import { MadeWithDyad } from "@/components/made-with-dyad";
-// import { ThemeToggle } from "@/components/ThemeToggle"; // REMOVIDO
 import { useSession } from "@/context/SessionContext";
 import { toast } from "sonner";
 import { Eye, EyeOff } from "lucide-react";
+import { ThemeToggle } from "@/components/ThemeToggle"; // Importar ThemeToggle
 
 const loginFormSchema = z.object({
   email: z.string().email("Digite um email válido.").min(1, "O email é obrigatório."),
@@ -37,7 +37,7 @@ const LoginPage = () => {
 
   React.useEffect(() => {
     if (!loading && session) {
-      navigate("/");
+      navigate("/app"); // Redireciona para /app após o login
     }
   }, [loading, session, navigate]);
 
@@ -55,9 +55,9 @@ const LoginPage = () => {
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-background p-4">
-      {/* <div className="absolute top-4 right-4">
-        <ThemeToggle /> // REMOVIDO
-      </div> */}
+      <div className="absolute top-4 right-4">
+        <ThemeToggle />
+      </div>
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl">Bem-vindo ao GPF</CardTitle>

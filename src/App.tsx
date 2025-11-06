@@ -6,26 +6,27 @@ import { Toaster } from "sonner";
 
 import Layout from "@/components/Layout";
 import ProtectedRoute from "@/components/ProtectedRoute";
-import ThemeManager from "@/components/ThemeManager";
 
-import Index from "@/pages/Index";
+import LandingPage from "@/pages/LandingPage"; // Nova Landing Page
 import TransactionsPage from "@/pages/TransactionsPage";
 import CategoryManagementPage from "@/pages/CategoryManagementPage";
 import BudgetManagementPage from "@/pages/BudgetManagementPage";
 import GoalsPage from "@/pages/GoalsPage";
-// REMOVIDO: import FinancialEducationPage from "@/pages/FinancialEducationPage";
 import DebtsPage from "@/pages/DebtsPage";
 import SubscriptionManagementPage from "@/pages/SubscriptionManagementPage";
-import BehavioralAnalysisPage from "@/pages/BehavioralAnalysisPage";
+// REMOVIDO: import BehavioralAnalysisPage from "@/pages/BehavioralAnalysisPage";
 import MonthlyReviewPage from "@/pages/MonthlyReviewPage";
 import ProfilePage from "@/pages/ProfilePage";
 import LoginPage from "@/pages/LoginPage";
 import SignupPage from "@/pages/SignupPage";
 import NotFound from "@/pages/NotFound";
+import PaymentPage from "@/pages/PaymentPage"; // Nova página de pagamento
+import SubscriptionRequiredPage from "@/pages/SubscriptionRequiredPage"; // Nova página de assinatura necessária
 
 import { SessionProvider } from "@/context/SessionContext";
 import { AuthProvider } from "@/context/AuthContext";
 import { TransactionProvider } from "@/context/TransactionContext";
+import { ThemeProvider } from "next-themes"; // Importar ThemeProvider
 
 function App() {
   return (
@@ -34,28 +35,31 @@ function App() {
       <SessionProvider>
         <AuthProvider>
           <TransactionProvider>
-            <ThemeManager>
+            <ThemeProvider attribute="class" defaultTheme="dark" enableSystem> {/* Adicionar ThemeProvider */}
               <Routes>
+                <Route path="/" element={<LandingPage />} /> {/* Nova Landing Page como rota raiz */}
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/signup" element={<SignupPage />} />
+                <Route path="/payment" element={<PaymentPage />} /> {/* Rota para pagamento */}
+                <Route path="/subscribe" element={<SubscriptionRequiredPage />} /> {/* Rota para assinatura necessária */}
+                
                 <Route element={<ProtectedRoute />}>
                   <Route element={<Layout />}>
-                    <Route path="/" element={<Index />} />
-                    <Route path="/transactions" element={<TransactionsPage />} />
-                    <Route path="/categories" element={<CategoryManagementPage />} />
-                    <Route path="/budgets" element={<BudgetManagementPage />} />
-                    <Route path="/goals" element={<GoalsPage />} />
-                    {/* REMOVIDO: <Route path="/education" element={<FinancialEducationPage />} /> */}
-                    <Route path="/debts" element={<DebtsPage />} />
-                    <Route path="/subscriptions" element={<SubscriptionManagementPage />} />
-                    <Route path="/behavioral-analysis" element={<BehavioralAnalysisPage />} />
-                    <Route path="/monthly-review" element={<MonthlyReviewPage />} />
-                    <Route path="/profile" element={<ProfilePage />} />
+                    <Route path="/app" element={<TransactionsPage />} /> {/* Rota padrão após login */}
+                    <Route path="/app/transactions" element={<TransactionsPage />} />
+                    <Route path="/app/categories" element={<CategoryManagementPage />} />
+                    <Route path="/app/budgets" element={<BudgetManagementPage />} />
+                    <Route path="/app/goals" element={<GoalsPage />} />
+                    <Route path="/app/debts" element={<DebtsPage />} />
+                    <Route path="/app/subscriptions" element={<SubscriptionManagementPage />} />
+                    {/* REMOVIDO: <Route path="/app/behavioral-analysis" element={<BehavioralAnalysisPage />} /> */}
+                    <Route path="/app/monthly-review" element={<MonthlyReviewPage />} />
+                    <Route path="/app/profile" element={<ProfilePage />} />
                   </Route>
                 </Route>
                 <Route path="*" element={<NotFound />} />
               </Routes>
-            </ThemeManager>
+            </ThemeProvider>
           </TransactionProvider>
         </AuthProvider>
       </SessionProvider>

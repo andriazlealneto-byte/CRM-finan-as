@@ -36,7 +36,7 @@ const debtFormSchema = z.object({
 });
 
 const DebtsPage = () => {
-  const { debts, addDebt, updateDebt, deleteDebt } = useTransactionContext();
+  const { debts, addDebt, updateDebt, deleteDebt, userProfile } = useTransactionContext();
   const [isAddDialogOpen, setIsAddDialogOpen] = React.useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = React.useState(false);
   const [editingDebt, setEditingDebt] = React.useState<z.infer<typeof debtFormSchema> & { id: string } | null>(null);
@@ -114,6 +114,18 @@ const DebtsPage = () => {
   const handleDeleteDebt = async (id: string) => {
     await deleteDebt(id);
   };
+
+  if (!userProfile?.show_debts) {
+    return (
+      <div className="flex flex-col items-center justify-center h-full text-center space-y-4">
+        <h1 className="text-3xl font-bold">Dívidas Desativadas</h1>
+        <p className="text-muted-foreground">
+          Esta seção está desativada nas suas configurações de perfil.
+          Ative-a na página de Perfil para gerenciar suas dívidas.
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">

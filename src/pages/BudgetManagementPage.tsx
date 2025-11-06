@@ -27,6 +27,7 @@ const BudgetManagementPage = () => {
     miscCategories, setMiscCategories,
     foodCategories, setFoodCategories,
     savedCategories,
+    userProfile,
   } = useTransactionContext();
 
   const form = useForm<z.infer<typeof budgetFormSchema>>({
@@ -55,6 +56,18 @@ const BudgetManagementPage = () => {
     setFoodCategories(values.foodCategories || []);
     toast.success("Configurações de orçamento salvas com sucesso!");
   };
+
+  if (!userProfile?.show_budgets) {
+    return (
+      <div className="flex flex-col items-center justify-center h-full text-center space-y-4">
+        <h1 className="text-3xl font-bold">Orçamentos Desativados</h1>
+        <p className="text-muted-foreground">
+          Esta seção está desativada nas suas configurações de perfil.
+          Ative-a na página de Perfil para gerenciar seus orçamentos.
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">

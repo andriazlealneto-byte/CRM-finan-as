@@ -9,7 +9,7 @@ import { Lightbulb, CheckCircle, XCircle, TrendingUp, TrendingDown } from "lucid
 import { Progress } from "@/components/ui/progress"; // Certifique-se de que Progress está importado
 
 const MonthlyReviewPage = () => {
-  const { transactions, goals, miscExpensesLimit, foodExpensesLimit, miscCategories, foodCategories } = useTransactionContext();
+  const { transactions, goals, miscExpensesLimit, foodExpensesLimit, miscCategories, foodCategories, userProfile } = useTransactionContext();
 
   const currentMonth = new Date();
   const previousMonth = subMonths(currentMonth, 1);
@@ -90,6 +90,18 @@ const MonthlyReviewPage = () => {
 
   // Ensure consistency score is not negative
   consistencyScore = Math.max(0, consistencyScore);
+
+  if (!userProfile?.show_monthly_review) {
+    return (
+      <div className="flex flex-col items-center justify-center h-full text-center space-y-4">
+        <h1 className="text-3xl font-bold">Reflexão Mensal Desativada</h1>
+        <p className="text-muted-foreground">
+          Esta seção está desativada nas suas configurações de perfil.
+          Ative-a na página de Perfil para ver sua reflexão mensal.
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
