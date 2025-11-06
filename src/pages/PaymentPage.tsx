@@ -6,12 +6,12 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } => "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"; // Corrigido aqui
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { MadeWithDyad } from "@/components/made-with-dyad";
 import { toast } from "sonner";
-import { CreditCard, CheckCircle, ChevronLeft } from "lucide-react"; // Importar ChevronLeft
+import { CreditCard, CheckCircle, ChevronLeft } from "lucide-react";
 import { useTransactionContext } from "@/context/TransactionContext";
 import { ThemeToggle } from "@/components/ThemeToggle";
 
