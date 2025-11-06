@@ -377,7 +377,7 @@ export const TransactionProvider = ({ children }: { children: ReactNode }) => {
       setUserProfile(profileData);
     }
     setLoading(false);
-  }, [user?.id]);
+  }, [user?.id, setUserProfile]); // Adicionado setUserProfile como dependência
 
   useEffect(() => {
     if (!sessionLoading && user?.id) {
@@ -407,7 +407,7 @@ export const TransactionProvider = ({ children }: { children: ReactNode }) => {
     }
   }, [sessionLoading, user?.id, fetchTransactions, fetchFutureExpenses, fetchSavedCategories, fetchBudgets, fetchGoals, fetchDebts, fetchSubscriptions, fetchUserProfile]);
 
-  const addTransaction = async (transaction: Omit<Transaction, "id" | "user_id">) => {
+  const addTransaction = useCallback(async (transaction: Omit<Transaction, "id" | "user_id">) => {
     if (!user?.id) {
       toast.error("Você precisa estar logado para adicionar transações.");
       return;
@@ -420,9 +420,9 @@ export const TransactionProvider = ({ children }: { children: ReactNode }) => {
       setTransactions((prev) => [...prev, data[0] as Transaction]);
       toast.success("Transação adicionada com sucesso!");
     }
-  };
+  }, [user?.id]);
 
-  const deleteTransaction = async (id: string) => {
+  const deleteTransaction = useCallback(async (id: string) => {
     if (!user?.id) {
       toast.error("Você precisa estar logado para excluir transações.");
       return;
@@ -435,9 +435,9 @@ export const TransactionProvider = ({ children }: { children: ReactNode }) => {
       setTransactions((prev) => prev.filter((t) => t.id !== id));
       toast.success("Transação excluída com sucesso!");
     }
-  };
+  }, [user?.id]);
 
-  const addFutureExpense = async (expense: Omit<FutureExpense, "id" | "user_id">) => {
+  const addFutureExpense = useCallback(async (expense: Omit<FutureExpense, "id" | "user_id">) => {
     if (!user?.id) {
       toast.error("Você precisa estar logado para adicionar gastos futuros.");
       return;
@@ -450,9 +450,9 @@ export const TransactionProvider = ({ children }: { children: ReactNode }) => {
       setFutureExpenses((prev) => [...prev, data[0] as FutureExpense]);
       toast.success("Gasto futuro adicionado com sucesso!");
     }
-  };
+  }, [user?.id]);
 
-  const deleteFutureExpense = async (id: string) => {
+  const deleteFutureExpense = useCallback(async (id: string) => {
     if (!user?.id) {
       toast.error("Você precisa estar logado para excluir gastos futuros.");
       return;
@@ -465,9 +465,9 @@ export const TransactionProvider = ({ children }: { children: ReactNode }) => {
       setFutureExpenses((prev) => prev.filter((e) => e.id !== id));
       toast.success("Gasto futuro excluído com sucesso!");
     }
-  };
+  }, [user?.id]);
 
-  const addSavedCategory = async (category: string) => {
+  const addSavedCategory = useCallback(async (category: string) => {
     if (!user?.id) {
       toast.error("Você precisa estar logado para adicionar categorias.");
       return;
@@ -482,9 +482,9 @@ export const TransactionProvider = ({ children }: { children: ReactNode }) => {
         toast.success("Categoria adicionada com sucesso!");
       }
     }
-  };
+  }, [user?.id, savedCategories]);
 
-  const editSavedCategory = async (oldCategory: string, newCategory: string) => {
+  const editSavedCategory = useCallback(async (oldCategory: string, newCategory: string) => {
     if (!user?.id) {
       toast.error("Você precisa estar logado para editar categorias.");
       return;
@@ -522,9 +522,9 @@ export const TransactionProvider = ({ children }: { children: ReactNode }) => {
         toast.success("Categoria editada com sucesso!");
       }
     }
-  };
+  }, [user?.id, savedCategories, setMiscCategoriesState, setFoodCategoriesState, setCustomBudgets]);
 
-  const deleteSavedCategory = async (categoryToDelete: string) => {
+  const deleteSavedCategory = useCallback(async (categoryToDelete: string) => {
     if (!user?.id) {
       toast.error("Você precisa estar logado para excluir categorias.");
       return;
@@ -545,9 +545,9 @@ export const TransactionProvider = ({ children }: { children: ReactNode }) => {
       })));
       toast.success(`Categoria "${categoryToDelete}" excluída com sucesso!`);
     }
-  };
+  }, [user?.id, setMiscCategoriesState, setFoodCategoriesState, setCustomBudgets]);
 
-  const updateBudgetsInSupabase = async (updates: Partial<UserBudget>) => {
+  const updateBudgetsInSupabase = useCallback(async (updates: Partial<UserBudget>) => {
     if (!user?.id) {
       toast.error("Você precisa estar logado para atualizar orçamentos.");
       return;
@@ -593,29 +593,29 @@ export const TransactionProvider = ({ children }: { children: ReactNode }) => {
         console.error("Erro ao criar orçamento:", error);
       }
     }
-  };
+  }, [user?.id, miscExpensesLimit, foodExpensesLimit, miscCategories, foodCategories, customBudgets]);
 
-  const setMiscExpensesLimit = (limit: number) => {
+  const setMiscExpensesLimit = useCallback((limit: number) => {
     setMiscExpensesLimitState(limit);
     updateBudgetsInSupabase({ misc_expenses_limit: limit });
-  };
+  }, [updateBudgetsInSupabase]);
 
-  const setFoodExpensesLimit = (limit: number) => {
+  const setFoodExpensesLimit = useCallback((limit: number) => {
     setFoodExpensesLimitState(limit);
     updateBudgetsInSupabase({ food_expenses_limit: limit });
-  };
+  }, [updateBudgetsInSupabase]);
 
-  const setMiscCategories = (categories: string[]) => {
+  const setMiscCategories = useCallback((categories: string[]) => {
     setMiscCategoriesState(categories);
     updateBudgetsInSupabase({ misc_categories: categories });
-  };
+  }, [updateBudgetsInSupabase]);
 
-  const setFoodCategories = (categories: string[]) => {
+  const setFoodCategories = useCallback((categories: string[]) => {
     setFoodCategoriesState(categories);
     updateBudgetsInSupabase({ food_categories: categories });
-  };
+  }, [updateBudgetsInSupabase]);
 
-  const updateCustomBudgetsInSupabase = async (budgets: Budget[]) => {
+  const updateCustomBudgetsInSupabase = useCallback(async (budgets: Budget[]) => {
     if (!user?.id) {
       toast.error("Você precisa estar logado para atualizar orçamentos personalizados.");
       return;
@@ -644,28 +644,28 @@ export const TransactionProvider = ({ children }: { children: ReactNode }) => {
     } else {
       setCustomBudgets(budgets);
     }
-  };
+  }, [user?.id, setCustomBudgets]);
 
-  const addCustomBudget = async (budget: Omit<Budget, "id">) => {
+  const addCustomBudget = useCallback(async (budget: Omit<Budget, "id">) => {
     const newBudget = { ...budget, id: crypto.randomUUID() }; // Generate client-side ID for now
     const updatedBudgets = [...customBudgets, newBudget];
     await updateCustomBudgetsInSupabase(updatedBudgets);
     toast.success("Orçamento personalizado adicionado com sucesso!");
-  };
+  }, [customBudgets, updateCustomBudgetsInSupabase]);
 
-  const updateCustomBudget = async (id: string, updates: Partial<Omit<Budget, "id"> | { categories: string[] }>) => {
+  const updateCustomBudget = useCallback(async (id: string, updates: Partial<Omit<Budget, "id"> | { categories: string[] }>) => {
     const updatedBudgets = customBudgets.map(b => b.id === id ? { ...b, ...updates } : b);
     await updateCustomBudgetsInSupabase(updatedBudgets);
     toast.success("Orçamento personalizado atualizado com sucesso!");
-  };
+  }, [customBudgets, updateCustomBudgetsInSupabase]);
 
-  const deleteCustomBudget = async (id: string) => {
+  const deleteCustomBudget = useCallback(async (id: string) => {
     const updatedBudgets = customBudgets.filter(b => b.id !== id);
     await updateCustomBudgetsInSupabase(updatedBudgets);
     toast.success("Orçamento personalizado excluído com sucesso!");
-  };
+  }, [customBudgets, updateCustomBudgetsInSupabase]);
 
-  const addGoal = async (goal: Omit<Goal, "id" | "user_id" | "created_at" | "updated_at">) => {
+  const addGoal = useCallback(async (goal: Omit<Goal, "id" | "user_id" | "created_at" | "updated_at">) => {
     if (!user?.id) {
       toast.error("Você precisa estar logado para adicionar metas.");
       return;
@@ -678,9 +678,9 @@ export const TransactionProvider = ({ children }: { children: ReactNode }) => {
       setGoals((prev) => [...prev, data[0] as Goal]);
       toast.success("Meta adicionada com sucesso!");
     }
-  };
+  }, [user?.id]);
 
-  const updateGoal = async (id: string, updates: Partial<Omit<Goal, "id" | "user_id" | "created_at">>) => {
+  const updateGoal = useCallback(async (id: string, updates: Partial<Omit<Goal, "id" | "user_id" | "created_at">>) => {
     if (!user?.id) {
       toast.error("Você precisa estar logado para atualizar metas.");
       return;
@@ -693,9 +693,9 @@ export const TransactionProvider = ({ children }: { children: ReactNode }) => {
       setGoals((prev) => prev.map((g) => (g.id === id ? { ...g, ...updates, updated_at: new Date().toISOString() } : g)));
       toast.success("Meta atualizada com sucesso!");
     }
-  };
+  }, [user?.id]);
 
-  const deleteGoal = async (id: string) => {
+  const deleteGoal = useCallback(async (id: string) => {
     if (!user?.id) {
       toast.error("Você precisa estar logado para excluir metas.");
       return;
@@ -708,9 +708,9 @@ export const TransactionProvider = ({ children }: { children: ReactNode }) => {
       setGoals((prev) => prev.filter((g) => g.id !== id));
       toast.success("Meta excluída com sucesso!");
     }
-  };
+  }, [user?.id]);
 
-  const addDebt = async (debt: Omit<Debt, "id" | "user_id" | "created_at" | "updated_at">) => {
+  const addDebt = useCallback(async (debt: Omit<Debt, "id" | "user_id" | "created_at" | "updated_at">) => {
     if (!user?.id) {
       toast.error("Você precisa estar logado para adicionar dívidas.");
       return;
@@ -723,9 +723,9 @@ export const TransactionProvider = ({ children }: { children: ReactNode }) => {
       setDebts((prev) => [...prev, data[0] as Debt]);
       toast.success("Dívida adicionada com sucesso!");
     }
-  };
+  }, [user?.id]);
 
-  const updateDebt = async (id: string, updates: Partial<Omit<Debt, "id" | "user_id" | "created_at">>) => {
+  const updateDebt = useCallback(async (id: string, updates: Partial<Omit<Debt, "id" | "user_id" | "created_at">>) => {
     if (!user?.id) {
       toast.error("Você precisa estar logado para atualizar dívidas.");
       return;
@@ -738,9 +738,9 @@ export const TransactionProvider = ({ children }: { children: ReactNode }) => {
       setDebts((prev) => prev.map((d) => (d.id === id ? { ...d, ...updates, updated_at: new Date().toISOString() } : d)));
       toast.success("Dívida atualizada com sucesso!");
     }
-  };
+  }, [user?.id]);
 
-  const deleteDebt = async (id: string) => {
+  const deleteDebt = useCallback(async (id: string) => {
     if (!user?.id) {
       toast.error("Você precisa estar logado para excluir dívidas.");
       return;
@@ -753,9 +753,9 @@ export const TransactionProvider = ({ children }: { children: ReactNode }) => {
       setDebts((prev) => prev.filter((d) => d.id !== id));
       toast.success("Dívida excluída com sucesso!");
     }
-  };
+  }, [user?.id]);
 
-  const addSubscription = async (subscription: Omit<Subscription, "id" | "user_id" | "created_at">) => {
+  const addSubscription = useCallback(async (subscription: Omit<Subscription, "id" | "user_id" | "created_at">) => {
     if (!user?.id) {
       toast.error("Você precisa estar logado para adicionar assinaturas.");
       return;
@@ -768,9 +768,9 @@ export const TransactionProvider = ({ children }: { children: ReactNode }) => {
       setSubscriptions((prev) => [...prev, data[0] as Subscription]);
       toast.success("Assinatura adicionada com sucesso!");
     }
-  };
+  }, [user?.id]);
 
-  const updateSubscription = async (id: string, updates: Partial<Omit<Subscription, "id" | "user_id" | "created_at">>) => {
+  const updateSubscription = useCallback(async (id: string, updates: Partial<Omit<Subscription, "id" | "user_id" | "created_at">>) => {
     if (!user?.id) {
       toast.error("Você precisa estar logado para atualizar assinaturas.");
       return;
@@ -783,9 +783,9 @@ export const TransactionProvider = ({ children }: { children: ReactNode }) => {
       setSubscriptions((prev) => prev.map((s) => (s.id === id ? { ...s, ...updates } : s)));
       toast.success("Assinatura atualizada com sucesso!");
     }
-  };
+  }, [user?.id]);
 
-  const deleteSubscription = async (id: string) => {
+  const deleteSubscription = useCallback(async (id: string) => {
     if (!user?.id) {
       toast.error("Você precisa estar logado para excluir assinaturas.");
       return;
@@ -798,7 +798,28 @@ export const TransactionProvider = ({ children }: { children: ReactNode }) => {
       setSubscriptions((prev) => prev.filter((s) => s.id !== id));
       toast.success("Assinatura excluída com sucesso!");
     }
-  };
+  }, [user?.id]);
+
+  const updateUserProfile = useCallback(async (updates: Partial<Omit<UserProfile, "id">>) => {
+    if (!user?.id) {
+      toast.error("Você precisa estar logado para atualizar seu perfil.");
+      return;
+    }
+    const { data, error } = await supabase
+      .from('profiles')
+      .update(updates)
+      .eq('id', user.id)
+      .select()
+      .single();
+
+    if (error) {
+      toast.error("Erro ao atualizar perfil: " + error.message);
+      console.error("Erro ao atualizar perfil:", error);
+    } else if (data) {
+      setUserProfile(data as UserProfile);
+      toast.success("Perfil atualizado com sucesso!");
+    }
+  }, [user?.id, setUserProfile]);
 
   const totalIncome = transactions
     .filter((t) => t.type === "income")
