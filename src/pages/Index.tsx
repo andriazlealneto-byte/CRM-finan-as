@@ -12,44 +12,44 @@ const Index = () => {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-3xl font-bold">Dashboard</h1>
+      <h1 className="text-3xl font-bold">Painel</h1>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Balance</CardTitle>
+            <CardTitle className="text-sm font-medium">Saldo Total</CardTitle>
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">${totalBalance.toFixed(2)}</div>
+            <div className="text-2xl font-bold">R${totalBalance.toFixed(2)}</div>
             <p className="text-xs text-muted-foreground">
-              +20.1% from last month
+              +20.1% do mês passado
             </p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Income</CardTitle>
+            <CardTitle className="text-sm font-medium">Receita Total</CardTitle>
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">${totalIncome.toFixed(2)}</div>
+            <div className="text-2xl font-bold">R${totalIncome.toFixed(2)}</div>
             <p className="text-xs text-muted-foreground">
-              +15% from last month
+              +15% do mês passado
             </p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Expenses</CardTitle>
+            <CardTitle className="text-sm font-medium">Despesas Totais</CardTitle>
             <TrendingDown className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">${totalExpenses.toFixed(2)}</div>
+            <div className="text-2xl font-bold">R${totalExpenses.toFixed(2)}</div>
             <p className="text-xs text-muted-foreground">
-              -5% from last month
+              -5% do mês passado
             </p>
           </CardContent>
         </Card>
@@ -58,10 +58,10 @@ const Index = () => {
       {/* More dashboard content can go here */}
       <Card>
         <CardHeader>
-          <CardTitle>Recent Activity</CardTitle>
+          <CardTitle>Atividade Recente</CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-muted-foreground">No recent activity yet. Add some transactions!</p>
+          <p className="text-muted-foreground">Nenhuma atividade recente ainda. Adicione algumas transações!</p>
         </CardContent>
       </Card>
     </div>
