@@ -16,7 +16,7 @@ import { cn } from "@/lib/utils";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from "@/components/ui/form";
 import { toast } from "sonner";
 import { useTransactionContext } from "@/context/TransactionContext"; // Import useTransactionContext
 import { Checkbox } from "@/components/ui/checkbox"; // Import Checkbox
@@ -274,7 +274,7 @@ const TransactionsPage = () => {
                       <FormItem>
                         <FormLabel>Valor</FormLabel>
                         <FormControl>
-                          <Input type="number" placeholder="0.00" {...field} /> {/* Removido parseFloat do onChange */}
+                          <Input type="number" placeholder="0.00" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -432,7 +432,7 @@ const TransactionsPage = () => {
                       <FormItem>
                         <FormLabel>Valor</FormLabel>
                         <FormControl>
-                          <Input type="number" placeholder="0.00" {...field} /> {/* Removido parseFloat do onChange */}
+                          <Input type="number" placeholder="0.00" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
