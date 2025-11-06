@@ -61,11 +61,7 @@ const Sidebar = ({ className, isMobile, onLinkClick }: SidebarProps) => {
       href: "/monthly-review",
       icon: <CalendarCheck className="mr-2 h-4 w-4" />,
     },
-    {
-      name: "Educação Financeira",
-      href: "/education",
-      icon: <BookOpen className="mr-2 h-4 w-4" />,
-    },
+    // REMOVIDO: Educação Financeira
     {
       name: "Perfil",
       href: "/profile",

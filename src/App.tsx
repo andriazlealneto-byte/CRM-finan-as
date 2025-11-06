@@ -13,11 +13,11 @@ import TransactionsPage from "@/pages/TransactionsPage";
 import CategoryManagementPage from "@/pages/CategoryManagementPage";
 import BudgetManagementPage from "@/pages/BudgetManagementPage";
 import GoalsPage from "@/pages/GoalsPage";
-import FinancialEducationPage from "@/pages/FinancialEducationPage";
+// REMOVIDO: import FinancialEducationPage from "@/pages/FinancialEducationPage";
 import DebtsPage from "@/pages/DebtsPage";
-import SubscriptionManagementPage from "@/pages/SubscriptionManagementPage"; // Importar nova página
-import BehavioralAnalysisPage from "@/pages/BehavioralAnalysisPage"; // Importar nova página
-import MonthlyReviewPage from "@/pages/MonthlyReviewPage"; // Importar nova página
+import SubscriptionManagementPage from "@/pages/SubscriptionManagementPage";
+import BehavioralAnalysisPage from "@/pages/BehavioralAnalysisPage";
+import MonthlyReviewPage from "@/pages/MonthlyReviewPage";
 import ProfilePage from "@/pages/ProfilePage";
 import LoginPage from "@/pages/LoginPage";
 import SignupPage from "@/pages/SignupPage";
@@ -45,11 +45,11 @@ function App() {
                     <Route path="/categories" element={<CategoryManagementPage />} />
                     <Route path="/budgets" element={<BudgetManagementPage />} />
                     <Route path="/goals" element={<GoalsPage />} />
-                    <Route path="/education" element={<FinancialEducationPage />} />
+                    {/* REMOVIDO: <Route path="/education" element={<FinancialEducationPage />} /> */}
                     <Route path="/debts" element={<DebtsPage />} />
                     <Route path="/subscriptions" element={<SubscriptionManagementPage />} />
                     <Route path="/behavioral-analysis" element={<BehavioralAnalysisPage />} />
-                    <Route path="/monthly-review" element={<MonthlyReviewPage />} /> {/* Nova rota */}
+                    <Route path="/monthly-review" element={<MonthlyReviewPage />} />
                     <Route path="/profile" element={<ProfilePage />} />
                   </Route>
                 </Route>
