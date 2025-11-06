@@ -10,11 +10,15 @@ import * as z from "zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from "@/components/ui/form";
 import { useTransactionContext } from "@/context/TransactionContext";
 import { toast } from "sonner";
-import { User, Palette, Shirt, LayoutDashboard, Mail, Lock, Eye, EyeOff } from "lucide-react"; // Importar novos ícones
+import { User, Palette, Shirt, LayoutDashboard, Mail, Lock, Eye, EyeOff, CreditCard } from "lucide-react"; // Importar novos ícones
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { supabase } from "@/lib/supabase";
 import { useSession } from "@/context/SessionContext";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { useNavigate } from "react-router-dom";
+import { format, parseISO } from "date-fns";
+import { ptBR } from "date-fns/locale";
 
 const profileFormSchema = z.object({
   first_name: z.string().min(1, "O primeiro nome é obrigatório.").max(50, "O primeiro nome não pode ter mais de 50 caracteres.").optional().or(z.literal("")),
@@ -55,6 +59,7 @@ const avatarOptions = [
 const ProfilePage = () => {
   const { userProfile, updateUserProfile } = useTransactionContext();
   const { user } = useSession(); // Obter o usuário da sessão para o email
+  const navigate = useNavigate();
   const [showCurrentPasswordEmail, setShowCurrentPasswordEmail] = React.useState(false);
   const [showCurrentPassword, setShowCurrentPassword] = React.useState(false);
   const [showNewPassword, setShowNewPassword] = React.useState(false);
@@ -182,6 +187,16 @@ const ProfilePage = () => {
       toast.success("Senha alterada com sucesso!");
       passwordForm.reset();
     }
+  };
+
+  const handleCancelSubscription = async () => {
+    await updateUserProfile({
+      is_premium: false,
+      subscription_type: null,
+      subscription_end_date: null,
+    });
+    toast.success("Sua assinatura foi cancelada com sucesso.");
+    navigate("/subscribe");
   };
 
   return (
@@ -356,10 +371,10 @@ const ProfilePage = () => {
                     </FormControl>
                     <div className="space-y-1 leading-none">
                       <FormLabel>
-                        Mostrar Assinaturas
+                        Mostrar Assinaturas (Externas)
                       </FormLabel>
                       <FormDescription>
-                        Exibe a seção de Assinaturas no menu e no painel.
+                        Exibe a seção de Assinaturas de serviços externos no menu e no painel.
                       </FormDescription>
                     </div>
                   </FormItem>
@@ -393,6 +408,67 @@ const ProfilePage = () => {
           <Button type="submit">Salvar Alterações do Perfil</Button>
         </form>
       </Form>
+
+      <Card className="w-full max-w-md">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <CreditCard className="h-5 w-5" /> Gerenciar Assinatura GPF
+          </CardTitle>
+          <CardDescription>
+            Gerencie o status da sua assinatura premium do GPF.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-2">
+          {userProfile?.is_premium ? (
+            <>
+              <p>
+                Você está no plano{" "}
+                <span className="font-semibold">
+                  {userProfile.subscription_type === "monthly" ? "Mensal" : "Anual"}
+                </span>
+                .
+              </p>
+              {userProfile.subscription_end_date && (
+                <p>
+                  Sua assinatura é válida até{" "}
+                  <span className="font-semibold">
+                    {format(parseISO(userProfile.subscription_end_date), "dd/MM/yyyy", { locale: ptBR })}
+                  </span>
+                  .
+                </p>
+              )}
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button variant="destructive" className="mt-4">
+                    Cancelar Assinatura
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Tem certeza que deseja cancelar?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      Ao cancelar, você perderá o acesso aos recursos premium do GPF após a data de vencimento da sua assinatura.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Não, Manter Assinatura</AlertDialogCancel>
+                    <AlertDialogAction onClick={handleCancelSubscription}>
+                      Sim, Cancelar
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            </>
+          ) : (
+            <>
+              <p>Você não possui uma assinatura ativa do GPF Premium.</p>
+              <Button className="mt-4" onClick={() => navigate("/subscribe")}>
+                Assinar Agora
+              </Button>
+            </>
+          )}
+        </CardContent>
+      </Card>
 
       <Card className="w-full max-w-md">
         <CardHeader>

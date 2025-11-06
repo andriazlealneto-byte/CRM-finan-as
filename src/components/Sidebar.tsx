@@ -58,7 +58,7 @@ const Sidebar = ({ className, isMobile, onLinkClick }: SidebarProps) => {
       name: "Assinaturas",
       href: "/app/subscriptions",
       icon: <Repeat className="mr-2 h-4 w-4" />,
-      show: userProfile?.show_subscriptions ?? true,
+      show: userProfile?.show_subscriptions ?? true, // Controla a visibilidade das assinaturas externas
     },
     // REMOVIDO: Análise Comportamental
     {
@@ -67,12 +67,13 @@ const Sidebar = ({ className, isMobile, onLinkClick }: SidebarProps) => {
       icon: <CalendarCheck className="mr-2 h-4 w-4" />,
       show: userProfile?.show_monthly_review ?? true,
     },
-    {
-      name: "Perfil",
-      href: "/app/profile",
-      icon: <User className="mr-2 h-4 w-4" />,
-      show: true, // Perfil sempre visível
-    },
+    // REMOVIDO: Perfil do menu lateral, agora acessível apenas pelo avatar
+    // {
+    //   name: "Perfil",
+    //   href: "/app/profile",
+    //   icon: <User className="mr-2 h-4 w-4" />,
+    //   show: true, 
+    // },
   ];
 
   return (

@@ -29,11 +29,11 @@ const subscriptionFormSchema = z.object({
 });
 
 const SubscriptionManagementPage = () => {
-  const { subscriptions, addSubscription, updateSubscription, deleteSubscription, userProfile, updateUserProfile } = useTransactionContext();
+  const { subscriptions, addSubscription, updateSubscription, deleteSubscription, userProfile } = useTransactionContext();
   const [isAddDialogOpen, setIsAddDialogOpen] = React.useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = React.useState(false);
   const [editingSubscription, setEditingSubscription] = React.useState<z.infer<typeof subscriptionFormSchema> & { id: string } | null>(null);
-  const navigate = useNavigate();
+  const navigate = useNavigate(); // Mantido caso haja necessidade de navegação futura, mas não para cancelar assinatura GPF
 
   const addForm = useForm<z.infer<typeof subscriptionFormSchema>>({
     resolver: zodResolver(subscriptionFormSchema),
@@ -89,15 +89,7 @@ const SubscriptionManagementPage = () => {
     await deleteSubscription(id);
   };
 
-  const handleCancelSubscription = async () => {
-    await updateUserProfile({
-      is_premium: false,
-      subscription_type: null,
-      subscription_end_date: null,
-    });
-    toast.success("Sua assinatura foi cancelada com sucesso.");
-    navigate("/subscribe");
-  };
+  // A função handleCancelSubscription e o Card de status da assinatura GPF foram movidos para ProfilePage.tsx
 
   const totalMonthlySubscriptions = subscriptions.reduce((sum, sub) => sum + sub.amount, 0);
 
@@ -115,68 +107,14 @@ const SubscriptionManagementPage = () => {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-3xl font-bold">Gerenciar Assinaturas</h1>
-      <p className="text-muted-foreground">Liste suas assinaturas e veja o gasto total mensal.</p>
+      <h1 className="text-3xl font-bold">Gerenciar Assinaturas Externas</h1>
+      <p className="text-muted-foreground">Liste suas assinaturas de serviços externos e veja o gasto total mensal.</p>
+
+      {/* Card de status da assinatura GPF removido daqui e movido para ProfilePage.tsx */}
 
       <Card>
         <CardHeader>
-          <CardTitle>Status da Sua Assinatura GPF</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-2">
-          {userProfile?.is_premium ? (
-            <>
-              <p>
-                Você está no plano{" "}
-                <span className="font-semibold">
-                  {userProfile.subscription_type === "monthly" ? "Mensal" : "Anual"}
-                </span>
-                .
-              </p>
-              {userProfile.subscription_end_date && (
-                <p>
-                  Sua assinatura é válida até{" "}
-                  <span className="font-semibold">
-                    {format(parseISO(userProfile.subscription_end_date), "dd/MM/yyyy", { locale: ptBR })}
-                  </span>
-                  .
-                </p>
-              )}
-              <AlertDialog>
-                <AlertDialogTrigger asChild>
-                  <Button variant="destructive" className="mt-4">
-                    Cancelar Assinatura
-                  </Button>
-                </AlertDialogTrigger>
-                <AlertDialogContent>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>Tem certeza que deseja cancelar?</AlertDialogTitle>
-                    <AlertDialogDescription>
-                      Ao cancelar, você perderá o acesso aos recursos premium do GPF após a data de vencimento da sua assinatura.
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel>Não, Manter Assinatura</AlertDialogCancel>
-                    <AlertDialogAction onClick={handleCancelSubscription}>
-                      Sim, Cancelar
-                    </AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
-            </>
-          ) : (
-            <>
-              <p>Você não possui uma assinatura ativa do GPF Premium.</p>
-              <Button className="mt-4" onClick={() => navigate("/subscribe")}>
-                Assinar Agora
-              </Button>
-            </>
-          )}
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>Gasto Total Mensal com Outras Assinaturas</CardTitle>
+          <CardTitle>Gasto Total Mensal com Assinaturas Externas</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">
@@ -198,9 +136,9 @@ const SubscriptionManagementPage = () => {
           </DialogTrigger>
           <DialogContent className="sm:max-w-[425px]">
             <DialogHeader>
-              <DialogTitle>Adicionar Nova Assinatura</DialogTitle>
+              <DialogTitle>Adicionar Nova Assinatura Externa</DialogTitle>
               <DialogDescription>
-                Preencha os detalhes da sua assinatura.
+                Preencha os detalhes da sua assinatura de serviço externo.
               </DialogDescription>
             </DialogHeader>
             <Form {...addForm}>

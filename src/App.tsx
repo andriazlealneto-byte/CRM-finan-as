@@ -8,6 +8,7 @@ import Layout from "@/components/Layout";
 import ProtectedRoute from "@/components/ProtectedRoute";
 
 import LandingPage from "@/pages/LandingPage"; // Nova Landing Page
+import Index from "@/pages/Index"; // Importar a página Index (Painel)
 import TransactionsPage from "@/pages/TransactionsPage";
 import CategoryManagementPage from "@/pages/CategoryManagementPage";
 import BudgetManagementPage from "@/pages/BudgetManagementPage";
@@ -45,7 +46,7 @@ function App() {
                 
                 <Route element={<ProtectedRoute />}>
                   <Route element={<Layout />}>
-                    <Route path="/app" element={<TransactionsPage />} /> {/* Rota padrão após login */}
+                    <Route path="/app" element={<Index />} /> {/* Rota padrão após login agora aponta para Index */}
                     <Route path="/app/transactions" element={<TransactionsPage />} />
                     <Route path="/app/categories" element={<CategoryManagementPage />} />
                     <Route path="/app/budgets" element={<BudgetManagementPage />} />

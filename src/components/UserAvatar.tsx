@@ -48,9 +48,9 @@ const UserAvatar = () => {
           <Settings className="mr-2 h-4 w-4" />
           Perfil
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => navigate("/app/subscriptions")}>
+        <DropdownMenuItem onClick={() => navigate("/app/profile")}> {/* Aponta para a página de perfil */}
           <CreditCard className="mr-2 h-4 w-4" />
-          Gerenciar Assinatura
+          Gerenciar Assinatura GPF
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={logout} className="text-red-500 hover:text-red-700">
