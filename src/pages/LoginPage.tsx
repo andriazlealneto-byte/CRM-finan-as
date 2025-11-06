@@ -12,6 +12,7 @@ import { useAuth } from "@/context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { MadeWithDyad } from "@/components/made-with-dyad";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { useSession } from "@/context/SessionContext"; // Import useSession
 
 const loginFormSchema = z.object({
   email: z.string().email("Digite um email válido.").min(1, "O email é obrigatório."),
@@ -19,7 +20,8 @@ const loginFormSchema = z.object({
 });
 
 const LoginPage = () => {
-  const { login, isAuthenticated } = useAuth();
+  const { login } = useAuth();
+  const { loading, session } = useSession(); // Usar o loading e session do SessionContext
   const navigate = useNavigate();
 
   const form = useForm<z.infer<typeof loginFormSchema>>({
@@ -31,14 +33,22 @@ const LoginPage = () => {
   });
 
   React.useEffect(() => {
-    if (isAuthenticated) {
+    if (!loading && session) {
       navigate("/");
     }
-  }, [isAuthenticated, navigate]);
+  }, [loading, session, navigate]);
 
-  const onSubmit = (values: z.infer<typeof loginFormSchema>) => {
-    login(values.email, values.password);
+  const onSubmit = async (values: z.infer<typeof loginFormSchema>) => {
+    await login(values.email, values.password);
   };
+
+  if (loading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <p>Carregando...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-background p-4">

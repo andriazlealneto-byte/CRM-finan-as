@@ -1,41 +1,61 @@
 "use client";
 
 import React, { createContext, useContext, useState, ReactNode, useEffect } from "react";
-import { useLocalStorage } from "@/hooks/use-local-storage";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
+import { supabase } from "@/lib/supabase"; // Importar o cliente Supabase
+import { useSession } from "./SessionContext"; // Importar o useSession
 
 interface AuthContextType {
   isAuthenticated: boolean;
-  login: (email: string, password: string) => boolean;
-  logout: () => void;
+  login: (email: string, password: string) => Promise<boolean>;
+  logout: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-const VALID_EMAIL = "andriazlealneto@gmail.com";
-const VALID_PASSWORD = "and183009";
-
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [isAuthenticated, setIsAuthenticated] = useLocalStorage<boolean>("isAuthenticated", false);
+  const { session, loading } = useSession(); // Usar o session do SessionContext
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const navigate = useNavigate();
 
-  const login = (email: string, password: string): boolean => {
-    if (email === VALID_EMAIL && password === VALID_PASSWORD) {
-      setIsAuthenticated(true);
-      toast.success("Login realizado com sucesso!");
-      navigate("/"); // Redireciona para a página inicial após o login
-      return true;
-    } else {
-      toast.error("Email ou senha inválidos.");
+  useEffect(() => {
+    if (!loading) {
+      setIsAuthenticated(!!session);
+      if (session && window.location.pathname === "/login") {
+        navigate("/");
+      } else if (!session && window.location.pathname !== "/login") {
+        navigate("/login");
+      }
+    }
+  }, [session, loading, navigate]);
+
+  const login = async (email: string, password: string): Promise<boolean> => {
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    if (error) {
+      toast.error("Erro ao fazer login: " + error.message);
+      console.error("Erro de login:", error);
       return false;
+    } else {
+      toast.success("Login realizado com sucesso!");
+      // O useEffect acima cuidará da navegação após a sessão ser atualizada
+      return true;
     }
   };
 
-  const logout = () => {
-    setIsAuthenticated(false);
-    toast.info("Você foi desconectado.");
-    navigate("/login"); // Redireciona para a página de login após o logout
+  const logout = async () => {
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      toast.error("Erro ao fazer logout: " + error.message);
+      console.error("Erro de logout:", error);
+    } else {
+      toast.info("Você foi desconectado.");
+      // O useEffect acima cuidará da navegação após a sessão ser atualizada
+    }
   };
 
   return (

@@ -3,17 +3,18 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Index from "./pages/Index"; // This is now the Dashboard
-import TransactionsPage from "./pages/TransactionsPage"; // New transactions page
-import CategoryManagementPage from "./pages/CategoryManagementPage"; // New category management page
-import BudgetManagementPage from "./pages/BudgetManagementPage"; // New budget management page
+import Index from "./pages/Index";
+import TransactionsPage from "./pages/TransactionsPage";
+import CategoryManagementPage from "./pages/CategoryManagementPage";
+import BudgetManagementPage from "./pages/BudgetManagementPage";
 import NotFound from "./pages/NotFound";
-import Layout from "./components/Layout"; // New layout component
-import { ThemeProvider } from "./components/ThemeProvider"; // Import ThemeProvider
-import { TransactionProvider } from "./context/TransactionContext"; // Import TransactionProvider
-import { AuthProvider } from "./context/AuthContext"; // Import AuthProvider
-import LoginPage from "./pages/LoginPage"; // Import LoginPage
-import ProtectedRoute from "./components/ProtectedRoute"; // Import ProtectedRoute
+import Layout from "./components/Layout";
+import { ThemeProvider } from "./components/ThemeProvider";
+import { TransactionProvider } from "./context/TransactionContext";
+import { AuthProvider } from "./context/AuthContext";
+import LoginPage from "./pages/LoginPage";
+import ProtectedRoute from "./components/ProtectedRoute";
+import { SessionProvider } from "./context/SessionContext"; // Import SessionProvider
 
 const queryClient = new QueryClient();
 
@@ -24,23 +25,22 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter>
-          <AuthProvider> {/* Wrap the entire app with AuthProvider */}
-            <TransactionProvider> {/* Wrap with TransactionProvider */}
+          <SessionProvider> {/* Wrap with SessionProvider */}
+            <AuthProvider>
               <Routes>
                 <Route path="/login" element={<LoginPage />} />
-                <Route element={<ProtectedRoute />}> {/* Protect these routes */}
+                <Route element={<ProtectedRoute />}>
                   <Route path="/" element={<Layout />}>
-                    <Route index element={<Index />} /> {/* Dashboard */}
-                    <Route path="transactions" element={<TransactionsPage />} /> {/* Transactions */}
-                    <Route path="categories" element={<CategoryManagementPage />} /> {/* Category Management */}
-                    <Route path="budgets" element={<BudgetManagementPage />} /> {/* Budget Management */}
-                    {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                    <Route index element={<Index />} />
+                    <Route path="transactions" element={<TransactionsPage />} />
+                    <Route path="categories" element={<CategoryManagementPage />} />
+                    <Route path="budgets" element={<BudgetManagementPage />} />
                     <Route path="*" element={<NotFound />} />
                   </Route>
                 </Route>
               </Routes>
-            </TransactionProvider>
-          </AuthProvider>
+            </AuthProvider>
+          </SessionProvider>
         </BrowserRouter>
       </TooltipProvider>
     </ThemeProvider>

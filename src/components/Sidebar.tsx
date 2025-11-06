@@ -2,10 +2,10 @@
 
 import React from "react";
 import { Link } from "react-router-dom";
-import { Home, DollarSign, ListChecks, LogOut, Wallet } from "lucide-react"; // Import ListChecks, LogOut and Wallet icon
+import { Home, DollarSign, ListChecks, LogOut, Wallet } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { useAuth } from "@/context/AuthContext"; // Import useAuth
+import { useAuth } from "@/context/AuthContext";
 
 interface SidebarProps extends React.HTMLAttributes<HTMLDivElement> {
   isMobile: boolean;
@@ -13,7 +13,7 @@ interface SidebarProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 const Sidebar = ({ className, isMobile, onLinkClick }: SidebarProps) => {
-  const { logout } = useAuth(); // Use the logout function
+  const { logout } = useAuth();
 
   const navItems = [
     {
@@ -27,12 +27,12 @@ const Sidebar = ({ className, isMobile, onLinkClick }: SidebarProps) => {
       icon: <DollarSign className="mr-2 h-4 w-4" />,
     },
     {
-      name: "Categorias", // New navigation item
+      name: "Categorias",
       href: "/categories",
       icon: <ListChecks className="mr-2 h-4 w-4" />,
     },
     {
-      name: "Orçamentos", // New navigation item for budgets
+      name: "Orçamentos",
       href: "/budgets",
       icon: <Wallet className="mr-2 h-4 w-4" />,
     },
@@ -66,9 +66,9 @@ const Sidebar = ({ className, isMobile, onLinkClick }: SidebarProps) => {
           <Button
             variant="ghost"
             className="w-full justify-start text-red-500 hover:text-red-700"
-            onClick={() => {
-              logout();
-              if (onLinkClick) onLinkClick(); // Close mobile sidebar on logout
+            onClick={async () => { // Make onClick async
+              await logout(); // Await the logout call
+              if (onLinkClick) onLinkClick();
             }}
           >
             <LogOut className="mr-2 h-4 w-4" />
