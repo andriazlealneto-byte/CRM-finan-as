@@ -23,7 +23,7 @@ const paymentCardFormSchema = z.object({
   cvv: z.string().min(3, "CVV inválido.").max(4, "CVV inválido."),
 });
 
-const SubscriptionDetailsPage: React.FC = () => {
+const SubscriptionDetailsPage = () => { // Alterado de React.FC para um componente funcional padrão
   const { userProfile, updateUserProfile } = useTransactionContext();
   const navigate = useNavigate();
 
