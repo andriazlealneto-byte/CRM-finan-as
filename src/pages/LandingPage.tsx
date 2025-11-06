@@ -153,9 +153,11 @@ const LandingPage = () => {
       </header>
 
       {/* Hero Section */}
-      <section className="relative h-[calc(100vh-64px)] flex items-center justify-center text-center bg-background text-white p-8"> {/* Removido overflow-hidden */}
-        <AnimatedBlob /> {/* O novo componente de fundo animado */}
-        <div className="max-w-4xl space-y-8 relative z-10"> {/* Conteúdo principal com z-index maior */}
+      <section className="relative h-[calc(100vh-64px)] flex items-center justify-center text-center bg-background text-white p-8">
+        <AnimatedBlob />
+        <div className="max-w-4xl space-y-8 relative z-10">
+          {/* ATENÇÃO: Mudar esta cor para 'text-black' fará o texto ficar invisível no fundo escuro. */}
+          {/* Por favor, considere manter 'text-white' ou mudar o fundo da seção para uma cor clara. */}
           <h1 className="text-6xl font-extrabold leading-tight tracking-tight">
             Assuma o Controle das Suas Finanças Pessoais
           </h1>
@@ -256,14 +258,16 @@ const LandingPage = () => {
       </section>
 
       {/* Call to Action */}
-      <section className="bg-primary text-white py-16 text-center space-y-6">
-        <h2 className="text-4xl font-bold">Pronto para Transformar Suas Finanças?</h2>
-        <p className="text-xl opacity-90 max-w-2xl mx-auto">
-          Junte-se a milhares de usuários que estão no controle de sua vida financeira com o GPF.
-        </p>
-        <Button size="lg" className="w-full rounded-xl bg-white text-primary hover:bg-gray-100" onClick={() => handleSubscriptionClick('monthly')}>
-          Começar Agora
-        </Button>
+      <section className="py-16 text-center bg-background">
+        <div className="max-w-3xl mx-auto p-12 bg-primary text-white space-y-6 rounded-[30%_70%_70%_30%_/_30%_30%_70%_70%] shadow-lg">
+          <h2 className="text-4xl font-bold">Pronto para Transformar Suas Finanças?</h2>
+          <p className="text-xl opacity-90 max-w-2xl mx-auto">
+            Junte-se a milhares de usuários que estão no controle de sua vida financeira com o GPF.
+          </p>
+          <Button size="lg" className="w-full sm:w-auto rounded-xl bg-white text-primary hover:bg-gray-100" onClick={() => handleSubscriptionClick('monthly')}>
+            Começar Agora
+          </Button>
+        </div>
       </section>
 
       {/* Footer */}
