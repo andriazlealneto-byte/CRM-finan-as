@@ -12,6 +12,7 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
 import { useTransactionContext } from "@/context/TransactionContext"; // Import useTransactionContext
 import AnimatedBlob from "@/components/AnimatedBlob"; // Importar o novo componente
+import Logo from "@/components/Logo"; // Importar o componente Logo
 
 const LandingPage = () => {
   const { session, loading } = useSession();
@@ -92,7 +93,7 @@ const LandingPage = () => {
       {/* Header */}
       <header className="sticky top-0 z-40 w-full border-b bg-background/80 backdrop-blur-sm">
         <div className="container flex h-16 items-center justify-between">
-          <Link to="/" className="text-2xl font-bold text-primary">GPF</Link>
+          <Logo />
           <div className="hidden md:flex items-center space-x-4">
             <Button variant="ghost" asChild><Link to="#features">Recursos</Link></Button>
             <Button variant="ghost" asChild><Link to="#pricing">Preços</Link></Button>
@@ -159,8 +160,7 @@ const LandingPage = () => {
             Assuma o Controle das Suas Finanças Pessoais
           </h1>
           <p className="text-2xl opacity-90 max-w-3xl mx-auto">
-            O GPF é a sua ferramenta completa para gerenciar receitas, despesas, metas e dívidas.
-            Comece hoje a construir um futuro financeiro sólido!
+            O GPF é a sua ferramenta completa para gerenciar receitas, despesas, metas e dívidas. Comece hoje a construir um futuro financeiro sólido!
           </p>
           <div className="flex flex-col sm:flex-row justify-center gap-4 pt-4">
             <Button size="lg" className="rounded-xl bg-white text-primary hover:bg-gray-100" onClick={() => handleSubscriptionClick('monthly')}>

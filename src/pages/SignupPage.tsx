@@ -15,6 +15,7 @@ import { useSession } from "@/context/SessionContext";
 import { toast } from "sonner";
 import { Eye, EyeOff, ChevronLeft } from "lucide-react"; // Importar ChevronLeft
 import { ThemeToggle } from "@/components/ThemeToggle"; // Importar ThemeToggle
+import Logo from "@/components/Logo"; // Importar o componente Logo
 
 const signupFormSchema = z.object({
   first_name: z.string().min(1, "O primeiro nome é obrigatório.").max(50, "O primeiro nome não pode ter mais de 50 caracteres."),
@@ -85,6 +86,7 @@ const SignupPage = () => {
       </div>
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
+          <Logo className="mx-auto mb-4" />
           <CardTitle className="text-2xl">Criar Nova Conta</CardTitle>
           <CardDescription>
             Cadastre-se para começar a gerenciar suas finanças.

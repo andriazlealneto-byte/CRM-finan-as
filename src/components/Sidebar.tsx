@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/context/AuthContext";
 import { useTransactionContext } from "@/context/TransactionContext"; // Importar o contexto de transações
+import Logo from "./Logo"; // Importar o componente Logo
 
 interface SidebarProps extends React.HTMLAttributes<HTMLDivElement> {
   isMobile: boolean;
@@ -80,9 +81,7 @@ const Sidebar = ({ className, isMobile, onLinkClick }: SidebarProps) => {
     <div className={cn("pb-12", className)}>
       <div className="space-y-4 py-4">
         <div className="px-3 py-2">
-          <h2 className="mb-2 px-4 text-lg font-semibold tracking-tight">
-            GPF (Gestão Pessoal de Finanças)
-          </h2>
+          <Logo href="/app" className="mb-2 px-4" textClassName="text-lg font-semibold tracking-tight" />
           <div className="space-y-1">
             {navItems.filter(item => item.show).map((item) => (
               <Button

@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { DollarSign, Crown, ChevronLeft } from "lucide-react"; // Importar ChevronLeft
 import { MadeWithDyad } from "@/components/made-with-dyad";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import Logo from "@/components/Logo"; // Importar o componente Logo
 
 const SubscriptionRequiredPage = () => {
   const navigate = useNavigate(); // Inicializar useNavigate
@@ -23,7 +24,7 @@ const SubscriptionRequiredPage = () => {
       </div>
       <Card className="w-full max-w-md text-center">
         <CardHeader>
-          <Crown className="mx-auto h-12 w-12 text-primary mb-4" />
+          <Logo className="mx-auto mb-4" iconClassName="h-12 w-12" />
           <CardTitle className="text-3xl font-bold">Assinatura Necessária</CardTitle>
           <CardDescription className="text-lg">
             Para continuar usando o GPF, por favor, assine um de nossos planos.

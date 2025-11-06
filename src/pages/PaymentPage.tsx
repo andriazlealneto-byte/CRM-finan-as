@@ -14,6 +14,7 @@ import { toast } from "sonner";
 import { CreditCard, CheckCircle, ChevronLeft } from "lucide-react";
 import { useTransactionContext } from "@/context/TransactionContext";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import Logo from "@/components/Logo"; // Importar o componente Logo
 
 const paymentFormSchema = z.object({
   cardNumber: z.string().min(16, "Número do cartão inválido.").max(16, "Número do cartão inválido."),
@@ -81,7 +82,7 @@ const PaymentPage = () => {
       </div>
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
-          <CreditCard className="mx-auto h-12 w-12 text-primary mb-4" />
+          <Logo className="mx-auto mb-4" iconClassName="h-12 w-12" />
           <CardTitle className="text-2xl">Finalizar Assinatura</CardTitle>
           <CardDescription>
             Você selecionou o {planDetails.name}. O valor total é {planDetails.price}.

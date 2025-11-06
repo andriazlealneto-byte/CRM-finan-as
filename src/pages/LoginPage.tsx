@@ -15,6 +15,7 @@ import { useSession } from "@/context/SessionContext";
 import { toast } from "sonner";
 import { Eye, EyeOff, ChevronLeft } from "lucide-react"; // Importar ChevronLeft
 import { ThemeToggle } from "@/components/ThemeToggle"; // Importar ThemeToggle
+import Logo from "@/components/Logo"; // Importar o componente Logo
 
 const loginFormSchema = z.object({
   email: z.string().email("Digite um email válido.").min(1, "O email é obrigatório."),
@@ -65,6 +66,7 @@ const LoginPage = () => {
       </div>
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
+          <Logo className="mx-auto mb-4" />
           <CardTitle className="text-2xl">Bem-vindo ao GPF</CardTitle>
           <CardDescription>
             Faça login para acessar sua gestão pessoal de finanças.
