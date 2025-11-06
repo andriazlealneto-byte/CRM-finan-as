@@ -152,7 +152,7 @@ const LandingPage = () => {
       </header>
 
       {/* Hero Section */}
-      <section className="relative h-[calc(100vh-64px)] flex items-center justify-center text-center bg-background text-white p-8 overflow-hidden">
+      <section className="relative h-[calc(100vh-64px)] flex items-center justify-center text-center bg-background text-white p-8"> {/* Removido overflow-hidden */}
         <AnimatedBlob /> {/* O novo componente de fundo animado */}
         <div className="max-w-4xl space-y-8 relative z-10"> {/* Conteúdo principal com z-index maior */}
           <h1 className="text-6xl font-extrabold leading-tight tracking-tight">

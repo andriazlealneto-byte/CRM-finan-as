@@ -7,8 +7,8 @@ const AnimatedBlob = ({ className }: { className?: string }) => {
   return (
     <div
       className={cn(
-        "absolute top-[10%] left-[-20%] w-[800px] h-[800px] rounded-[30%_70%_70%_30%_/_30%_30%_70%_70%] opacity-60 z-0",
-        "bg-gradient-to-br from-primary via-primary-gradient-end to-primary",
+        "absolute top-[-10%] left-[-20%] w-[1000px] h-[1000px] rounded-[30%_70%_70%_30%_/_30%_30%_70%_70%] opacity-60 z-0",
+        "bg-gradient-to-br from-primary via-[hsl(var(--primary-gradient-end))] to-primary", // Corrigido o 'via'
         "bg-[length:400%_400%] animate-blob-gradient-shift",
         "transform -rotate-30", // Para a diagonal
         "filter blur-[80px]", // Efeito de desfoque para o 'liquid glass'
