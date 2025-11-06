@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useState, ReactNode, useEffect, useCallback } from "react";
 import { useLocalStorage } from "@/hooks/use-local-storage"; // Still used for auth, but not for transaction data
-import { format, addMonths } from "date-fns"; // Importar addMonths
+import { format, addMonths, parseISO, addDays } from "date-fns"; // Importar addMonths e addDays
 import { supabase } from "@/lib/supabase";
 import { toast } from "sonner";
 import { useSession } from "./SessionContext"; // Import useSession
@@ -103,6 +103,7 @@ interface UserProfile {
   subscription_type: 'monthly' | 'annual' | null; // Tipo de assinatura
   subscription_end_date: string | null; // Data de término da assinatura
   data_retention_until: string | null; // NOVO CAMPO: Data até quando os dados serão retidos após o cancelamento
+  grace_period_start_date: string | null; // NOVO CAMPO: Data de início do período de carência
   show_budgets: boolean; // Novo campo para visibilidade do menu
   show_goals: boolean; // Novo campo para visibilidade do menu
   show_debts: boolean; // Novo campo para visibilidade do menu
@@ -348,7 +349,8 @@ export const TransactionProvider = ({ children }: { children: ReactNode }) => {
             is_premium: false, // Default to non-premium
             subscription_type: null,
             subscription_end_date: null,
-            data_retention_until: null, // Inicializar como null
+            data_retention_until: null,
+            grace_period_start_date: null, // Initialize new field
             show_budgets: true, // Default to true
             show_goals: true, // Default to true
             show_debts: true, // Default to true
@@ -370,14 +372,17 @@ export const TransactionProvider = ({ children }: { children: ReactNode }) => {
         console.error("Erro ao carregar perfil:", error);
       }
     } else {
-      // Ensure default names if they are null in DB (for existing users before this change)
       const profileData = data as UserProfile;
       if (!profileData.misc_budget_name) profileData.misc_budget_name = "Gastos Bestas";
       if (!profileData.food_budget_name) profileData.food_budget_name = "Comida";
+      // Ensure grace_period_start_date is initialized if null for existing users
+      if (profileData.grace_period_start_date === undefined) { // Check for undefined to handle existing data
+          profileData.grace_period_start_date = null;
+      }
       setUserProfile(profileData);
     }
     setLoading(false);
-  }, [user?.id, setUserProfile]); // Adicionado setUserProfile como dependência
+  }, [user?.id, setUserProfile]);
 
   useEffect(() => {
     if (!sessionLoading && user?.id) {
@@ -753,7 +758,7 @@ export const TransactionProvider = ({ children }: { children: ReactNode }) => {
       setDebts((prev) => prev.filter((d) => d.id !== id));
       toast.success("Dívida excluída com sucesso!");
     }
-  }, [user?.id]);
+    }, [user?.id]);
 
   const addSubscription = useCallback(async (subscription: Omit<Subscription, "id" | "user_id" | "created_at">) => {
     if (!user?.id) {
@@ -805,6 +810,15 @@ export const TransactionProvider = ({ children }: { children: ReactNode }) => {
       toast.error("Você precisa estar logado para atualizar seu perfil.");
       return;
     }
+
+    // Special handling for cancellation: set data_retention_until
+    if (updates.is_premium === false && userProfile?.is_premium === true) {
+      updates.data_retention_until = format(addMonths(new Date(), 1), "yyyy-MM-dd");
+      updates.subscription_type = null;
+      updates.subscription_end_date = null;
+      updates.grace_period_start_date = null; // Clear grace period on explicit cancellation
+    }
+
     const { data, error } = await supabase
       .from('profiles')
       .update(updates)
@@ -819,7 +833,47 @@ export const TransactionProvider = ({ children }: { children: ReactNode }) => {
       setUserProfile(data as UserProfile);
       toast.success("Perfil atualizado com sucesso!");
     }
-  }, [user?.id, setUserProfile]);
+  }, [user?.id, userProfile, setUserProfile]);
+
+  // NEW: Effect to handle subscription expiration and grace period
+  useEffect(() => {
+    if (!userProfile || !user?.id || !userProfile.is_premium) return;
+
+    const checkSubscriptionStatus = async () => {
+      const now = new Date();
+      const subscriptionEndDate = userProfile.subscription_end_date ? parseISO(userProfile.subscription_end_date) : null;
+      const gracePeriodStartDate = userProfile.grace_period_start_date ? parseISO(userProfile.grace_period_start_date) : null;
+
+      // Case 1: Subscription has ended, and we need to start grace period
+      if (subscriptionEndDate && subscriptionEndDate < now && !gracePeriodStartDate) {
+        console.log("Subscription ended, initiating grace period.");
+        await updateUserProfile({ grace_period_start_date: format(subscriptionEndDate, "yyyy-MM-dd") });
+        // No toast here, toast will be handled by Layout component
+      }
+      // Case 2: Grace period has ended, revoke premium access
+      else if (gracePeriodStartDate) {
+        const gracePeriodEndDate = addDays(gracePeriodStartDate, 7); // Grace period is 7 days from subscription_end_date
+
+        if (now > gracePeriodEndDate) {
+          console.log("Grace period ended, revoking premium access.");
+          await updateUserProfile({
+            is_premium: false,
+            subscription_type: null,
+            subscription_end_date: null,
+            grace_period_start_date: null,
+            data_retention_until: format(addMonths(now, 1), "yyyy-MM-dd"), // Set retention date on auto-cancellation
+          });
+          toast.error("Sua assinatura expirou e o período de carência terminou. O acesso premium foi revogado.");
+        }
+      }
+    };
+
+    // Run check immediately and then every hour (or more frequently if needed)
+    checkSubscriptionStatus();
+    const intervalId = setInterval(checkSubscriptionStatus, 60 * 60 * 1000); // Check every hour
+
+    return () => clearInterval(intervalId);
+  }, [userProfile, user?.id, updateUserProfile]);
 
   const totalIncome = transactions
     .filter((t) => t.type === "income")

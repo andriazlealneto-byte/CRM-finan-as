@@ -55,6 +55,7 @@ const PaymentPage = () => {
       is_premium: true,
       subscription_type: subscriptionType,
       subscription_end_date: endDate.toISOString().split('T')[0], // Format YYYY-MM-DD
+      grace_period_start_date: null, // Clear grace period on successful payment
     });
 
     toast.dismiss("payment-toast");

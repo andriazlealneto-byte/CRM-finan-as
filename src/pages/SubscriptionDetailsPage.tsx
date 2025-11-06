@@ -13,7 +13,7 @@ import { toast } from "sonner";
 import { CreditCard, CheckCircle, PlusCircle, Edit, Trash2 } from "lucide-react";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { useNavigate } from "react-router-dom";
-import { format, parseISO, addMonths } from "date-fns";
+import { format, parseISO, addMonths, addDays } from "date-fns"; // Importar addDays
 import { ptBR } from "date-fns/locale";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -178,9 +178,18 @@ const SubscriptionDetailsPage = () => {
               </p>
               {userProfile.subscription_end_date && (
                 <p>
-                  Sua assinatura é válida até{" "}
+                  Data de Renovação:{" "} {/* Changed text here */}
                   <span className="font-semibold">
                     {format(parseISO(userProfile.subscription_end_date), "dd/MM/yyyy", { locale: ptBR })}
+                  </span>
+                  .
+                </p>
+              )}
+              {userProfile.grace_period_start_date && (
+                <p className="text-yellow-500">
+                  Você está no período de carência. O acesso premium será revogado em{" "}
+                  <span className="font-semibold">
+                    {format(addDays(parseISO(userProfile.grace_period_start_date), 7), "dd/MM/yyyy", { locale: ptBR })}
                   </span>
                   .
                 </p>
