@@ -76,6 +76,9 @@ interface UserProfile {
   first_name: string | null;
   last_name: string | null;
   avatar_url: string | null;
+  primary_color_hsl: string | null; // Nova propriedade
+  background_color_hsl: string | null; // Nova propriedade
+  avatar_style: string | null; // Nova propriedade
 }
 
 interface TransactionContextType {
@@ -274,7 +277,14 @@ export const TransactionProvider = ({ children }: { children: ReactNode }) => {
       if (error.code === 'PGRST116') { // No rows found
         const { data: newProfile, error: insertError } = await supabase
           .from('profiles')
-          .insert({ id: user.id, first_name: user.user_metadata.first_name || null, last_name: user.user_metadata.last_name || null })
+          .insert({ 
+            id: user.id, 
+            first_name: user.user_metadata.first_name || null, 
+            last_name: user.user_metadata.last_name || null,
+            primary_color_hsl: '250 80% 60%', // Default value
+            background_color_hsl: '220 10% 10%', // Default value
+            avatar_style: 'User', // Default value
+          })
           .select()
           .single();
         if (insertError) {
