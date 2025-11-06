@@ -13,7 +13,7 @@ import { toast } from "sonner";
 import { CreditCard, CheckCircle } from "lucide-react";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { useNavigate } from "react-router-dom";
-import { format, parseISO, addMonths } from "date-fns"; // Importar addMonths
+import { format, parseISO, addMonths } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
 const paymentCardFormSchema = z.object({
@@ -23,7 +23,7 @@ const paymentCardFormSchema = z.object({
   cvv: z.string().min(3, "CVV inválido.").max(4, "CVV inválido."),
 });
 
-const SubscriptionDetailsPage = () => {
+const SubscriptionDetailsPage: React.FC = () => {
   const { userProfile, updateUserProfile } = useTransactionContext();
   const navigate = useNavigate();
 
