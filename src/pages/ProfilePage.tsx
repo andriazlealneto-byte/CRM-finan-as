@@ -1,9 +1,9 @@
 "use client";
 
 import React from "react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/button"; // Keep original Button for type, but use GlassButton
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"; // Keep original Card for type, but use GlassCard
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -19,6 +19,8 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { useNavigate } from "react-router-dom";
 import { format, parseISO } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import GlassCard from "@/components/GlassCard"; // Import GlassCard
+import GlassButton from "@/components/GlassButton"; // Import GlassButton
 
 const profileFormSchema = z.object({
   first_name: z.string().min(1, "O primeiro nome é obrigatório.").max(50, "O primeiro nome não pode ter mais de 50 caracteres.").optional().or(z.literal("")),
@@ -196,7 +198,7 @@ const ProfilePage = () => {
 
       <Form {...profileForm}>
         <form onSubmit={profileForm.handleSubmit(onProfileSubmit)} className="space-y-6">
-          <Card className="w-full max-w-md">
+          <GlassCard className="w-full max-w-md">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <User className="h-5 w-5" /> Informações do Usuário
@@ -233,9 +235,9 @@ const ProfilePage = () => {
                 )}
               />
             </CardContent>
-          </Card>
+          </GlassCard>
 
-          <Card className="w-full max-w-md">
+          <GlassCard className="w-full max-w-md">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Shirt className="h-5 w-5" /> Personalização de Avatar
@@ -270,9 +272,9 @@ const ProfilePage = () => {
                 )}
               />
             </CardContent>
-          </Card>
+          </GlassCard>
 
-          <Card className="w-full max-w-md">
+          <GlassCard className="w-full max-w-md">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <LayoutDashboard className="h-5 w-5" /> Visibilidade do Menu Lateral
@@ -393,13 +395,13 @@ const ProfilePage = () => {
                 )}
               />
             </CardContent>
-          </Card>
+          </GlassCard>
 
-          <Button type="submit">Salvar Alterações do Perfil</Button>
+          <GlassButton type="submit">Salvar Alterações do Perfil</GlassButton>
         </form>
       </Form>
 
-      <Card className="w-full max-w-md">
+      <GlassCard className="w-full max-w-md">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Mail className="h-5 w-5" /> Alterar E-mail
@@ -437,7 +439,7 @@ const ProfilePage = () => {
                           placeholder="********"
                           {...field}
                         />
-                        <Button
+                        <GlassButton
                           type="button"
                           variant="ghost"
                           size="icon"
@@ -449,7 +451,7 @@ const ProfilePage = () => {
                           ) : (
                             <Eye className="h-4 w-4 text-muted-foreground" />
                           )}
-                        </Button>
+                        </GlassButton>
                       </div>
                     </FormControl>
                     <FormDescription>
@@ -459,15 +461,15 @@ const ProfilePage = () => {
                   </FormItem>
                 )}
               />
-              <Button type="submit" className="w-full">
+              <GlassButton type="submit" className="w-full">
                 Alterar E-mail
-              </Button>
+              </GlassButton>
             </form>
           </Form>
         </CardContent>
-      </Card>
+      </GlassCard>
 
-      <Card className="w-full max-w-md">
+      <GlassCard className="w-full max-w-md">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Lock className="h-5 w-5" /> Alterar Senha
@@ -492,7 +494,7 @@ const ProfilePage = () => {
                           placeholder="********"
                           {...field}
                         />
-                        <Button
+                        <GlassButton
                           type="button"
                           variant="ghost"
                           size="icon"
@@ -504,7 +506,7 @@ const ProfilePage = () => {
                           ) : (
                             <Eye className="h-4 w-4 text-muted-foreground" />
                           )}
-                        </Button>
+                        </GlassButton>
                       </div>
                     </FormControl>
                     <FormMessage />
@@ -524,7 +526,7 @@ const ProfilePage = () => {
                           placeholder="********"
                           {...field}
                         />
-                        <Button
+                        <GlassButton
                           type="button"
                           variant="ghost"
                           size="icon"
@@ -536,7 +538,7 @@ const ProfilePage = () => {
                           ) : (
                             <Eye className="h-4 w-4 text-muted-foreground" />
                           )}
-                        </Button>
+                        </GlassButton>
                       </div>
                     </FormControl>
                     <FormMessage />
@@ -556,7 +558,7 @@ const ProfilePage = () => {
                           placeholder="********"
                           {...field}
                         />
-                        <Button
+                        <GlassButton
                           type="button"
                           variant="ghost"
                           size="icon"
@@ -568,20 +570,20 @@ const ProfilePage = () => {
                           ) : (
                             <Eye className="h-4 w-4 text-muted-foreground" />
                           )}
-                        </Button>
+                        </GlassButton>
                       </div>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-              <Button type="submit" className="w-full">
+              <GlassButton type="submit" className="w-full">
                 Alterar Senha
-              </Button>
+              </GlassButton>
             </form>
           </Form>
         </CardContent>
-      </Card>
+      </GlassCard>
     </div>
   );
 };

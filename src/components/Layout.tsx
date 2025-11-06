@@ -6,13 +6,14 @@ import Sidebar from "./Sidebar";
 import { MadeWithDyad } from "./made-with-dyad";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/button"; // Keep original Button for type, but use GlassButton
 import { Menu } from "lucide-react";
 import UserAvatar from "./UserAvatar"; // Importar UserAvatar
 import { ThemeToggle } from "./ThemeToggle"; // Importar ThemeToggle
 import { useTransactionContext } from "@/context/TransactionContext"; // Importar o contexto de transações
 import { toast } from "sonner"; // Importar toast do sonner
 import { differenceInDays, parseISO, addDays } from "date-fns"; // Importar utilitários de data
+import GlassButton from "./GlassButton"; // Import GlassButton
 
 const Layout = () => {
   const isMobile = useIsMobile();
@@ -85,9 +86,9 @@ const Layout = () => {
       {isMobile ? (
         <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
           <SheetTrigger asChild>
-            <Button variant="ghost" size="icon" className="fixed top-4 left-4 z-50">
+            <GlassButton variant="ghost" size="icon" className="fixed top-4 left-4 z-50">
               <Menu className="h-6 w-6" />
-            </Button>
+            </GlassButton>
           </SheetTrigger>
           <SheetContent side="left" className="p-0 w-64">
             <Sidebar isMobile={isMobile} onLinkClick={handleLinkClick} />

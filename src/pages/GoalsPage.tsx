@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/button"; // Keep original Button for type, but use GlassButton
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { PlusCircle, Edit, Trash2, CalendarIcon, TrendingUp, DollarSign } from "lucide-react";
@@ -21,6 +21,8 @@ import { ptBR } from "date-fns/locale";
 import { cn } from "@/lib/utils";
 import { Progress } from "@/components/ui/progress";
 import { Checkbox } from "@/components/ui/checkbox";
+import GlassCard from "@/components/GlassCard"; // Import GlassCard
+import GlassButton from "@/components/GlassButton"; // Import GlassButton
 
 // Função para calcular o valor futuro de uma série de pagamentos (anuidade)
 const calculateFutureValue = (
@@ -246,10 +248,10 @@ const GoalsPage = () => {
       <div className="flex justify-end">
         <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
           <DialogTrigger asChild>
-            <Button>
+            <GlassButton>
               <PlusCircle className="mr-2 h-4 w-4" />
               Adicionar Meta
-            </Button>
+            </GlassButton>
           </DialogTrigger>
           <DialogContent className="sm:max-w-[425px]">
             <DialogHeader>
@@ -281,18 +283,16 @@ const GoalsPage = () => {
                       <FormLabel>Data Limite</FormLabel>
                       <Popover>
                         <PopoverTrigger asChild>
-                          <FormControl>
-                            <Button
-                              variant={"outline"}
-                              className={cn(
-                                "w-full justify-start text-left font-normal",
-                                !field.value && "text-muted-foreground"
-                              )}
-                            >
-                              <CalendarIcon className="mr-2 h-4 w-4" />
-                              {field.value ? format(field.value, "PPP", { locale: ptBR }) : <span>Escolha uma data</span>}
-                            </Button>
-                          </FormControl>
+                          <GlassButton
+                            variant={"outline"}
+                            className={cn(
+                              "w-full justify-start text-left font-normal",
+                              !field.value && "text-muted-foreground"
+                            )}
+                          >
+                            <CalendarIcon className="mr-2 h-4 w-4" />
+                            {field.value ? format(field.value, "PPP", { locale: ptBR }) : <span>Escolha uma data</span>}
+                          </GlassButton>
                         </PopoverTrigger>
                         <PopoverContent className="w-auto p-0" align="start">
                           <Calendar
@@ -417,7 +417,7 @@ const GoalsPage = () => {
                   </>
                 )}
                 <DialogFooter>
-                  <Button type="submit">Salvar Meta</Button>
+                  <GlassButton type="submit">Salvar Meta</GlassButton>
                 </DialogFooter>
               </form>
             </Form>
@@ -487,14 +487,14 @@ const GoalsPage = () => {
                         if (!open) setEditingGoal(null);
                       }}>
                         <DialogTrigger asChild>
-                          <Button
+                          <GlassButton
                             variant="ghost"
                             size="icon"
                             className="mr-2"
                             onClick={() => setEditingGoal(goal)}
                           >
                             <Edit className="h-4 w-4" />
-                          </Button>
+                          </GlassButton>
                         </DialogTrigger>
                         <DialogContent className="sm:max-w-[425px]">
                           <DialogHeader>
@@ -526,18 +526,16 @@ const GoalsPage = () => {
                                     <FormLabel>Data Limite</FormLabel>
                                     <Popover>
                                       <PopoverTrigger asChild>
-                                        <FormControl>
-                                          <Button
-                                            variant={"outline"}
-                                            className={cn(
-                                              "w-full justify-start text-left font-normal",
-                                              !field.value && "text-muted-foreground"
-                                            )}
-                                          >
-                                            <CalendarIcon className="mr-2 h-4 w-4" />
-                                            {field.value ? format(field.value, "PPP", { locale: ptBR }) : <span>Escolha uma data</span>}
-                                          </Button>
-                                        </FormControl>
+                                        <GlassButton
+                                          variant={"outline"}
+                                          className={cn(
+                                            "w-full justify-start text-left font-normal",
+                                            !field.value && "text-muted-foreground"
+                                          )}
+                                        >
+                                          <CalendarIcon className="mr-2 h-4 w-4" />
+                                          {field.value ? format(field.value, "PPP", { locale: ptBR }) : <span>Escolha uma data</span>}
+                                        </GlassButton>
                                       </PopoverTrigger>
                                       <PopoverContent className="w-auto p-0" align="start">
                                         <Calendar
@@ -653,7 +651,7 @@ const GoalsPage = () => {
                                       <FormItem>
                                         <FormLabel>Contribuição Mensal (R$)</FormLabel>
                                         <FormControl>
-                                          <Input type="number" {...field} />
+                                          <Input type="number" placeholder="500.00" {...field} />
                                         </FormControl>
                                         <FormMessage />
                                       </FormItem>
@@ -662,7 +660,7 @@ const GoalsPage = () => {
                                 </>
                               )}
                               <DialogFooter>
-                                <Button type="submit">Salvar Alterações</Button>
+                                <GlassButton type="submit">Salvar Alterações</GlassButton>
                               </DialogFooter>
                             </form>
                           </Form>
@@ -671,13 +669,13 @@ const GoalsPage = () => {
 
                       <AlertDialog>
                         <AlertDialogTrigger asChild>
-                          <Button
+                          <GlassButton
                             variant="ghost"
                             size="icon"
                             className="text-red-500 hover:text-red-700"
                           >
                             <Trash2 className="h-4 w-4" />
-                          </Button>
+                          </GlassButton>
                         </AlertDialogTrigger>
                         <AlertDialogContent>
                           <AlertDialogHeader>

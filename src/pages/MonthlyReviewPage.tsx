@@ -1,12 +1,13 @@
 "use client";
 
 import React from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"; // Keep original Card for type, but use GlassCard
 import { useTransactionContext } from "@/context/TransactionContext";
 import { format, subMonths, startOfMonth, endOfMonth, parseISO, isSameMonth, isSameYear } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { Lightbulb, CheckCircle, XCircle, TrendingUp, TrendingDown } from "lucide-react";
 import { Progress } from "@/components/ui/progress"; // Certifique-se de que Progress está importado
+import GlassCard from "@/components/GlassCard"; // Import GlassCard
 
 const MonthlyReviewPage = () => {
   const { transactions, goals, miscExpensesLimit, foodExpensesLimit, miscCategories, foodCategories, userProfile } = useTransactionContext();
@@ -108,7 +109,7 @@ const MonthlyReviewPage = () => {
       <h1 className="text-3xl font-bold">Reflexão Mensal: {formattedPreviousMonth}</h1>
       <p className="text-muted-foreground">Uma análise do seu desempenho financeiro no mês passado e sugestões para o futuro.</p>
 
-      <Card>
+      <GlassCard>
         <CardHeader>
           <CardTitle className="flex items-center gap-2"><Lightbulb className="h-5 w-5" /> Resumo do Mês</CardTitle>
           <CardDescription>Seu desempenho financeiro em {formattedPreviousMonth}.</CardDescription>
@@ -130,9 +131,9 @@ const MonthlyReviewPage = () => {
             <p className="text-xl font-bold mt-1">{consistencyScore.toFixed(0)}%</p>
           </div>
         </CardContent>
-      </Card>
+      </GlassCard>
 
-      <Card>
+      <GlassCard>
         <CardHeader>
           <CardTitle className="flex items-center gap-2"><CheckCircle className="h-5 w-5 text-green-500" /> O que deu certo?</CardTitle>
           <CardDescription>Pontos positivos do seu mês.</CardDescription>
@@ -148,9 +149,9 @@ const MonthlyReviewPage = () => {
             <p className="text-muted-foreground">Nenhum ponto positivo identificado neste mês. Vamos buscar melhorias para o próximo!</p>
           )}
         </CardContent>
-      </Card>
+      </GlassCard>
 
-      <Card>
+      <GlassCard>
         <CardHeader>
           <CardTitle className="flex items-center gap-2"><XCircle className="h-5 w-5 text-red-500" /> O que precisa melhorar?</CardTitle>
           <CardDescription>Áreas para focar no próximo mês.</CardDescription>
@@ -166,7 +167,7 @@ const MonthlyReviewPage = () => {
             <p className="text-muted-foreground">Ótimo trabalho! Não há grandes pontos de melhoria identificados. Continue monitorando suas finanças.</p>
           )}
         </CardContent>
-      </Card>
+      </GlassCard>
     </div>
   );
 };

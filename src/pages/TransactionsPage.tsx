@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/button"; // Keep original Button for type, but use GlassButton
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { PlusCircle, Search, CalendarIcon, Trash2, Clock } from "lucide-react";
@@ -22,6 +22,7 @@ import { useTransactionContext } from "@/context/TransactionContext";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
+import GlassButton from "@/components/GlassButton"; // Import GlassButton
 
 interface Transaction {
   id: string;
@@ -220,7 +221,7 @@ const TransactionsPage = () => {
         <div className="flex items-center gap-2">
           <Popover>
             <PopoverTrigger asChild>
-              <Button
+              <GlassButton
                 variant={"outline"}
                 className={cn(
                   "w-[200px] justify-start text-left font-normal",
@@ -233,7 +234,7 @@ const TransactionsPage = () => {
                 ) : (
                   <span>Filtrar por data</span>
                 )}
-              </Button>
+              </GlassButton>
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0">
               <Calendar
@@ -245,9 +246,9 @@ const TransactionsPage = () => {
               />
               {selectedFilterDate && (
                 <div className="p-2">
-                  <Button variant="ghost" onClick={() => setSelectedFilterDate(undefined)} className="w-full">
+                  <GlassButton variant="ghost" onClick={() => setSelectedFilterDate(undefined)} className="w-full">
                     Limpar filtro
-                  </Button>
+                  </GlassButton>
                 </div>
               )}
             </PopoverContent>
@@ -255,10 +256,10 @@ const TransactionsPage = () => {
 
           <Dialog open={isAddTransactionDialogOpen} onOpenChange={setIsAddTransactionDialogOpen}>
             <DialogTrigger asChild>
-              <Button>
+              <GlassButton>
                 <PlusCircle className="mr-2 h-4 w-4" />
                 Adicionar Transação
-              </Button>
+              </GlassButton>
             </DialogTrigger>
             <DialogContent className="sm:max-w-[425px]">
               <DialogHeader>
@@ -278,7 +279,7 @@ const TransactionsPage = () => {
                         <Popover>
                           <PopoverTrigger asChild>
                             <FormControl>
-                              <Button
+                              <GlassButton
                                 variant={"outline"}
                                 className={cn(
                                   "w-full justify-start text-left font-normal",
@@ -287,7 +288,7 @@ const TransactionsPage = () => {
                               >
                                 <CalendarIcon className="mr-2 h-4 w-4" />
                                 {field.value ? format(field.value, "PPP", { locale: ptBR }) : <span>Escolha uma data</span>}
-                              </Button>
+                              </GlassButton>
                             </FormControl>
                           </PopoverTrigger>
                           <PopoverContent className="w-auto p-0" align="start">
@@ -446,7 +447,7 @@ const TransactionsPage = () => {
                     )}
                   />
                   <DialogFooter>
-                    <Button type="submit">Salvar Transação</Button>
+                    <GlassButton type="submit">Salvar Transação</GlassButton>
                   </DialogFooter>
                 </form>
               </Form>
@@ -455,10 +456,10 @@ const TransactionsPage = () => {
 
           <Dialog open={isAddFutureExpenseDialogOpen} onOpenChange={setIsAddFutureExpenseDialogOpen}>
             <DialogTrigger asChild>
-              <Button variant="outline">
+              <GlassButton variant="outline">
                 <Clock className="mr-2 h-4 w-4" />
                 Adicionar Gasto Futuro
-              </Button>
+              </GlassButton>
             </DialogTrigger>
             <DialogContent className="sm:max-w-[425px]">
               <DialogHeader>
@@ -478,7 +479,7 @@ const TransactionsPage = () => {
                         <Popover>
                           <PopoverTrigger asChild>
                             <FormControl>
-                              <Button
+                              <GlassButton
                                 variant={"outline"}
                                 className={cn(
                                   "w-full justify-start text-left font-normal",
@@ -491,7 +492,7 @@ const TransactionsPage = () => {
                                 ) : (
                                   <span>Escolha as datas</span>
                                 )}
-                              </Button>
+                              </GlassButton>
                             </FormControl>
                           </PopoverTrigger>
                           <PopoverContent className="w-auto p-0" align="start">
@@ -628,7 +629,7 @@ const TransactionsPage = () => {
                     />
                   )}
                   <DialogFooter>
-                    <Button type="submit">Salvar Gasto(s) Futuro(s)</Button>
+                    <GlassButton type="submit">Salvar Gasto(s) Futuro(s)</GlassButton>
                   </DialogFooter>
                 </form>
               </Form>
@@ -660,14 +661,14 @@ const TransactionsPage = () => {
                     {transaction.amount > 0 ? "+" : ""}{transaction.amount.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
                   </TableCell>
                   <TableCell className="text-right">
-                    <Button
+                    <GlassButton
                       variant="ghost"
                       size="icon"
                       onClick={() => handleDeleteTransaction(transaction.id)}
                       className="text-red-500 hover:text-red-700"
                     >
                       <Trash2 className="h-4 w-4" />
-                    </Button>
+                    </GlassButton>
                   </TableCell>
                 </TableRow>
               ))
@@ -709,14 +710,14 @@ const TransactionsPage = () => {
                     {expense.installments && expense.installments > 1 ? `${expense.installments}x` : "À vista"}
                   </TableCell>
                   <TableCell className="text-right">
-                    <Button
+                    <GlassButton
                       variant="ghost"
                       size="icon"
                       onClick={() => handleDeleteFutureExpense(expense.id)}
                       className="text-red-500 hover:text-red-700"
                     >
                       <Trash2 className="h-4 w-4" />
-                    </Button>
+                    </GlassButton>
                   </TableCell>
                 </TableRow>
               ))

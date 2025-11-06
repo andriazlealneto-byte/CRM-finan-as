@@ -1,14 +1,15 @@
 "use client";
 
 import React from "react";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { DollarSign, TrendingUp, TrendingDown, CalendarClock, ShoppingBag, Utensils, Target, ArrowUp, ArrowDown } from "lucide-react"; // Import new icons
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"; // Keep original Card for type, but use GlassCard
+import { DollarSign, TrendingUp, TrendingDown, CalendarClock, ShoppingBag, Utensils, Target, ArrowUp, ArrowDown, Wallet } from "lucide-react"; // Import new icons
 import { useTransactionContext } from "@/context/TransactionContext"; // Import the context hook
 import { format, subMonths, startOfMonth, endOfMonth, parseISO, differenceInMonths } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { Progress } from "@/components/ui/progress"; // Import Progress component
 import DashboardCharts from "@/components/DashboardCharts"; // Import DashboardCharts
 import { cn } from "@/lib/utils"; // Importar a função cn
+import GlassCard from "@/components/GlassCard"; // Import GlassCard
 
 // Função para calcular o valor futuro de uma série de pagamentos (anuidade)
 const calculateFutureValue = (
@@ -132,7 +133,7 @@ const Index = () => {
       </h1>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card>
+        <GlassCard>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Saldo Total</CardTitle>
             <DollarSign className="h-4 w-4 text-muted-foreground" />
@@ -143,9 +144,9 @@ const Index = () => {
               Seu saldo atual.
             </p>
           </CardContent>
-        </Card>
+        </GlassCard>
 
-        <Card>
+        <GlassCard>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Receita Total</CardTitle>
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
@@ -156,9 +157,9 @@ const Index = () => {
               Total de receitas registradas.
             </p>
           </CardContent>
-        </Card>
+        </GlassCard>
 
-        <Card>
+        <GlassCard>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Despesas Totais</CardTitle>
             <TrendingDown className="h-4 w-4 text-muted-foreground" />
@@ -169,9 +170,9 @@ const Index = () => {
               Total de despesas registradas.
             </p>
           </CardContent>
-        </Card>
+        </GlassCard>
 
-        <Card>
+        <GlassCard>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Gastos Futuros</CardTitle>
             <CalendarClock className="h-4 w-4 text-muted-foreground" />
@@ -182,10 +183,10 @@ const Index = () => {
               {futureExpenses.length === 1 ? "gasto futuro pendente" : "gastos futuros pendentes"}
             </p>
           </CardContent>
-        </Card>
+        </GlassCard>
 
         {userProfile?.show_goals && (
-          <Card>
+          <GlassCard>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Metas Ativas</CardTitle>
               <Target className="h-4 w-4 text-muted-foreground" />
@@ -196,10 +197,10 @@ const Index = () => {
                 {goals.filter(g => (g.current_amount || 0) < (g.target_amount || 0) && parseISO(g.due_date) >= new Date()).length === 1 ? "meta ativa" : "metas ativas"}
               </p>
             </CardContent>
-          </Card>
+          </GlassCard>
         )}
 
-        <Card>
+        <GlassCard>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Comparativo Mensal</CardTitle>
             {expenseComparisonIcon}
@@ -210,10 +211,10 @@ const Index = () => {
               {expenseComparisonMessage}
             </p>
           </CardContent>
-        </Card>
+        </GlassCard>
 
         {userProfile?.show_goals && financialFreedomGoal && (
-          <Card className="lg:col-span-2">
+          <GlassCard className="lg:col-span-2">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Liberdade Financeira: {financialFreedomGoal.name}</CardTitle>
               <TrendingUp className="h-4 w-4 text-muted-foreground" />
@@ -227,7 +228,7 @@ const Index = () => {
                 {ffIsAchieved ? "Meta de Liberdade Financeira Atingida!" : `${ffMonthsRemaining > 0 ? ffMonthsRemaining : 0} meses restantes para a data limite.`}
               </p>
             </CardContent>
-          </Card>
+          </GlassCard>
         )}
       </div>
 
@@ -235,7 +236,7 @@ const Index = () => {
         <>
           <h2 className="text-2xl font-bold mt-8 mb-4">Orçamentos Atuais</h2>
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-2">
-            <Card>
+            <GlassCard>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">{userProfile?.misc_budget_name || "Gastos Bestas"}</CardTitle>
                 <ShoppingBag className="h-4 w-4 text-muted-foreground" />
@@ -247,9 +248,9 @@ const Index = () => {
                   {miscProgress > 100 ? "Limite excedido!" : `${(miscExpensesLimit - currentMiscExpenses).toFixed(2)} restantes`}
                 </p>
               </CardContent>
-            </Card>
+            </GlassCard>
 
-            <Card>
+            <GlassCard>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">{userProfile?.food_budget_name || "Comida"}</CardTitle>
                 <Utensils className="h-4 w-4 text-muted-foreground" />
@@ -261,13 +262,13 @@ const Index = () => {
                   {foodProgress > 100 ? "Limite excedido!" : `${(foodExpensesLimit - currentFoodExpenses).toFixed(2)} restantes`}
                 </p>
               </CardContent>
-            </Card>
+            </GlassCard>
 
             {customBudgets.map((budget) => {
               const currentCustomExpenses = calculateCustomBudgetExpenses(budget.categories);
               const customProgress = (currentCustomExpenses / budget.limit) * 100;
               return (
-                <Card key={budget.id}>
+                <GlassCard key={budget.id}>
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-sm font-medium">{budget.name}</CardTitle>
                     <Wallet className="h-4 w-4 text-muted-foreground" />
@@ -279,7 +280,7 @@ const Index = () => {
                       {customProgress > 100 ? "Limite excedido!" : `${(budget.limit - currentCustomExpenses).toFixed(2)} restantes`}
                     </p>
                   </CardContent>
-                </Card>
+                </GlassCard>
               );
             })}
           </div>
@@ -289,14 +290,14 @@ const Index = () => {
       <h2 className="text-2xl font-bold mt-8 mb-4">Análise de Gastos</h2>
       <DashboardCharts />
 
-      <Card>
+      <GlassCard>
         <CardHeader>
           <CardTitle>Atividade Recente</CardTitle>
         </CardHeader>
         <CardContent>
           <p className="text-muted-foreground">Nenhuma atividade recente ainda. Adicione algumas transações!</p>
         </CardContent>
-      </Card>
+      </GlassCard>
     </div>
   );
 };

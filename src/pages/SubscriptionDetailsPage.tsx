@@ -1,9 +1,9 @@
 "use client";
 
 import React from "react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/button"; // Keep original Button for type, but use GlassButton
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"; // Keep original Card for type, but use GlassCard
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -17,6 +17,8 @@ import { format, parseISO, addMonths, addDays } from "date-fns"; // Importar add
 import { ptBR } from "date-fns/locale";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import GlassCard from "@/components/GlassCard"; // Import GlassCard
+import GlassButton from "@/components/GlassButton"; // Import GlassButton
 
 interface PaymentCard {
   id: string;
@@ -157,7 +159,7 @@ const SubscriptionDetailsPage = () => {
         Gerencie o status da sua assinatura premium do GPF e seus cartões de pagamento.
       </p>
 
-      <Card className="w-full max-w-md">
+      <GlassCard className="w-full max-w-md">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <CreditCard className="h-5 w-5" /> Status da Assinatura
@@ -196,9 +198,9 @@ const SubscriptionDetailsPage = () => {
               )}
               <AlertDialog>
                 <AlertDialogTrigger asChild>
-                  <Button variant="destructive" className="mt-4">
+                  <GlassButton variant="destructive" className="mt-4">
                     Cancelar Assinatura
-                  </Button>
+                  </GlassButton>
                 </AlertDialogTrigger>
                 <AlertDialogContent>
                   <AlertDialogHeader>
@@ -219,16 +221,16 @@ const SubscriptionDetailsPage = () => {
           ) : (
             <>
               <p>Você não possui uma assinatura ativa do GPF Premium.</p>
-              <Button className="mt-4" onClick={() => navigate("/subscribe")}>
+              <GlassButton className="mt-4" onClick={() => navigate("/subscribe")}>
                 Assinar Agora
-              </Button>
+              </GlassButton>
             </>
           )}
         </CardContent>
-      </Card>
+      </GlassCard>
 
       {userProfile?.is_premium && (
-        <Card className="w-full max-w-md">
+        <GlassCard className="w-full max-w-md">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <CreditCard className="h-5 w-5" /> Gerenciar Cartões de Pagamento
@@ -241,10 +243,10 @@ const SubscriptionDetailsPage = () => {
             <div className="flex justify-end">
               <Dialog open={isAddCardDialogOpen} onOpenChange={setIsAddCardDialogOpen}>
                 <DialogTrigger asChild>
-                  <Button>
+                  <GlassButton>
                     <PlusCircle className="mr-2 h-4 w-4" />
                     Adicionar Cartão
-                  </Button>
+                  </GlassButton>
                 </DialogTrigger>
                 <DialogContent className="sm:max-w-[425px]">
                   <DialogHeader>
@@ -310,7 +312,7 @@ const SubscriptionDetailsPage = () => {
                         />
                       </div>
                       <DialogFooter>
-                        <Button type="submit">Salvar Cartão</Button>
+                        <GlassButton type="submit">Salvar Cartão</GlassButton>
                       </DialogFooter>
                     </form>
                   </Form>
@@ -341,14 +343,14 @@ const SubscriptionDetailsPage = () => {
                             if (!open) setEditingCard(null);
                           }}>
                             <DialogTrigger asChild>
-                              <Button
+                              <GlassButton
                                 variant="ghost"
                                 size="icon"
                                 className="mr-2"
                                 onClick={() => setEditingCard(card)}
                               >
                                 <Edit className="h-4 w-4" />
-                              </Button>
+                              </GlassButton>
                             </DialogTrigger>
                             <DialogContent className="sm:max-w-[425px]">
                               <DialogHeader>
@@ -414,7 +416,7 @@ const SubscriptionDetailsPage = () => {
                                     />
                                   </div>
                                   <DialogFooter>
-                                    <Button type="submit">Salvar Alterações</Button>
+                                    <GlassButton type="submit">Salvar Alterações</GlassButton>
                                   </DialogFooter>
                                 </form>
                               </Form>
@@ -423,14 +425,14 @@ const SubscriptionDetailsPage = () => {
 
                           <AlertDialog>
                             <AlertDialogTrigger asChild>
-                              <Button
+                              <GlassButton
                                 variant="ghost"
                                 size="icon"
                                 className="text-red-500 hover:text-red-700"
                                 disabled={paymentCards.length <= 1} // Desabilita se for o último cartão
                               >
                                 <Trash2 className="h-4 w-4" />
-                              </Button>
+                              </GlassButton>
                             </AlertDialogTrigger>
                             <AlertDialogContent>
                               <AlertDialogHeader>
@@ -461,7 +463,7 @@ const SubscriptionDetailsPage = () => {
               </Table>
             </div>
           </CardContent>
-        </Card>
+        </GlassCard>
       )}
     </div>
   );

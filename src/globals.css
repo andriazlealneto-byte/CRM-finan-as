@@ -42,6 +42,8 @@
     --sidebar-border: 220 10% 10%; /* Dark grey/purple */
     --sidebar-ring: 250 80% 60%; /* Primary purple */
 
+    --radius: 0.75rem; /* Increased default radius for more rounded corners */
+
     color-scheme: dark; /* Definir esquema de cores padrão como escuro */
   }
 

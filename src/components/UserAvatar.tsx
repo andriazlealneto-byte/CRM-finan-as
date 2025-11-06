@@ -7,6 +7,7 @@ import { User, Smile, Ghost, Bot, Cat, Dog, Crown, Zap, LogOut, Settings, Credit
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
+import GlassButton from "./GlassButton"; // Import GlassButton
 
 // Mapeamento de estilos de avatar para componentes de ícone
 const avatarIcons: { [key: string]: React.ElementType } = {
@@ -33,7 +34,7 @@ const UserAvatar = () => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <div className="cursor-pointer">
+        <GlassButton variant="ghost" className="cursor-pointer p-0 h-9 w-9 rounded-full"> {/* Use GlassButton for trigger */}
           <Avatar className="h-9 w-9 border-2 border-primary">
             {/* Se você tiver URLs de imagem para avatares, pode usar AvatarImage */}
             {/* <AvatarImage src={userProfile?.avatar_url || ""} alt="User Avatar" /> */}
@@ -41,7 +42,7 @@ const UserAvatar = () => {
               <AvatarIcon className="h-5 w-5" />
             </AvatarFallback>
           </Avatar>
-        </div>
+        </GlassButton>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" forceMount>
         <DropdownMenuItem onClick={() => navigate("/app/profile")}>

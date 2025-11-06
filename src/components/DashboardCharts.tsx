@@ -1,11 +1,12 @@
 "use client";
 
 import React from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"; // Keep original Card for type, but use GlassCard
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, BarChart, XAxis, YAxis, Tooltip, Bar, LineChart, Line, CartesianGrid } from "recharts";
 import { useTransactionContext } from "@/context/TransactionContext";
 import { format, parseISO, startOfMonth, endOfMonth, eachMonthOfInterval } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import GlassCard from "@/components/GlassCard"; // Import GlassCard
 
 const COLORS = ['#8884d8', '#82ca9d', '#ffc658', '#ff8042', '#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
 
@@ -71,7 +72,7 @@ const DashboardCharts = () => {
 
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-      <Card className="lg:col-span-1">
+      <GlassCard className="lg:col-span-1">
         <CardHeader>
           <CardTitle>Despesas por Categoria</CardTitle>
         </CardHeader>
@@ -101,9 +102,9 @@ const DashboardCharts = () => {
             <p className="text-center text-muted-foreground">Nenhuma despesa para exibir.</p>
           )}
         </CardContent>
-      </Card>
+      </GlassCard>
 
-      <Card className="lg:col-span-2">
+      <GlassCard className="lg:col-span-2">
         <CardHeader>
           <CardTitle>Receitas vs. Despesas Mensais</CardTitle>
         </CardHeader>
@@ -124,9 +125,9 @@ const DashboardCharts = () => {
             <p className="text-center text-muted-foreground">Nenhum dado mensal para exibir.</p>
           )}
         </CardContent>
-      </Card>
+      </GlassCard>
 
-      <Card className="lg:col-span-3">
+      <GlassCard className="lg:col-span-3">
         <CardHeader>
           <CardTitle>Evolução do Saldo ao Longo do Tempo</CardTitle>
         </CardHeader>
@@ -146,7 +147,7 @@ const DashboardCharts = () => {
             <p className="text-center text-muted-foreground">Nenhum histórico de saldo para exibir.</p>
           )}
         </CardContent>
-      </Card>
+      </GlassCard>
     </div>
   );
 };

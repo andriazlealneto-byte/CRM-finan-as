@@ -4,7 +4,7 @@ import React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/button"; // Keep original Button for type, but use GlassButton
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
@@ -16,6 +16,7 @@ import { toast } from "sonner";
 import { Eye, EyeOff, ChevronLeft } from "lucide-react"; // Importar ChevronLeft
 import { ThemeToggle } from "@/components/ThemeToggle"; // Importar ThemeToggle
 import Logo from "@/components/Logo"; // Importar o componente Logo
+import GlassButton from "@/components/GlassButton"; // Import GlassButton
 
 const loginFormSchema = z.object({
   email: z.string().email("Digite um email válido.").min(1, "O email é obrigatório."),
@@ -57,9 +58,9 @@ const LoginPage = () => {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-background p-4">
       <div className="absolute top-4 left-4"> {/* Botão de voltar */}
-        <Button variant="ghost" size="icon" onClick={() => navigate("/")}>
+        <GlassButton variant="ghost" size="icon" onClick={() => navigate("/")}>
           <ChevronLeft className="h-6 w-6" />
-        </Button>
+        </GlassButton>
       </div>
       <div className="absolute top-4 right-4">
         <ThemeToggle />
@@ -101,7 +102,7 @@ const LoginPage = () => {
                           placeholder="********"
                           {...field}
                         />
-                        <Button
+                        <GlassButton
                           type="button"
                           variant="ghost"
                           size="icon"
@@ -113,16 +114,16 @@ const LoginPage = () => {
                           ) : (
                             <Eye className="h-4 w-4 text-muted-foreground" />
                           )}
-                        </Button>
+                        </GlassButton>
                       </div>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-              <Button type="submit" className="w-full">
+              <GlassButton type="submit" className="w-full">
                 Entrar
-              </Button>
+              </GlassButton>
             </form>
           </Form>
           <p className="mt-4 text-center text-sm text-muted-foreground">

@@ -1,9 +1,9 @@
 "use client";
 
 import React from "react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/button"; // Keep original Button for type, but use GlassButton
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"; // Keep original Card for type, but use GlassCard
 import { Label } from "@/components/ui/label";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -15,7 +15,9 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { PlusCircle, Edit, Trash2, Wallet } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"; // Adicionado importação da tabela
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import GlassCard from "@/components/GlassCard"; // Import GlassCard
+import GlassButton from "@/components/GlassButton"; // Import GlassButton
 
 const defaultBudgetFormSchema = z.object({
   miscBudgetName: z.string().min(1, "O nome do orçamento é obrigatório.").max(50, "O nome não pode ter mais de 50 caracteres."),
@@ -56,15 +58,6 @@ const BudgetManagementPage = () => {
       foodBudgetName: userProfile?.food_budget_name || "Comida",
       foodExpensesLimit: foodExpensesLimit,
       foodCategories: foodCategories,
-    },
-  });
-
-  const customBudgetForm = useForm<z.infer<typeof customBudgetFormSchema>>({
-    resolver: zodResolver(customBudgetFormSchema),
-    defaultValues: {
-      name: "",
-      limit: 0,
-      categories: [],
     },
   });
 
@@ -149,7 +142,7 @@ const BudgetManagementPage = () => {
 
       <Form {...defaultBudgetForm}>
         <form onSubmit={defaultBudgetForm.handleSubmit(onDefaultBudgetSubmit)} className="space-y-6">
-          <Card>
+          <GlassCard>
             <CardHeader>
               <CardTitle>Orçamento Padrão: {userProfile?.misc_budget_name || "Gastos Bestas"}</CardTitle>
               <CardDescription>Defina um limite mensal e selecione as categorias para este orçamento.</CardDescription>
@@ -236,9 +229,9 @@ const BudgetManagementPage = () => {
                 )}
               />
             </CardContent>
-          </Card>
+          </GlassCard>
 
-          <Card>
+          <GlassCard>
             <CardHeader>
               <CardTitle>Orçamento Padrão: {userProfile?.food_budget_name || "Comida"}</CardTitle>
               <CardDescription>Defina um limite mensal e selecione as categorias para este orçamento.</CardDescription>
@@ -325,9 +318,9 @@ const BudgetManagementPage = () => {
                 )}
               />
             </CardContent>
-          </Card>
+          </GlassCard>
 
-          <Button type="submit">Salvar Orçamentos Padrão</Button>
+          <GlassButton type="submit">Salvar Orçamentos Padrão</GlassButton>
         </form>
       </Form>
 
@@ -337,10 +330,10 @@ const BudgetManagementPage = () => {
       <div className="flex justify-end">
         <Dialog open={isAddCustomBudgetDialogOpen} onOpenChange={setIsAddCustomBudgetDialogOpen}>
           <DialogTrigger asChild>
-            <Button>
+            <GlassButton>
               <PlusCircle className="mr-2 h-4 w-4" />
               Adicionar Novo Orçamento
-            </Button>
+            </GlassButton>
           </DialogTrigger>
           <DialogContent className="sm:max-w-[425px]">
             <DialogHeader>
@@ -432,7 +425,7 @@ const BudgetManagementPage = () => {
                   )}
                 />
                 <DialogFooter>
-                  <Button type="submit">Salvar Orçamento</Button>
+                  <GlassButton type="submit">Salvar Orçamento</GlassButton>
                 </DialogFooter>
               </form>
             </Form>
@@ -463,14 +456,14 @@ const BudgetManagementPage = () => {
                       if (!open) setEditingCustomBudget(null);
                     }}>
                       <DialogTrigger asChild>
-                        <Button
+                        <GlassButton
                           variant="ghost"
                           size="icon"
                           className="mr-2"
                           onClick={() => setEditingCustomBudget(budget)}
                         >
                           <Edit className="h-4 w-4" />
-                        </Button>
+                        </GlassButton>
                       </DialogTrigger>
                       <DialogContent className="sm:max-w-[425px]">
                         <DialogHeader>
@@ -562,7 +555,7 @@ const BudgetManagementPage = () => {
                               )}
                             />
                             <DialogFooter>
-                              <Button type="submit">Salvar Alterações</Button>
+                              <GlassButton type="submit">Salvar Alterações</GlassButton>
                             </DialogFooter>
                           </form>
                         </Form>
@@ -571,13 +564,13 @@ const BudgetManagementPage = () => {
 
                     <AlertDialog>
                       <AlertDialogTrigger asChild>
-                        <Button
+                        <GlassButton
                           variant="ghost"
                           size="icon"
                           className="text-red-500 hover:text-red-700"
                         >
                           <Trash2 className="h-4 w-4" />
-                        </Button>
+                        </GlassButton>
                       </AlertDialogTrigger>
                       <AlertDialogContent>
                         <AlertDialogHeader>

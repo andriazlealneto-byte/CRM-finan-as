@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/button"; // Keep original Button for type, but use GlassButton
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { PlusCircle, Edit, Trash2 } from "lucide-react";
@@ -14,6 +14,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { toast } from "sonner";
 import { useTransactionContext } from "@/context/TransactionContext";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import GlassButton from "@/components/GlassButton"; // Import GlassButton
 
 const categoryFormSchema = z.object({
   name: z.string().min(1, "O nome da categoria é obrigatório.").max(50, "O nome da categoria não pode ter mais de 50 caracteres."),
@@ -81,10 +82,10 @@ const CategoryManagementPage = () => {
       <div className="flex justify-end">
         <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
           <DialogTrigger asChild>
-            <Button>
+            <GlassButton>
               <PlusCircle className="mr-2 h-4 w-4" />
               Adicionar Categoria
-            </Button>
+            </GlassButton>
           </DialogTrigger>
           <DialogContent className="sm:max-w-[425px]">
             <DialogHeader>
@@ -109,7 +110,7 @@ const CategoryManagementPage = () => {
                   )}
                 />
                 <DialogFooter>
-                  <Button type="submit">Salvar Categoria</Button>
+                  <GlassButton type="submit">Salvar Categoria</GlassButton>
                 </DialogFooter>
               </form>
             </Form>
@@ -136,14 +137,14 @@ const CategoryManagementPage = () => {
                       if (!open) setEditingCategory(null);
                     }}>
                       <DialogTrigger asChild>
-                        <Button
+                        <GlassButton
                           variant="ghost"
                           size="icon"
                           className="mr-2"
                           onClick={() => setEditingCategory(category)}
                         >
                           <Edit className="h-4 w-4" />
-                        </Button>
+                        </GlassButton>
                       </DialogTrigger>
                       <DialogContent className="sm:max-w-[425px]">
                         <DialogHeader>
@@ -168,7 +169,7 @@ const CategoryManagementPage = () => {
                               )}
                             />
                             <DialogFooter>
-                              <Button type="submit">Salvar Alterações</Button>
+                              <GlassButton type="submit">Salvar Alterações</GlassButton>
                             </DialogFooter>
                           </form>
                         </Form>
@@ -177,13 +178,13 @@ const CategoryManagementPage = () => {
 
                     <AlertDialog>
                       <AlertDialogTrigger asChild>
-                        <Button
+                        <GlassButton
                           variant="ghost"
                           size="icon"
                           className="text-red-500 hover:text-red-700"
                         >
                           <Trash2 className="h-4 w-4" />
-                        </Button>
+                        </GlassButton>
                       </AlertDialogTrigger>
                       <AlertDialogContent>
                         <AlertDialogHeader>

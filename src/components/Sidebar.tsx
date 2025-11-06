@@ -3,11 +3,12 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { Home, DollarSign, ListChecks, LogOut, Wallet, Target, BookOpen, CreditCard, User, Repeat, Brain, CalendarCheck } from "lucide-react"; // Importar novos ícones
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/button"; // Keep original Button for type, but use GlassButton
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/context/AuthContext";
 import { useTransactionContext } from "@/context/TransactionContext"; // Importar o contexto de transações
 import Logo from "./Logo"; // Importar o componente Logo
+import GlassButton from "./GlassButton"; // Import GlassButton
 
 interface SidebarProps extends React.HTMLAttributes<HTMLDivElement> {
   isMobile: boolean;
@@ -84,7 +85,7 @@ const Sidebar = ({ className, isMobile, onLinkClick }: SidebarProps) => {
           <Logo href="/app" className="mb-2 px-4" textClassName="text-lg font-semibold tracking-tight" />
           <div className="space-y-1">
             {navItems.filter(item => item.show).map((item) => (
-              <Button
+              <GlassButton
                 key={item.name}
                 variant="ghost"
                 className="w-full justify-start"
@@ -95,12 +96,12 @@ const Sidebar = ({ className, isMobile, onLinkClick }: SidebarProps) => {
                   {item.icon}
                   {item.name}
                 </Link>
-              </Button>
+              </GlassButton>
             ))}
           </div>
         </div>
         <div className="px-3 py-2">
-          <Button
+          <GlassButton
             variant="ghost"
             className="w-full justify-start text-red-500 hover:text-red-700"
             onClick={async () => {
@@ -110,7 +111,7 @@ const Sidebar = ({ className, isMobile, onLinkClick }: SidebarProps) => {
           >
             <LogOut className="mr-2 h-4 w-4" />
             Sair
-          </Button>
+          </GlassButton>
         </div>
       </div>
     </div>

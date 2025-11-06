@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/button"; // Keep original Button for type, but use GlassButton
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { PlusCircle, Edit, Trash2, CalendarIcon } from "lucide-react";
@@ -19,8 +19,10 @@ import { Calendar } from "@/components/ui/calendar";
 import { format, parseISO } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { cn } from "@/lib/utils";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"; // Keep original Card for type, but use GlassCard
 import { useNavigate } from "react-router-dom";
+import GlassCard from "@/components/GlassCard"; // Import GlassCard
+import GlassButton from "@/components/GlassButton"; // Import GlassButton
 
 const subscriptionFormSchema = z.object({
   name: z.string().min(1, "O nome da assinatura é obrigatório.").max(100, "O nome não pode ter mais de 100 caracteres."),
@@ -112,7 +114,7 @@ const SubscriptionManagementPage = () => {
 
       {/* Card de status da assinatura GPF removido daqui e movido para ProfilePage.tsx */}
 
-      <Card>
+      <GlassCard>
         <CardHeader>
           <CardTitle>Gasto Total Mensal com Assinaturas Externas</CardTitle>
         </CardHeader>
@@ -124,15 +126,15 @@ const SubscriptionManagementPage = () => {
             Este é o valor total que você gasta por mês com todas as suas assinaturas externas.
           </p>
         </CardContent>
-      </Card>
+      </GlassCard>
 
       <div className="flex justify-end">
         <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
           <DialogTrigger asChild>
-            <Button>
+            <GlassButton>
               <PlusCircle className="mr-2 h-4 w-4" />
               Adicionar Assinatura
-            </Button>
+            </GlassButton>
           </DialogTrigger>
           <DialogContent className="sm:max-w-[425px]">
             <DialogHeader>
@@ -177,18 +179,16 @@ const SubscriptionManagementPage = () => {
                       <FormLabel>Próxima Data de Vencimento (Opcional)</FormLabel>
                       <Popover>
                         <PopoverTrigger asChild>
-                          <FormControl>
-                            <Button
-                              variant={"outline"}
-                              className={cn(
-                                "w-full justify-start text-left font-normal",
-                                !field.value && "text-muted-foreground"
-                              )}
-                            >
-                              <CalendarIcon className="mr-2 h-4 w-4" />
-                              {field.value ? format(field.value, "PPP", { locale: ptBR }) : <span>Escolha uma data</span>}
-                            </Button>
-                          </FormControl>
+                          <GlassButton
+                            variant={"outline"}
+                            className={cn(
+                              "w-full justify-start text-left font-normal",
+                              !field.value && "text-muted-foreground"
+                            )}
+                          >
+                            <CalendarIcon className="mr-2 h-4 w-4" />
+                            {field.value ? format(field.value, "PPP", { locale: ptBR }) : <span>Escolha uma data</span>}
+                          </GlassButton>
                         </PopoverTrigger>
                         <PopoverContent className="w-auto p-0" align="start">
                           <Calendar
@@ -205,7 +205,7 @@ const SubscriptionManagementPage = () => {
                   )}
                 />
                 <DialogFooter>
-                  <Button type="submit">Salvar Assinatura</Button>
+                  <GlassButton type="submit">Salvar Assinatura</GlassButton>
                 </DialogFooter>
               </form>
             </Form>
@@ -238,14 +238,14 @@ const SubscriptionManagementPage = () => {
                       if (!open) setEditingSubscription(null);
                     }}>
                       <DialogTrigger asChild>
-                        <Button
+                        <GlassButton
                           variant="ghost"
                           size="icon"
                           className="mr-2"
                           onClick={() => setEditingSubscription(sub)}
                         >
                           <Edit className="h-4 w-4" />
-                        </Button>
+                        </GlassButton>
                       </DialogTrigger>
                       <DialogContent className="sm:max-w-[425px]">
                         <DialogHeader>
@@ -290,18 +290,16 @@ const SubscriptionManagementPage = () => {
                                   <FormLabel>Próxima Data de Vencimento (Opcional)</FormLabel>
                                   <Popover>
                                     <PopoverTrigger asChild>
-                                      <FormControl>
-                                        <Button
-                                          variant={"outline"}
-                                          className={cn(
-                                            "w-full justify-start text-left font-normal",
-                                            !field.value && "text-muted-foreground"
-                                          )}
-                                        >
-                                          <CalendarIcon className="mr-2 h-4 w-4" />
-                                          {field.value ? format(field.value, "PPP", { locale: ptBR }) : <span>Escolha uma data</span>}
-                                        </Button>
-                                      </FormControl>
+                                      <GlassButton
+                                        variant={"outline"}
+                                        className={cn(
+                                          "w-full justify-start text-left font-normal",
+                                          !field.value && "text-muted-foreground"
+                                        )}
+                                      >
+                                        <CalendarIcon className="mr-2 h-4 w-4" />
+                                        {field.value ? format(field.value, "PPP", { locale: ptBR }) : <span>Escolha uma data</span>}
+                                      </GlassButton>
                                     </PopoverTrigger>
                                     <PopoverContent className="w-auto p-0" align="start">
                                       <Calendar
@@ -318,7 +316,7 @@ const SubscriptionManagementPage = () => {
                               )}
                             />
                             <DialogFooter>
-                              <Button type="submit">Salvar Alterações</Button>
+                              <GlassButton type="submit">Salvar Alterações</GlassButton>
                             </DialogFooter>
                           </form>
                         </Form>
@@ -327,13 +325,13 @@ const SubscriptionManagementPage = () => {
 
                     <AlertDialog>
                       <AlertDialogTrigger asChild>
-                        <Button
+                        <GlassButton
                           variant="ghost"
                           size="icon"
                           className="text-red-500 hover:text-red-700"
                         >
                           <Trash2 className="h-4 w-4" />
-                        </Button>
+                        </GlassButton>
                       </AlertDialogTrigger>
                       <AlertDialogContent>
                         <AlertDialogHeader>
