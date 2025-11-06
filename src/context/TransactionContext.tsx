@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useState, ReactNode, useEffect, useCallback } from "react";
 import { useLocalStorage } from "@/hooks/use-local-storage"; // Still used for auth, but not for transaction data
-import { format } from "date-fns";
+import { format, addMonths } from "date-fns"; // Importar addMonths
 import { supabase } from "@/lib/supabase";
 import { toast } from "sonner";
 import { useSession } from "./SessionContext"; // Import useSession
@@ -94,6 +94,7 @@ interface UserProfile {
   is_premium: boolean; // Novo campo para status de assinatura
   subscription_type: 'monthly' | 'annual' | null; // Tipo de assinatura
   subscription_end_date: string | null; // Data de término da assinatura
+  data_retention_until: string | null; // NOVO CAMPO: Data até quando os dados serão retidos após o cancelamento
   show_budgets: boolean; // Novo campo para visibilidade do menu
   show_goals: boolean; // Novo campo para visibilidade do menu
   show_debts: boolean; // Novo campo para visibilidade do menu
@@ -327,6 +328,7 @@ export const TransactionProvider = ({ children }: { children: ReactNode }) => {
             is_premium: false, // Default to non-premium
             subscription_type: null,
             subscription_end_date: null,
+            data_retention_until: null, // Inicializar como null
             show_budgets: true, // Default to true
             show_goals: true, // Default to true
             show_debts: true, // Default to true
@@ -715,12 +717,23 @@ export const TransactionProvider = ({ children }: { children: ReactNode }) => {
       toast.error("Você precisa estar logado para atualizar seu perfil.");
       return;
     }
-    const { error } = await supabase.from('profiles').update(updates).eq('id', user.id);
+
+    const profileUpdates: Partial<UserProfile> = { ...updates };
+
+    if (updates.is_premium === false) {
+      profileUpdates.subscription_type = null;
+      profileUpdates.subscription_end_date = null;
+      profileUpdates.data_retention_until = format(addMonths(new Date(), 1), "yyyy-MM-dd"); // Retém dados por 1 mês
+    } else if (updates.is_premium === true) {
+      profileUpdates.data_retention_until = null; // Limpa a data de retenção se reativar
+    }
+
+    const { error } = await supabase.from('profiles').update(profileUpdates).eq('id', user.id);
     if (error) {
       toast.error("Erro ao atualizar perfil: " + error.message);
       console.error("Erro ao atualizar perfil:", error);
     } else {
-      setUserProfile((prev) => (prev ? { ...prev, ...updates } : null));
+      setUserProfile((prev) => (prev ? { ...prev, ...profileUpdates } : null));
       toast.success("Perfil atualizado com sucesso!");
     }
   };

@@ -13,7 +13,7 @@ import { toast } from "sonner";
 import { CreditCard, CheckCircle } from "lucide-react";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { useNavigate } from "react-router-dom";
-import { format, parseISO } from "date-fns";
+import { format, parseISO, addMonths } from "date-fns"; // Importar addMonths
 import { ptBR } from "date-fns/locale";
 
 const paymentCardFormSchema = z.object({
@@ -40,11 +40,11 @@ const SubscriptionDetailsPage = () => {
   const handleCancelSubscription = async () => {
     await updateUserProfile({
       is_premium: false,
-      subscription_type: null,
-      subscription_end_date: null,
+      // subscription_type e subscription_end_date serão definidos como null no TransactionContext
+      // data_retention_until será definido no TransactionContext
     });
-    toast.success("Sua assinatura foi cancelada com sucesso.");
-    navigate("/subscribe");
+    toast.success("Sua assinatura foi cancelada com sucesso. Seu login será suspenso e seus dados serão retidos por 1 mês.");
+    navigate("/subscribe"); // Redireciona para a página de assinatura necessária
   };
 
   const handleUpdatePaymentCard = async (values: z.infer<typeof paymentCardFormSchema>) => {
@@ -59,6 +59,8 @@ const SubscriptionDetailsPage = () => {
     });
     paymentCardForm.reset(); // Clear form after successful update
   };
+
+  const retentionDate = userProfile?.data_retention_until ? format(parseISO(userProfile.data_retention_until), "dd/MM/yyyy", { locale: ptBR }) : "N/A";
 
   return (
     <div className="space-y-6">
@@ -105,7 +107,7 @@ const SubscriptionDetailsPage = () => {
                   <AlertDialogHeader>
                     <AlertDialogTitle>Tem certeza que deseja cancelar?</AlertDialogTitle>
                     <AlertDialogDescription>
-                      Ao cancelar, você perderá o acesso aos recursos premium do GPF após a data de vencimento da sua assinatura.
+                      Ao cancelar, seu login será suspenso imediatamente. Seus dados serão retidos por 1 mês a partir de hoje. Se você reativar a assinatura dentro desse período, terá acesso total aos seus dados novamente. Após {retentionDate}, todos os seus dados serão permanentemente excluídos.
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter>
@@ -199,8 +201,8 @@ const SubscriptionDetailsPage = () => {
                   Atualizar Cartão
                 </Button>
               </form>
-            </Form>
-          </CardContent>
+            </CardContent>
+          </Card>
         </Card>
       )}
     </div>
