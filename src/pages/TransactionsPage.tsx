@@ -18,8 +18,10 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from "@/components/ui/form";
 import { toast } from "sonner";
-import { useTransactionContext } from "@/context/TransactionContext"; // Import useTransactionContext
-import { Checkbox } from "@/components/ui/checkbox"; // Import Checkbox
+import { useTransactionContext } from "@/context/TransactionContext";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"; // Import Select components
+import { Switch } from "@/components/ui/switch"; // Import Switch
 
 interface Transaction {
   id: string;
@@ -39,28 +41,32 @@ interface FutureExpense {
   category: string;
 }
 
+const NEW_CATEGORY_OPTION = "ADICIONAR_NOVA_CATEGORIA";
+
 const transactionFormSchema = z.object({
   date: z.date({
     required_error: "A data é obrigatória.",
   }),
   description: z.string().min(1, "A descrição é obrigatória."),
-  amount: z.coerce.number().positive("O valor deve ser positivo."), // Alterado para z.coerce.number()
+  amount: z.coerce.number().positive("O valor deve ser positivo."),
   type: z.enum(["income", "expense"], {
     required_error: "O tipo é obrigatório.",
   }),
   category: z.string().min(1, "A categoria é obrigatória."),
-  isFixed: z.boolean().default(false), // Novo campo para gasto fixo
+  isFixed: z.boolean().default(false),
+  saveNewCategory: z.boolean().optional(), // Campo opcional para salvar nova categoria
 });
 
 const futureExpenseFormSchema = z.object({
-  dueDates: z.array(z.date()).min(1, "Selecione pelo menos uma data de vencimento."), // Alterado para array de datas
+  dueDates: z.array(z.date()).min(1, "Selecione pelo menos uma data de vencimento."),
   description: z.string().min(1, "A descrição é obrigatória."),
-  amount: z.coerce.number().positive("O valor deve ser positivo."), // Alterado para z.coerce.number()
+  amount: z.coerce.number().positive("O valor deve ser positivo."),
   category: z.string().min(1, "A categoria é obrigatória."),
+  saveNewCategory: z.boolean().optional(), // Campo opcional para salvar nova categoria
 });
 
 const TransactionsPage = () => {
-  const { transactions, addTransaction, deleteTransaction, futureExpenses, addFutureExpense, deleteFutureExpense } = useTransactionContext();
+  const { transactions, addTransaction, deleteTransaction, futureExpenses, addFutureExpense, deleteFutureExpense, savedCategories, addSavedCategory } = useTransactionContext();
   const [searchTerm, setSearchTerm] = React.useState("");
   const [isAddTransactionDialogOpen, setIsAddTransactionDialogOpen] = React.useState(false);
   const [isAddFutureExpenseDialogOpen, setIsAddFutureExpenseDialogOpen] = React.useState(false);
@@ -70,11 +76,12 @@ const TransactionsPage = () => {
     resolver: zodResolver(transactionFormSchema),
     defaultValues: {
       description: "",
-      amount: "", // Alterado para string vazia
+      amount: "",
       type: "expense",
       category: "",
       date: new Date(),
       isFixed: false,
+      saveNewCategory: false,
     },
   });
 
@@ -82,9 +89,10 @@ const TransactionsPage = () => {
     resolver: zodResolver(futureExpenseFormSchema),
     defaultValues: {
       description: "",
-      amount: "", // Alterado para string vazia
+      amount: "",
       category: "",
-      dueDates: [], // Inicializa como array vazio
+      dueDates: [],
+      saveNewCategory: false,
     },
   });
 
@@ -97,8 +105,21 @@ const TransactionsPage = () => {
       category: values.category,
       isFixed: values.isFixed,
     });
+
+    if (values.saveNewCategory && !savedCategories.includes(values.category)) {
+      addSavedCategory(values.category);
+    }
+
     toast.success("Transação adicionada com sucesso!");
-    transactionForm.reset();
+    transactionForm.reset({
+      description: "",
+      amount: "",
+      type: "expense",
+      category: "",
+      date: new Date(),
+      isFixed: false,
+      saveNewCategory: false,
+    });
     setIsAddTransactionDialogOpen(false);
   };
 
@@ -116,8 +137,19 @@ const TransactionsPage = () => {
         category: values.category,
       });
     });
+
+    if (values.saveNewCategory && !savedCategories.includes(values.category)) {
+      addSavedCategory(values.category);
+    }
+
     toast.success("Gasto(s) futuro(s) adicionado(s) com sucesso!");
-    futureExpenseForm.reset();
+    futureExpenseForm.reset({
+      description: "",
+      amount: "",
+      category: "",
+      dueDates: [],
+      saveNewCategory: false,
+    });
     setIsAddFutureExpenseDialogOpen(false);
   };
 
@@ -320,13 +352,59 @@ const TransactionsPage = () => {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Categoria</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Ex: Alimentação, Transporte" {...field} />
-                        </FormControl>
+                        <Select onValueChange={field.onChange} value={field.value}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Selecione uma categoria" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {savedCategories.map((category) => (
+                              <SelectItem key={category} value={category}>
+                                {category}
+                              </SelectItem>
+                            ))}
+                            <SelectItem value={NEW_CATEGORY_OPTION}>
+                              Adicionar nova categoria...
+                            </SelectItem>
+                          </SelectContent>
+                        </Select>
+                        {field.value === NEW_CATEGORY_OPTION && (
+                          <Input
+                            placeholder="Digite a nova categoria"
+                            value={transactionForm.getValues("category") === NEW_CATEGORY_OPTION ? "" : transactionForm.getValues("category")}
+                            onChange={(e) => transactionForm.setValue("category", e.target.value)}
+                            className="mt-2"
+                          />
+                        )}
                         <FormMessage />
                       </FormItem>
                     )}
                   />
+                  {transactionForm.watch("category") && transactionForm.watch("category") !== NEW_CATEGORY_OPTION && !savedCategories.includes(transactionForm.watch("category")) && (
+                    <FormField
+                      control={transactionForm.control}
+                      name="saveNewCategory"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                          <div className="space-y-0.5">
+                            <FormLabel className="text-base">
+                              Salvar categoria para uso futuro?
+                            </FormLabel>
+                            <FormDescription>
+                              Esta categoria será adicionada à sua lista de categorias salvas.
+                            </FormDescription>
+                          </div>
+                          <FormControl>
+                            <Switch
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                            />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+                  )}
                   <FormField
                     control={transactionForm.control}
                     name="isFixed"
@@ -400,7 +478,7 @@ const TransactionsPage = () => {
                           </PopoverTrigger>
                           <PopoverContent className="w-auto p-0" align="start">
                             <Calendar
-                              mode="multiple" // Alterado para seleção múltipla
+                              mode="multiple"
                               selected={field.value}
                               onSelect={field.onChange}
                               initialFocus
@@ -444,13 +522,59 @@ const TransactionsPage = () => {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Categoria</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Ex: Moradia, Contas" {...field} />
-                        </FormControl>
+                        <Select onValueChange={field.onChange} value={field.value}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Selecione uma categoria" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {savedCategories.map((category) => (
+                              <SelectItem key={category} value={category}>
+                                {category}
+                              </SelectItem>
+                            ))}
+                            <SelectItem value={NEW_CATEGORY_OPTION}>
+                              Adicionar nova categoria...
+                            </SelectItem>
+                          </SelectContent>
+                        </Select>
+                        {field.value === NEW_CATEGORY_OPTION && (
+                          <Input
+                            placeholder="Digite a nova categoria"
+                            value={futureExpenseForm.getValues("category") === NEW_CATEGORY_OPTION ? "" : futureExpenseForm.getValues("category")}
+                            onChange={(e) => futureExpenseForm.setValue("category", e.target.value)}
+                            className="mt-2"
+                          />
+                        )}
                         <FormMessage />
                       </FormItem>
                     )}
                   />
+                  {futureExpenseForm.watch("category") && futureExpenseForm.watch("category") !== NEW_CATEGORY_OPTION && !savedCategories.includes(futureExpenseForm.watch("category")) && (
+                    <FormField
+                      control={futureExpenseForm.control}
+                      name="saveNewCategory"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                          <div className="space-y-0.5">
+                            <FormLabel className="text-base">
+                              Salvar categoria para uso futuro?
+                            </FormLabel>
+                            <FormDescription>
+                              Esta categoria será adicionada à sua lista de categorias salvas.
+                            </FormDescription>
+                          </div>
+                          <FormControl>
+                            <Switch
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                            />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+                  )}
                   <DialogFooter>
                     <Button type="submit">Salvar Gasto(s) Futuro(s)</Button>
                   </DialogFooter>

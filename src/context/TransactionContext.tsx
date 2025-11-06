@@ -32,6 +32,8 @@ interface TransactionContextType {
   totalBalance: number;
   totalIncome: number;
   totalExpenses: number;
+  savedCategories: string[]; // Nova propriedade para categorias salvas
+  addSavedCategory: (category: string) => void; // Nova função para adicionar categoria
 }
 
 const TransactionContext = createContext<TransactionContextType | undefined>(undefined);
@@ -47,6 +49,10 @@ export const TransactionProvider = ({ children }: { children: ReactNode }) => {
   const [futureExpenses, setFutureExpenses] = useLocalStorage<FutureExpense[]>("finance-future-expenses", [
     { id: "fe1", dueDate: "2023-11-05", description: "Conta de Luz", amount: 150, category: "Contas" },
     { id: "fe2", dueDate: "2023-11-10", description: "Mensalidade Academia", amount: 80, category: "Saúde" },
+  ]);
+
+  const [savedCategories, setSavedCategories] = useLocalStorage<string[]>("finance-saved-categories", [
+    "Alimentação", "Moradia", "Transporte", "Saúde", "Educação", "Lazer", "Trabalho", "Contas", "Outros"
   ]);
 
   const addTransaction = (transaction: Omit<Transaction, "id">) => {
@@ -65,6 +71,12 @@ export const TransactionProvider = ({ children }: { children: ReactNode }) => {
 
   const deleteFutureExpense = (id: string) => {
     setFutureExpenses((prev) => prev.filter((e) => e.id !== id));
+  };
+
+  const addSavedCategory = (category: string) => {
+    if (category && !savedCategories.includes(category)) {
+      setSavedCategories((prev) => [...prev, category]);
+    }
   };
 
   const totalIncome = transactions
@@ -89,6 +101,8 @@ export const TransactionProvider = ({ children }: { children: ReactNode }) => {
         totalBalance,
         totalIncome,
         totalExpenses,
+        savedCategories,
+        addSavedCategory,
       }}
     >
       {children}
