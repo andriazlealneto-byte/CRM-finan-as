@@ -8,7 +8,7 @@ import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { Progress } from "@/components/ui/progress"; // Import Progress component
 import DashboardCharts from "@/components/DashboardCharts"; // Import DashboardCharts
-import FinancialAssistant from "@/components/FinancialAssistant"; // Import FinancialAssistant
+// import FinancialAssistant from "@/components/FinancialAssistant"; // REMOVIDO
 
 const Index = () => {
   const {
@@ -137,7 +137,7 @@ const Index = () => {
       <h2 className="text-2xl font-bold mt-8 mb-4">Análise de Gastos</h2>
       <DashboardCharts />
 
-      <FinancialAssistant /> {/* Novo componente do assistente financeiro */}
+      {/* FinancialAssistant removido */}
 
       <Card>
         <CardHeader>
