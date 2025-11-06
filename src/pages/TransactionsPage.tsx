@@ -44,10 +44,7 @@ const transactionFormSchema = z.object({
     required_error: "A data é obrigatória.",
   }),
   description: z.string().min(1, "A descrição é obrigatória."),
-  amount: z.preprocess(
-    (val) => Number(val),
-    z.number().positive("O valor deve ser positivo.")
-  ),
+  amount: z.coerce.number().positive("O valor deve ser positivo."), // Alterado para z.coerce.number()
   type: z.enum(["income", "expense"], {
     required_error: "O tipo é obrigatório.",
   }),
@@ -58,10 +55,7 @@ const transactionFormSchema = z.object({
 const futureExpenseFormSchema = z.object({
   dueDates: z.array(z.date()).min(1, "Selecione pelo menos uma data de vencimento."), // Alterado para array de datas
   description: z.string().min(1, "A descrição é obrigatória."),
-  amount: z.preprocess(
-    (val) => Number(val),
-    z.number().positive("O valor deve ser positivo.")
-  ),
+  amount: z.coerce.number().positive("O valor deve ser positivo."), // Alterado para z.coerce.number()
   category: z.string().min(1, "A categoria é obrigatória."),
 });
 
@@ -76,7 +70,7 @@ const TransactionsPage = () => {
     resolver: zodResolver(transactionFormSchema),
     defaultValues: {
       description: "",
-      amount: 0,
+      amount: "", // Alterado para string vazia
       type: "expense",
       category: "",
       date: new Date(),
@@ -88,7 +82,7 @@ const TransactionsPage = () => {
     resolver: zodResolver(futureExpenseFormSchema),
     defaultValues: {
       description: "",
-      amount: 0,
+      amount: "", // Alterado para string vazia
       category: "",
       dueDates: [], // Inicializa como array vazio
     },
@@ -280,7 +274,7 @@ const TransactionsPage = () => {
                       <FormItem>
                         <FormLabel>Valor</FormLabel>
                         <FormControl>
-                          <Input type="number" placeholder="0.00" {...field} onChange={e => field.onChange(parseFloat(e.target.value))} />
+                          <Input type="number" placeholder="0.00" {...field} /> {/* Removido parseFloat do onChange */}
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -438,7 +432,7 @@ const TransactionsPage = () => {
                       <FormItem>
                         <FormLabel>Valor</FormLabel>
                         <FormControl>
-                          <Input type="number" placeholder="0.00" {...field} onChange={e => field.onChange(parseFloat(e.target.value))} />
+                          <Input type="number" placeholder="0.00" {...field} /> {/* Removido parseFloat do onChange */}
                         </FormControl>
                         <FormMessage />
                       </FormItem>
