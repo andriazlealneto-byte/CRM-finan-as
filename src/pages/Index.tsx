@@ -8,6 +8,7 @@ import { format, subMonths, startOfMonth, endOfMonth, parseISO } from "date-fns"
 import { ptBR } from "date-fns/locale";
 import { Progress } from "@/components/ui/progress"; // Import Progress component
 import DashboardCharts from "@/components/DashboardCharts"; // Import DashboardCharts
+import { cn } from "@/lib/utils"; // Importar a função cn
 
 const Index = () => {
   const {
