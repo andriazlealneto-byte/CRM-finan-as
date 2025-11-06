@@ -3,7 +3,7 @@
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { CheckCircle, DollarSign, TrendingUp, Shield, Star, Menu } from "lucide-react";
 import { MadeWithDyad } from "@/components/made-with-dyad";
 import { ThemeToggle } from "@/components/ThemeToggle";
@@ -121,8 +121,7 @@ const LandingPage = () => {
                       <Button asChild className="w-full"><Link to="/login">Login</Link></Button>
                     )}
                   </div>
-                </div>
-              </SheetContent>
+                </SheetContent>
             </Sheet>
           </div>
         </div>
