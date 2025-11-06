@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index"; // This is now the Dashboard
 import TransactionsPage from "./pages/TransactionsPage"; // New transactions page
 import CategoryManagementPage from "./pages/CategoryManagementPage"; // New category management page
+import BudgetManagementPage from "./pages/BudgetManagementPage"; // New budget management page
 import NotFound from "./pages/NotFound";
 import Layout from "./components/Layout"; // New layout component
 import { ThemeProvider } from "./components/ThemeProvider"; // Import ThemeProvider
@@ -32,6 +33,7 @@ const App = () => (
                     <Route index element={<Index />} /> {/* Dashboard */}
                     <Route path="transactions" element={<TransactionsPage />} /> {/* Transactions */}
                     <Route path="categories" element={<CategoryManagementPage />} /> {/* Category Management */}
+                    <Route path="budgets" element={<BudgetManagementPage />} /> {/* Budget Management */}
                     {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                     <Route path="*" element={<NotFound />} />
                   </Route>

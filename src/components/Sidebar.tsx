@@ -2,7 +2,7 @@
 
 import React from "react";
 import { Link } from "react-router-dom";
-import { Home, DollarSign, ListChecks, LogOut } from "lucide-react"; // Import ListChecks and LogOut icon
+import { Home, DollarSign, ListChecks, LogOut, Wallet } from "lucide-react"; // Import ListChecks, LogOut and Wallet icon
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/context/AuthContext"; // Import useAuth
@@ -30,6 +30,11 @@ const Sidebar = ({ className, isMobile, onLinkClick }: SidebarProps) => {
       name: "Categorias", // New navigation item
       href: "/categories",
       icon: <ListChecks className="mr-2 h-4 w-4" />,
+    },
+    {
+      name: "Orçamentos", // New navigation item for budgets
+      href: "/budgets",
+      icon: <Wallet className="mr-2 h-4 w-4" />,
     },
   ];
 

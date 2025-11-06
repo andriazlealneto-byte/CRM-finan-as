@@ -36,6 +36,18 @@ interface TransactionContextType {
   addSavedCategory: (category: string) => void; // Nova função para adicionar categoria
   editSavedCategory: (oldCategory: string, newCategory: string) => void; // Função para editar categoria
   deleteSavedCategory: (categoryToDelete: string) => void; // Função para excluir categoria
+  
+  // Novas propriedades para orçamentos
+  miscExpensesLimit: number;
+  setMiscExpensesLimit: (limit: number) => void;
+  foodExpensesLimit: number;
+  setFoodExpensesLimit: (limit: number) => void;
+  miscCategories: string[];
+  setMiscCategories: (categories: string[]) => void;
+  foodCategories: string[];
+  setFoodCategories: (categories: string[]) => void;
+  currentMiscExpenses: number;
+  currentFoodExpenses: number;
 }
 
 const TransactionContext = createContext<TransactionContextType | undefined>(undefined);
@@ -56,6 +68,13 @@ export const TransactionProvider = ({ children }: { children: ReactNode }) => {
   const [savedCategories, setSavedCategories] = useLocalStorage<string[]>("finance-saved-categories", [
     "Alimentação", "Moradia", "Transporte", "Saúde", "Educação", "Lazer", "Trabalho", "Contas", "Outros"
   ]);
+
+  // Novos estados para orçamentos
+  const [miscExpensesLimit, setMiscExpensesLimit] = useLocalStorage<number>("finance-misc-expenses-limit", 200);
+  const [foodExpensesLimit, setFoodExpensesLimit] = useLocalStorage<number>("finance-food-expenses-limit", 500);
+  const [miscCategories, setMiscCategories] = useLocalStorage<string[]>("finance-misc-categories", ["Lazer", "Outros"]);
+  const [foodCategories, setFoodCategories] = useLocalStorage<string[]>("finance-food-categories", ["Alimentação"]);
+
 
   const addTransaction = (transaction: Omit<Transaction, "id">) => {
     const newTransaction: Transaction = { ...transaction, id: String(Date.now()) };
@@ -86,18 +105,17 @@ export const TransactionProvider = ({ children }: { children: ReactNode }) => {
       setSavedCategories((prev) =>
         prev.map((cat) => (cat === oldCategory ? newCategory : cat))
       );
-      // Optionally, update existing transactions/future expenses with the new category name
-      // For simplicity, this example does not update existing transactions/future expenses.
-      // If this is desired, you would iterate through transactions and futureExpenses
-      // and update their category fields.
+      // Atualizar categorias de orçamento se a categoria for renomeada
+      setMiscCategories((prev) => prev.map(cat => cat === oldCategory ? newCategory : cat));
+      setFoodCategories((prev) => prev.map(cat => cat === oldCategory ? newCategory : cat));
     }
   };
 
   const deleteSavedCategory = (categoryToDelete: string) => {
     setSavedCategories((prev) => prev.filter((cat) => cat !== categoryToDelete));
-    // Optionally, handle transactions/future expenses that used this category.
-    // For simplicity, this example does not modify existing transactions/future expenses.
-    // You might want to set their category to "Outros" or a default, or prompt the user.
+    // Remover a categoria das listas de orçamento se ela for excluída
+    setMiscCategories((prev) => prev.filter((cat) => cat !== categoryToDelete));
+    setFoodCategories((prev) => prev.filter((cat) => cat !== categoryToDelete));
   };
 
   const totalIncome = transactions
@@ -109,6 +127,15 @@ export const TransactionProvider = ({ children }: { children: ReactNode }) => {
     .reduce((sum, t) => sum + Math.abs(t.amount), 0); // Use Math.abs for display
 
   const totalBalance = transactions.reduce((sum, t) => sum + t.amount, 0);
+
+  // Cálculo dos gastos atuais para categorias específicas
+  const currentMiscExpenses = transactions
+    .filter(t => t.type === "expense" && miscCategories.includes(t.category))
+    .reduce((sum, t) => sum + Math.abs(t.amount), 0);
+
+  const currentFoodExpenses = transactions
+    .filter(t => t.type === "expense" && foodCategories.includes(t.category))
+    .reduce((sum, t) => sum + Math.abs(t.amount), 0);
 
   return (
     <TransactionContext.Provider
@@ -126,6 +153,16 @@ export const TransactionProvider = ({ children }: { children: ReactNode }) => {
         addSavedCategory,
         editSavedCategory,
         deleteSavedCategory,
+        miscExpensesLimit,
+        setMiscExpensesLimit,
+        foodExpensesLimit,
+        setFoodExpensesLimit,
+        miscCategories,
+        setMiscCategories,
+        foodCategories,
+        setFoodCategories,
+        currentMiscExpenses,
+        currentFoodExpenses,
       }}
     >
       {children}
