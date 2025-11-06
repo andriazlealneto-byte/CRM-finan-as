@@ -48,7 +48,7 @@ const UserAvatar = () => {
           <Settings className="mr-2 h-4 w-4" />
           Perfil
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => navigate("/app/subscription-details")}> {/* Aponta para a nova página de detalhes da assinatura */}
+        <DropdownMenuItem onClick={() => navigate("/app/subscription-details")}>
           <CreditCard className="mr-2 h-4 w-4" />
           Gerenciar Assinatura GPF
         </DropdownMenuItem>
