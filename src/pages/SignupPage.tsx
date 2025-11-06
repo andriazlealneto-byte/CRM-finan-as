@@ -14,6 +14,7 @@ import { MadeWithDyad } from "@/components/made-with-dyad";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { useSession } from "@/context/SessionContext";
 import { toast } from "sonner";
+import { Eye, EyeOff } from "lucide-react"; // Importar ícones de olho
 
 const signupFormSchema = z.object({
   email: z.string().email("Digite um email válido.").min(1, "O email é obrigatório."),
@@ -25,9 +26,11 @@ const signupFormSchema = z.object({
 });
 
 const SignupPage = () => {
-  const { signup } = useAuth(); // Usaremos uma nova função 'signup' do AuthContext
+  const { signup } = useAuth();
   const { loading, session } = useSession();
   const navigate = useNavigate();
+  const [showPassword, setShowPassword] = React.useState(false); // Estado para alternar visibilidade da senha
+  const [showConfirmPassword, setShowConfirmPassword] = React.useState(false); // Estado para alternar visibilidade da confirmação de senha
 
   const form = useForm<z.infer<typeof signupFormSchema>>({
     resolver: zodResolver(signupFormSchema),
@@ -48,7 +51,7 @@ const SignupPage = () => {
     const success = await signup(values.email, values.password);
     if (success) {
       toast.success("Cadastro realizado com sucesso! Verifique seu e-mail para confirmar a conta.");
-      navigate("/login"); // Redireciona para a página de login após o cadastro
+      navigate("/login");
     }
   };
 
@@ -95,7 +98,26 @@ const SignupPage = () => {
                   <FormItem>
                     <FormLabel>Senha</FormLabel>
                     <FormControl>
-                      <Input type="password" placeholder="********" {...field} />
+                      <div className="relative">
+                        <Input
+                          type={showPassword ? "text" : "password"}
+                          placeholder="********"
+                          {...field}
+                        />
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          className="absolute right-0 top-0 h-full px-3 py-1 hover:bg-transparent"
+                          onClick={() => setShowPassword((prev) => !prev)}
+                        >
+                          {showPassword ? (
+                            <EyeOff className="h-4 w-4 text-muted-foreground" />
+                          ) : (
+                            <Eye className="h-4 w-4 text-muted-foreground" />
+                          )}
+                        </Button>
+                      </div>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -108,7 +130,26 @@ const SignupPage = () => {
                   <FormItem>
                     <FormLabel>Confirmar Senha</FormLabel>
                     <FormControl>
-                      <Input type="password" placeholder="********" {...field} />
+                      <div className="relative">
+                        <Input
+                          type={showConfirmPassword ? "text" : "password"}
+                          placeholder="********"
+                          {...field}
+                        />
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          className="absolute right-0 top-0 h-full px-3 py-1 hover:bg-transparent"
+                          onClick={() => setShowConfirmPassword((prev) => !prev)}
+                        >
+                          {showConfirmPassword ? (
+                            <EyeOff className="h-4 w-4 text-muted-foreground" />
+                          ) : (
+                            <Eye className="h-4 w-4 text-muted-foreground" />
+                          )}
+                        </Button>
+                      </div>
                     </FormControl>
                     <FormMessage />
                   </FormItem>

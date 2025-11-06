@@ -9,10 +9,12 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { useAuth } from "@/context/AuthContext";
-import { useNavigate, Link } from "react-router-dom"; // Importar Link
+import { useNavigate, Link } from "react-router-dom";
 import { MadeWithDyad } from "@/components/made-with-dyad";
 import { ThemeToggle } from "@/components/ThemeToggle";
-import { useSession } from "@/context/SessionContext"; // Import useSession
+import { useSession } from "@/context/SessionContext";
+import { toast } from "sonner";
+import { Eye, EyeOff } from "lucide-react"; // Importar ícones de olho
 
 const loginFormSchema = z.object({
   email: z.string().email("Digite um email válido.").min(1, "O email é obrigatório."),
@@ -21,8 +23,9 @@ const loginFormSchema = z.object({
 
 const LoginPage = () => {
   const { login } = useAuth();
-  const { loading, session } = useSession(); // Usar o loading e session do SessionContext
+  const { loading, session } = useSession();
   const navigate = useNavigate();
+  const [showPassword, setShowPassword] = React.useState(false); // Estado para alternar visibilidade da senha
 
   const form = useForm<z.infer<typeof loginFormSchema>>({
     resolver: zodResolver(loginFormSchema),
@@ -85,7 +88,26 @@ const LoginPage = () => {
                   <FormItem>
                     <FormLabel>Senha</FormLabel>
                     <FormControl>
-                      <Input type="password" placeholder="********" {...field} />
+                      <div className="relative">
+                        <Input
+                          type={showPassword ? "text" : "password"}
+                          placeholder="********"
+                          {...field}
+                        />
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          className="absolute right-0 top-0 h-full px-3 py-1 hover:bg-transparent"
+                          onClick={() => setShowPassword((prev) => !prev)}
+                        >
+                          {showPassword ? (
+                            <EyeOff className="h-4 w-4 text-muted-foreground" />
+                          ) : (
+                            <Eye className="h-4 w-4 text-muted-foreground" />
+                          )}
+                        </Button>
+                      </div>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
