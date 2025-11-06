@@ -41,6 +41,11 @@ const LandingPage = () => {
       description: "Mantenha suas dívidas e parcelamentos sob controle.",
     },
     {
+      icon: <CheckCircle className="h-6 w-6 text-primary" />,
+      title: "Orçamentos Personalizados",
+      description: "Crie orçamentos para categorias específicas e evite gastos excessivos.",
+    },
+    {
       icon: <Menu className="h-6 w-6 text-primary" />,
       title: "Assinaturas e Recorrências",
       description: "Gerencie todos os seus serviços de assinatura em um só lugar.",
@@ -137,7 +142,7 @@ const LandingPage = () => {
             <Button size="lg" className="bg-white text-primary hover:bg-gray-100" onClick={() => handleSubscriptionClick('monthly')}>
               Começar Agora (Mensal)
             </Button>
-            <Button size="lg" variant="outline" className="hover:bg-white hover:text-primary" onClick={() => handleSubscriptionClick('annual')}>
+            <Button size="lg" variant="outline" className="border-primary text-primary hover:bg-primary hover:text-primary-foreground" onClick={() => handleSubscriptionClick('annual')}>
               Economize 20% (Anual)
             </Button>
           </div>
