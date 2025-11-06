@@ -95,7 +95,7 @@ const SubscriptionManagementPage = () => {
 
   const totalMonthlySubscriptions = subscriptions.reduce((sum, sub) => sum + sub.amount, 0);
 
-  if (!userProfile?.show_subscriptions) {
+  if (userProfile === null || userProfile.show_subscriptions === false) {
     return (
       <div className="flex flex-col items-center justify-center h-full text-center space-y-4">
         <h1 className="text-3xl font-bold">Assinaturas Desativadas</h1>

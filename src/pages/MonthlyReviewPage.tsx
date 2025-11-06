@@ -92,7 +92,7 @@ const MonthlyReviewPage = () => {
   // Ensure consistency score is not negative
   consistencyScore = Math.max(0, consistencyScore);
 
-  if (!userProfile?.show_monthly_review) {
+  if (userProfile === null || userProfile.show_monthly_review === false) {
     return (
       <div className="flex flex-col items-center justify-center h-full text-center space-y-4">
         <h1 className="text-3xl font-bold">Reflexão Mensal Desativada</h1>

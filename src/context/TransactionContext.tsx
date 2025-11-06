@@ -379,6 +379,13 @@ export const TransactionProvider = ({ children }: { children: ReactNode }) => {
       if (profileData.grace_period_start_date === undefined) { // Check for undefined to handle existing data
           profileData.grace_period_start_date = null;
       }
+      // Ensure new visibility fields are initialized for existing users if they are undefined
+      if (profileData.show_budgets === undefined) profileData.show_budgets = true;
+      if (profileData.show_goals === undefined) profileData.show_goals = true;
+      if (profileData.show_debts === undefined) profileData.show_debts = true;
+      if (profileData.show_subscriptions === undefined) profileData.show_subscriptions = true;
+      if (profileData.show_monthly_review === undefined) profileData.show_monthly_review = true;
+
       setUserProfile(profileData);
     }
     setLoading(false);

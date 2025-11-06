@@ -116,7 +116,7 @@ const DebtsPage = () => {
     await deleteDebt(id);
   };
 
-  if (!userProfile?.show_debts) {
+  if (userProfile === null || userProfile.show_debts === false) {
     return (
       <div className="flex flex-col items-center justify-center h-full text-center space-y-4">
         <h1 className="text-3xl font-bold">Dívidas Desativadas</h1>

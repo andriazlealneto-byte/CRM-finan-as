@@ -123,7 +123,7 @@ const BudgetManagementPage = () => {
     toast.success(`Orçamento "${name}" excluído com sucesso!`);
   };
 
-  if (!userProfile?.show_budgets) {
+  if (userProfile === null || userProfile.show_budgets === false) {
     return (
       <div className="flex flex-col items-center justify-center h-full text-center space-y-4">
         <h1 className="text-3xl font-bold">Orçamentos Desativados</h1>

@@ -228,7 +228,7 @@ const GoalsPage = () => {
     );
   };
 
-  if (!userProfile?.show_goals) {
+  if (userProfile === null || userProfile.show_goals === false) {
     return (
       <div className="flex flex-col items-center justify-center h-full text-center space-y-4">
         <h1 className="text-3xl font-bold">Metas Desativadas</h1>
