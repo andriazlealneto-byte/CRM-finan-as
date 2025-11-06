@@ -13,7 +13,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { MadeWithDyad } from "@/components/made-with-dyad";
 import { useSession } from "@/context/SessionContext";
 import { toast } from "sonner";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, ChevronLeft } from "lucide-react"; // Importar ChevronLeft
 import { ThemeToggle } from "@/components/ThemeToggle"; // Importar ThemeToggle
 
 const loginFormSchema = z.object({
@@ -55,6 +55,11 @@ const LoginPage = () => {
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-background p-4">
+      <div className="absolute top-4 left-4"> {/* Botão de voltar */}
+        <Button variant="ghost" size="icon" onClick={() => navigate("/")}>
+          <ChevronLeft className="h-6 w-6" />
+        </Button>
+      </div>
       <div className="absolute top-4 right-4">
         <ThemeToggle />
       </div>

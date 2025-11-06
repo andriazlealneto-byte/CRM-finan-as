@@ -1,16 +1,23 @@
 "use client";
 
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom"; // Importar useNavigate
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { DollarSign, Crown } from "lucide-react";
+import { DollarSign, Crown, ChevronLeft } from "lucide-react"; // Importar ChevronLeft
 import { MadeWithDyad } from "@/components/made-with-dyad";
 import { ThemeToggle } from "@/components/ThemeToggle";
 
 const SubscriptionRequiredPage = () => {
+  const navigate = useNavigate(); // Inicializar useNavigate
+
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-background p-4">
+      <div className="absolute top-4 left-4"> {/* Botão de voltar */}
+        <Button variant="ghost" size="icon" onClick={() => navigate("/")}>
+          <ChevronLeft className="h-6 w-6" />
+        </Button>
+      </div>
       <div className="absolute top-4 right-4 flex items-center gap-2">
         <ThemeToggle />
       </div>
@@ -28,10 +35,10 @@ const SubscriptionRequiredPage = () => {
           </p>
           <div className="flex flex-col gap-4">
             <Button asChild size="lg" className="w-full">
-              <Link to="/?plan=monthly">Assinar Plano Mensal (R$39,90/mês)</Link>
+              <Link to="/payment?plan=monthly">Assinar Plano Mensal (R$39,90/mês)</Link>
             </Button>
             <Button asChild size="lg" variant="outline" className="w-full">
-              <Link to="/?plan=annual">Assinar Plano Anual (20% de desconto)</Link>
+              <Link to="/payment?plan=annual">Assinar Plano Anual (20% de desconto)</Link>
             </Button>
           </div>
           <p className="text-sm text-muted-foreground">

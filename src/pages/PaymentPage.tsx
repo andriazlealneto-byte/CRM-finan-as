@@ -6,12 +6,12 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } => "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { MadeWithDyad } from "@/components/made-with-dyad";
 import { toast } from "sonner";
-import { CreditCard, CheckCircle } from "lucide-react";
+import { CreditCard, CheckCircle, ChevronLeft } from "lucide-react"; // Importar ChevronLeft
 import { useTransactionContext } from "@/context/TransactionContext";
 import { ThemeToggle } from "@/components/ThemeToggle";
 
@@ -71,6 +71,11 @@ const PaymentPage = () => {
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-background p-4">
+      <div className="absolute top-4 left-4"> {/* Botão de voltar */}
+        <Button variant="ghost" size="icon" onClick={() => navigate("/")}>
+          <ChevronLeft className="h-6 w-6" />
+        </Button>
+      </div>
       <div className="absolute top-4 right-4 flex items-center gap-2">
         <ThemeToggle />
       </div>
