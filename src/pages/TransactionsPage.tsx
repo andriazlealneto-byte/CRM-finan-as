@@ -4,21 +4,21 @@ import React from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { PlusCircle, Search, CalendarIcon, Trash2 } from "lucide-react";
+import { PlusCircle, Search, CalendarIcon, Trash2, Clock } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { format } from "date-fns";
-import { ptBR } from "date-fns/locale"; // Import Portuguese locale
+import { ptBR } from "date-fns/locale";
 import { cn } from "@/lib/utils";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { toast } from "sonner"; // Using sonner for toasts
-import { useLocalStorage } from "@/hooks/use-local-storage"; // Import useLocalStorage
+import { toast } from "sonner";
+import { useTransactionContext } from "@/context/TransactionContext"; // Import useTransactionContext
 
 interface Transaction {
   id: string;
@@ -29,7 +29,15 @@ interface Transaction {
   category: string;
 }
 
-const formSchema = z.object({
+interface FutureExpense {
+  id: string;
+  dueDate: string;
+  description: string;
+  amount: number;
+  category: string;
+}
+
+const transactionFormSchema = z.object({
   date: z.date({
     required_error: "A data é obrigatória.",
   }),
@@ -44,19 +52,27 @@ const formSchema = z.object({
   category: z.string().min(1, "A categoria é obrigatória."),
 });
 
+const futureExpenseFormSchema = z.object({
+  dueDate: z.date({
+    required_error: "A data de vencimento é obrigatória.",
+  }),
+  description: z.string().min(1, "A descrição é obrigatória."),
+  amount: z.preprocess(
+    (val) => Number(val),
+    z.number().positive("O valor deve ser positivo.")
+  ),
+  category: z.string().min(1, "A categoria é obrigatória."),
+});
+
 const TransactionsPage = () => {
-  const [transactions, setTransactions] = useLocalStorage<Transaction[]>("finance-transactions", [
-    { id: "1", date: "2023-10-26", description: "Salário", amount: 3000, type: "income", category: "Trabalho" },
-    { id: "2", date: "2023-10-25", description: "Compras de Supermercado", amount: 120.50, type: "expense", category: "Alimentação" },
-    { id: "3", date: "2023-10-24", description: "Projeto Freelance", amount: 500, type: "income", category: "Trabalho" },
-    { id: "4", date: "2023-10-23", description: "Aluguel", amount: 800, type: "expense", category: "Moradia" },
-  ]);
+  const { transactions, addTransaction, deleteTransaction, futureExpenses, addFutureExpense, deleteFutureExpense } = useTransactionContext();
   const [searchTerm, setSearchTerm] = React.useState("");
   const [isAddTransactionDialogOpen, setIsAddTransactionDialogOpen] = React.useState(false);
+  const [isAddFutureExpenseDialogOpen, setIsAddFutureExpenseDialogOpen] = React.useState(false);
   const [selectedFilterDate, setSelectedFilterDate] = React.useState<Date | undefined>(undefined);
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const transactionForm = useForm<z.infer<typeof transactionFormSchema>>({
+    resolver: zodResolver(transactionFormSchema),
     defaultValues: {
       description: "",
       amount: 0,
@@ -66,24 +82,49 @@ const TransactionsPage = () => {
     },
   });
 
-  const handleAddTransaction = (values: z.infer<typeof formSchema>) => {
-    const newTransaction: Transaction = {
-      id: String(Date.now()), // More robust ID generation
+  const futureExpenseForm = useForm<z.infer<typeof futureExpenseFormSchema>>({
+    resolver: zodResolver(futureExpenseFormSchema),
+    defaultValues: {
+      description: "",
+      amount: 0,
+      category: "",
+      dueDate: new Date(),
+    },
+  });
+
+  const handleAddTransaction = (values: z.infer<typeof transactionFormSchema>) => {
+    addTransaction({
       date: format(values.date, "yyyy-MM-dd"),
       description: values.description,
       amount: values.type === "expense" ? -values.amount : values.amount,
       type: values.type,
       category: values.category,
-    };
-    setTransactions((prev) => [...prev, newTransaction]);
+    });
     toast.success("Transação adicionada com sucesso!");
-    form.reset();
+    transactionForm.reset();
     setIsAddTransactionDialogOpen(false);
   };
 
   const handleDeleteTransaction = (id: string) => {
-    setTransactions((prev) => prev.filter((t) => t.id !== id));
+    deleteTransaction(id);
     toast.success("Transação excluída com sucesso!");
+  };
+
+  const handleAddFutureExpense = (values: z.infer<typeof futureExpenseFormSchema>) => {
+    addFutureExpense({
+      dueDate: format(values.dueDate, "yyyy-MM-dd"),
+      description: values.description,
+      amount: values.amount,
+      category: values.category,
+    });
+    toast.success("Gasto futuro adicionado com sucesso!");
+    futureExpenseForm.reset();
+    setIsAddFutureExpenseDialogOpen(false);
+  };
+
+  const handleDeleteFutureExpense = (id: string) => {
+    deleteFutureExpense(id);
+    toast.success("Gasto futuro excluído com sucesso!");
   };
 
   const filteredTransactions = transactions.filter(transaction => {
@@ -99,15 +140,28 @@ const TransactionsPage = () => {
     return matchesSearch && matchesDate;
   });
 
+  const filteredFutureExpenses = futureExpenses.filter(expense => {
+    const matchesSearch =
+      expense.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      expense.category.toLowerCase().includes(searchTerm.toLowerCase());
+
+    const expenseDate = new Date(expense.dueDate);
+    const matchesDate = selectedFilterDate
+      ? expenseDate.toDateString() === selectedFilterDate.toDateString()
+      : true;
+
+    return matchesSearch && matchesDate;
+  });
+
   return (
     <div className="space-y-6">
-      <h1 className="text-3xl font-bold">Transações</h1>
+      <h1 className="text-3xl font-bold">Transações e Gastos Futuros</h1>
 
       <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
         <div className="relative w-full max-w-sm">
           <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Buscar transações..."
+            placeholder="Buscar transações ou gastos futuros..."
             className="pl-8"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
@@ -138,7 +192,7 @@ const TransactionsPage = () => {
                 selected={selectedFilterDate}
                 onSelect={setSelectedFilterDate}
                 initialFocus
-                locale={ptBR} // Set locale for calendar
+                locale={ptBR}
               />
               {selectedFilterDate && (
                 <div className="p-2">
@@ -164,10 +218,10 @@ const TransactionsPage = () => {
                   Preencha os detalhes da sua transação.
                 </DialogDescription>
               </DialogHeader>
-              <Form {...form}>
-                <form onSubmit={form.handleSubmit(handleAddTransaction)} className="grid gap-4 py-4">
+              <Form {...transactionForm}>
+                <form onSubmit={transactionForm.handleSubmit(handleAddTransaction)} className="grid gap-4 py-4">
                   <FormField
-                    control={form.control}
+                    control={transactionForm.control}
                     name="date"
                     render={({ field }) => (
                       <FormItem className="flex flex-col">
@@ -202,7 +256,7 @@ const TransactionsPage = () => {
                     )}
                   />
                   <FormField
-                    control={form.control}
+                    control={transactionForm.control}
                     name="description"
                     render={({ field }) => (
                       <FormItem>
@@ -215,7 +269,7 @@ const TransactionsPage = () => {
                     )}
                   />
                   <FormField
-                    control={form.control}
+                    control={transactionForm.control}
                     name="amount"
                     render={({ field }) => (
                       <FormItem>
@@ -228,7 +282,7 @@ const TransactionsPage = () => {
                     )}
                   />
                   <FormField
-                    control={form.control}
+                    control={transactionForm.control}
                     name="type"
                     render={({ field }) => (
                       <FormItem className="space-y-3">
@@ -262,7 +316,7 @@ const TransactionsPage = () => {
                     )}
                   />
                   <FormField
-                    control={form.control}
+                    control={transactionForm.control}
                     name="category"
                     render={({ field }) => (
                       <FormItem>
@@ -281,9 +335,108 @@ const TransactionsPage = () => {
               </Form>
             </DialogContent>
           </Dialog>
+
+          <Dialog open={isAddFutureExpenseDialogOpen} onOpenChange={setIsAddFutureExpenseDialogOpen}>
+            <DialogTrigger asChild>
+              <Button variant="outline">
+                <Clock className="mr-2 h-4 w-4" />
+                Adicionar Gasto Futuro
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[425px]">
+              <DialogHeader>
+                <DialogTitle>Adicionar Novo Gasto Futuro</DialogTitle>
+                <DialogDescription>
+                  Preencha os detalhes do seu gasto futuro.
+                </DialogDescription>
+              </DialogHeader>
+              <Form {...futureExpenseForm}>
+                <form onSubmit={futureExpenseForm.handleSubmit(handleAddFutureExpense)} className="grid gap-4 py-4">
+                  <FormField
+                    control={futureExpenseForm.control}
+                    name="dueDate"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-col">
+                        <FormLabel>Data de Vencimento</FormLabel>
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <FormControl>
+                              <Button
+                                variant={"outline"}
+                                className={cn(
+                                  "w-full justify-start text-left font-normal",
+                                  !field.value && "text-muted-foreground"
+                                )}
+                              >
+                                <CalendarIcon className="mr-2 h-4 w-4" />
+                                {field.value ? format(field.value, "PPP", { locale: ptBR }) : <span>Escolha uma data</span>}
+                              </Button>
+                            </FormControl>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-auto p-0" align="start">
+                            <Calendar
+                              mode="single"
+                              selected={field.value}
+                              onSelect={field.onChange}
+                              initialFocus
+                              locale={ptBR}
+                            />
+                          </PopoverContent>
+                        </Popover>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={futureExpenseForm.control}
+                    name="description"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Descrição</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Ex: Aluguel, Conta de Luz" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={futureExpenseForm.control}
+                    name="amount"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Valor</FormLabel>
+                        <FormControl>
+                          <Input type="number" placeholder="0.00" {...field} onChange={e => field.onChange(parseFloat(e.target.value))} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={futureExpenseForm.control}
+                    name="category"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Categoria</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Ex: Moradia, Contas" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <DialogFooter>
+                    <Button type="submit">Salvar Gasto Futuro</Button>
+                  </DialogFooter>
+                </form>
+              </Form>
+            </DialogContent>
+          </Dialog>
         </div>
       </div>
 
+      <h2 className="text-2xl font-bold mt-8 mb-4">Transações Recentes</h2>
       <div className="rounded-md border">
         <Table>
           <TableHeader>
@@ -321,6 +474,51 @@ const TransactionsPage = () => {
               <TableRow>
                 <TableCell colSpan={5} className="h-24 text-center text-muted-foreground">
                   Nenhuma transação encontrada.
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </div>
+
+      <h2 className="text-2xl font-bold mt-8 mb-4">Gastos Futuros</h2>
+      <div className="rounded-md border">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Data de Vencimento</TableHead>
+              <TableHead>Descrição</TableHead>
+              <TableHead>Categoria</TableHead>
+              <TableHead className="text-right">Valor</TableHead>
+              <TableHead className="text-right">Ações</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {filteredFutureExpenses.length > 0 ? (
+              filteredFutureExpenses.map((expense) => (
+                <TableRow key={expense.id}>
+                  <TableCell>{format(new Date(expense.dueDate), "dd/MM/yyyy", { locale: ptBR })}</TableCell>
+                  <TableCell>{expense.description}</TableCell>
+                  <TableCell>{expense.category}</TableCell>
+                  <TableCell className="text-right text-red-600">
+                    - {expense.amount.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => handleDeleteFutureExpense(expense.id)}
+                      className="text-red-500 hover:text-red-700"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={5} className="h-24 text-center text-muted-foreground">
+                  Nenhum gasto futuro encontrado.
                 </TableCell>
               </TableRow>
             )}

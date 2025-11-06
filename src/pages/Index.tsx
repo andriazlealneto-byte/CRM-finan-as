@@ -2,13 +2,13 @@
 
 import React from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { DollarSign, TrendingUp, TrendingDown } from "lucide-react";
+import { DollarSign, TrendingUp, TrendingDown, CalendarClock } from "lucide-react";
+import { useTransactionContext } from "@/context/TransactionContext"; // Import the context hook
+import { format } from "date-fns";
+import { ptBR } from "date-fns/locale";
 
 const Index = () => {
-  // Placeholder data for the dashboard
-  const totalBalance = 5230.50;
-  const totalIncome = 1500.00;
-  const totalExpenses = 750.25;
+  const { totalBalance, totalIncome, totalExpenses, futureExpenses } = useTransactionContext();
 
   return (
     <div className="space-y-6">
@@ -23,7 +23,7 @@ const Index = () => {
           <CardContent>
             <div className="text-2xl font-bold">R${totalBalance.toFixed(2)}</div>
             <p className="text-xs text-muted-foreground">
-              +20.1% do mês passado
+              Seu saldo atual.
             </p>
           </CardContent>
         </Card>
@@ -36,7 +36,7 @@ const Index = () => {
           <CardContent>
             <div className="text-2xl font-bold">R${totalIncome.toFixed(2)}</div>
             <p className="text-xs text-muted-foreground">
-              +15% do mês passado
+              Total de receitas registradas.
             </p>
           </CardContent>
         </Card>
@@ -49,13 +49,44 @@ const Index = () => {
           <CardContent>
             <div className="text-2xl font-bold">R${totalExpenses.toFixed(2)}</div>
             <p className="text-xs text-muted-foreground">
-              -5% do mês passado
+              Total de despesas registradas.
             </p>
           </CardContent>
         </Card>
       </div>
 
-      {/* More dashboard content can go here */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center">
+            <CalendarClock className="mr-2 h-5 w-5" />
+            Próximos Gastos Futuros
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          {futureExpenses.length > 0 ? (
+            <div className="space-y-4">
+              {futureExpenses
+                .sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime())
+                .map((expense) => (
+                  <div key={expense.id} className="flex items-center justify-between border-b pb-2 last:border-b-0 last:pb-0">
+                    <div>
+                      <p className="font-medium">{expense.description}</p>
+                      <p className="text-sm text-muted-foreground">
+                        {format(new Date(expense.dueDate), "dd/MM/yyyy", { locale: ptBR })} - {expense.category}
+                      </p>
+                    </div>
+                    <p className="font-bold text-red-600">
+                      - {expense.amount.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
+                    </p>
+                  </div>
+                ))}
+            </div>
+          ) : (
+            <p className="text-muted-foreground">Nenhum gasto futuro registrado. Adicione um!</p>
+          )}
+        </CardContent>
+      </Card>
+
       <Card>
         <CardHeader>
           <CardTitle>Atividade Recente</CardTitle>

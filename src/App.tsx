@@ -8,24 +8,27 @@ import TransactionsPage from "./pages/TransactionsPage"; // New transactions pag
 import NotFound from "./pages/NotFound";
 import Layout from "./components/Layout"; // New layout component
 import { ThemeProvider } from "./components/ThemeProvider"; // Import ThemeProvider
+import { TransactionProvider } from "./context/TransactionContext"; // Import TransactionProvider
 
 const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme" attribute="class" enableSystem> {/* Add attribute and enableSystem explicitly */}
+    <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme" attribute="class" enableSystem>
       <TooltipProvider>
         <Toaster />
         <Sonner />
         <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Layout />}>
-              <Route index element={<Index />} /> {/* Dashboard */}
-              <Route path="transactions" element={<TransactionsPage />} /> {/* Transactions */}
-              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-              <Route path="*" element={<NotFound />} />
-            </Route>
-          </Routes>
+          <TransactionProvider> {/* Wrap with TransactionProvider */}
+            <Routes>
+              <Route path="/" element={<Layout />}>
+                <Route index element={<Index />} /> {/* Dashboard */}
+                <Route path="transactions" element={<TransactionsPage />} /> {/* Transactions */}
+                {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                <Route path="*" element={<NotFound />} />
+              </Route>
+            </Routes>
+          </TransactionProvider>
         </BrowserRouter>
       </TooltipProvider>
     </ThemeProvider>
