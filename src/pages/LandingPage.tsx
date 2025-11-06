@@ -10,9 +10,11 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 import { useSession } from "@/context/SessionContext";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
+import { useTransactionContext } from "@/context/TransactionContext"; // Import useTransactionContext
 
 const LandingPage = () => {
   const { session, loading } = useSession();
+  const { userProfile } = useTransactionContext(); // Get userProfile
   const navigate = useNavigate();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
 
@@ -95,8 +97,14 @@ const LandingPage = () => {
             <Button variant="ghost" asChild><Link to="#pricing">Preços</Link></Button>
             <Button variant="ghost" asChild><Link to="#testimonials">Depoimentos</Link></Button>
             <ThemeToggle />
-            {session ? (
-              <Button asChild><Link to="/app">Ir para o App</Link></Button>
+            {loading ? ( // Show loading state for auth
+              <Button variant="ghost" disabled>Carregando...</Button>
+            ) : session ? (
+              userProfile?.is_premium ? (
+                <Button asChild><Link to="/app">Ir para o App</Link></Button>
+              ) : (
+                <Button asChild><Link to="/subscribe">Assinar Agora</Link></Button>
+              )
             ) : (
               <Button asChild><Link to="/login">Login</Link></Button>
             )}
@@ -115,8 +123,14 @@ const LandingPage = () => {
                   <Button variant="ghost" asChild onClick={() => setIsMobileMenuOpen(false)}><Link to="#pricing">Preços</Link></Button>
                   <Button variant="ghost" asChild onClick={() => setIsMobileMenuOpen(false)}><Link to="#testimonials">Depoimentos</Link></Button>
                   <div className="pt-4">
-                    {session ? (
-                      <Button asChild className="w-full"><Link to="/app">Ir para o App</Link></Button>
+                    {loading ? (
+                      <Button className="w-full" disabled>Carregando...</Button>
+                    ) : session ? (
+                      userProfile?.is_premium ? (
+                        <Button asChild className="w-full"><Link to="/app">Ir para o App</Link></Button>
+                      ) : (
+                        <Button asChild className="w-full"><Link to="/subscribe">Assinar Agora</Link></Button>
+                      )
                     ) : (
                       <Button asChild className="w-full"><Link to="/login">Login</Link></Button>
                     )}
