@@ -9,7 +9,7 @@ import { useSession } from "./SessionContext"; // Importar o useSession
 interface AuthContextType {
   isAuthenticated: boolean;
   login: (email: string, password: string) => Promise<boolean>;
-  signup: (email: string, password: string) => Promise<boolean>; // Adicionando a função signup
+  signup: (email: string, password: string, first_name: string, last_name: string) => Promise<boolean>; // Adicionando a função signup com nome e sobrenome
   logout: () => Promise<void>;
 }
 
@@ -48,10 +48,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  const signup = async (email: string, password: string): Promise<boolean> => {
+  const signup = async (email: string, password: string, first_name: string, last_name: string): Promise<boolean> => {
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
+      options: {
+        data: {
+          first_name,
+          last_name,
+        },
+      },
     });
 
     if (error) {

@@ -17,6 +17,8 @@ import { Eye, EyeOff } from "lucide-react";
 import { ThemeToggle } from "@/components/ThemeToggle"; // Importar ThemeToggle
 
 const signupFormSchema = z.object({
+  first_name: z.string().min(1, "O primeiro nome é obrigatório.").max(50, "O primeiro nome não pode ter mais de 50 caracteres."),
+  last_name: z.string().min(1, "O sobrenome é obrigatório.").max(50, "O sobrenome não pode ter mais de 50 caracteres."),
   email: z.string().email("Digite um email válido.").min(1, "O email é obrigatório."),
   password: z.string().min(6, "A senha deve ter pelo menos 6 caracteres."),
   confirmPassword: z.string().min(6, "Confirme sua senha."),
@@ -37,6 +39,8 @@ const SignupPage = () => {
   const form = useForm<z.infer<typeof signupFormSchema>>({
     resolver: zodResolver(signupFormSchema),
     defaultValues: {
+      first_name: "",
+      last_name: "",
       email: "",
       password: "",
       confirmPassword: "",
@@ -50,7 +54,7 @@ const SignupPage = () => {
   }, [loading, session, navigate]);
 
   const onSubmit = async (values: z.infer<typeof signupFormSchema>) => {
-    const success = await signup(values.email, values.password);
+    const success = await signup(values.email, values.password, values.first_name, values.last_name);
     if (success) {
       toast.success("Cadastro realizado com sucesso! Verifique seu e-mail para confirmar a conta.");
       if (plan) {
@@ -84,6 +88,32 @@ const SignupPage = () => {
         <CardContent>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+              <FormField
+                control={form.control}
+                name="first_name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Primeiro Nome</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Seu primeiro nome" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="last_name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Sobrenome</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Seu sobrenome" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
               <FormField
                 control={form.control}
                 name="email"
