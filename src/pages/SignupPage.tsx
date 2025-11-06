@@ -56,11 +56,11 @@ const SignupPage = () => {
   const onSubmit = async (values: z.infer<typeof signupFormSchema>) => {
     const success = await signup(values.email, values.password, values.first_name, values.last_name);
     if (success) {
-      toast.success("Cadastro realizado com sucesso! Verifique seu e-mail para confirmar a conta.");
+      // A mensagem de sucesso agora é tratada dentro da função signup no AuthContext
       if (plan) {
         navigate(`/payment?plan=${plan}`);
       } else {
-        navigate("/login"); // Fallback se não houver plano
+        navigate("/app"); // Redireciona para /app se não houver plano, pois o usuário já está logado
       }
     }
   };
