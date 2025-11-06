@@ -13,6 +13,7 @@ import TransactionsPage from "@/pages/TransactionsPage";
 import CategoryManagementPage from "@/pages/CategoryManagementPage";
 import BudgetManagementPage from "@/pages/BudgetManagementPage";
 import LoginPage from "@/pages/LoginPage";
+import SignupPage from "@/pages/SignupPage"; // Importar a nova página de cadastro
 import NotFound from "@/pages/NotFound";
 
 import { SessionProvider } from "@/context/SessionContext";
@@ -29,6 +30,7 @@ function App() {
             <TransactionProvider>
               <Routes>
                 <Route path="/login" element={<LoginPage />} />
+                <Route path="/signup" element={<SignupPage />} /> {/* Nova rota de cadastro */}
                 <Route element={<ProtectedRoute />}>
                   <Route element={<Layout />}>
                     <Route path="/" element={<Index />} />

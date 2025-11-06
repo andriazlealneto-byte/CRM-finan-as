@@ -9,6 +9,7 @@ import { useSession } from "./SessionContext"; // Importar o useSession
 interface AuthContextType {
   isAuthenticated: boolean;
   login: (email: string, password: string) => Promise<boolean>;
+  signup: (email: string, password: string) => Promise<boolean>; // Adicionando a função signup
   logout: () => Promise<void>;
 }
 
@@ -22,9 +23,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     if (!loading) {
       setIsAuthenticated(!!session);
-      if (session && window.location.pathname === "/login") {
+      if (session && (window.location.pathname === "/login" || window.location.pathname === "/signup")) {
         navigate("/");
-      } else if (!session && window.location.pathname !== "/login") {
+      } else if (!session && window.location.pathname !== "/login" && window.location.pathname !== "/signup") {
         navigate("/login");
       }
     }
@@ -47,6 +48,24 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  const signup = async (email: string, password: string): Promise<boolean> => {
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+    });
+
+    if (error) {
+      toast.error("Erro ao cadastrar: " + error.message);
+      console.error("Erro de cadastro:", error);
+      return false;
+    } else if (data.user) {
+      // Supabase envia um e-mail de confirmação por padrão.
+      // O usuário precisará confirmar o e-mail antes de poder fazer login.
+      return true;
+    }
+    return false; // Caso não haja erro, mas também não haja user (situação improvável)
+  };
+
   const logout = async () => {
     const { error } = await supabase.auth.signOut();
     if (error) {
@@ -59,7 +78,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, login, logout }}>
+    <AuthContext.Provider value={{ isAuthenticated, login, signup, logout }}>
       {children}
     </AuthContext.Provider>
   );
