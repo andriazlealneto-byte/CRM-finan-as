@@ -39,6 +39,8 @@ interface FutureExpense {
   description: string;
   amount: number;
   category: string;
+  installments?: number; // Novo campo
+  term_months?: number; // Novo campo
 }
 
 const NEW_CATEGORY_OPTION = "ADICIONAR_NOVA_CATEGORIA";
@@ -62,7 +64,17 @@ const futureExpenseFormSchema = z.object({
   description: z.string().min(1, "A descrição é obrigatória."),
   amount: z.coerce.number().positive("O valor deve ser positivo."),
   category: z.string().min(1, "A categoria é obrigatória."),
+  installments: z.coerce.number().min(1, "O número de parcelas deve ser no mínimo 1.").optional(), // Novo campo
+  term_months: z.coerce.number().min(1, "O prazo em meses deve ser no mínimo 1.").optional(), // Novo campo
   saveNewCategory: z.boolean().optional(), // Campo opcional para salvar nova categoria
+}).superRefine((data, ctx) => {
+  if (data.installments && data.installments > 1 && !data.term_months) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "O prazo em meses é obrigatório para gastos parcelados.",
+      path: ["term_months"],
+    });
+  }
 });
 
 const TransactionsPage = () => {
@@ -92,6 +104,8 @@ const TransactionsPage = () => {
       amount: "",
       category: "",
       dueDates: [],
+      installments: 1, // Default para 1 parcela
+      term_months: undefined,
       saveNewCategory: false,
     },
   });
@@ -135,6 +149,8 @@ const TransactionsPage = () => {
         description: values.description,
         amount: values.amount,
         category: values.category,
+        installments: values.installments, // Passar parcelas
+        term_months: values.term_months, // Passar prazo
       });
     });
 
@@ -148,6 +164,8 @@ const TransactionsPage = () => {
       amount: "",
       category: "",
       dueDates: [],
+      installments: 1,
+      term_months: undefined,
       saveNewCategory: false,
     });
     setIsAddFutureExpenseDialogOpen(false);
@@ -551,6 +569,40 @@ const TransactionsPage = () => {
                       </FormItem>
                     )}
                   />
+                  <FormField
+                    control={futureExpenseForm.control}
+                    name="installments"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Número de Parcelas</FormLabel>
+                        <FormControl>
+                          <Input type="number" placeholder="1" min="1" {...field} />
+                        </FormControl>
+                        <FormDescription>
+                          Defina o número total de parcelas para este gasto.
+                        </FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  {futureExpenseForm.watch("installments") && futureExpenseForm.watch("installments") > 1 && (
+                    <FormField
+                      control={futureExpenseForm.control}
+                      name="term_months"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Prazo Total (meses)</FormLabel>
+                          <FormControl>
+                            <Input type="number" placeholder="12" min="1" {...field} />
+                          </FormControl>
+                          <FormDescription>
+                            O prazo total em meses para o pagamento de todas as parcelas.
+                          </FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  )}
                   {futureExpenseForm.watch("category") && futureExpenseForm.watch("category") !== NEW_CATEGORY_OPTION && !savedCategories.includes(futureExpenseForm.watch("category")) && (
                     <FormField
                       control={futureExpenseForm.control}
@@ -639,6 +691,7 @@ const TransactionsPage = () => {
               <TableHead>Descrição</TableHead>
               <TableHead>Categoria</TableHead>
               <TableHead className="text-right">Valor</TableHead>
+              <TableHead className="text-right">Parcelas</TableHead>
               <TableHead className="text-right">Ações</TableHead>
             </TableRow>
           </TableHeader>
@@ -651,6 +704,9 @@ const TransactionsPage = () => {
                   <TableCell>{expense.category}</TableCell>
                   <TableCell className="text-right text-red-600">
                     - {expense.amount.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
+                  </TableCell>
+                  <TableCell className="text-right">
+                    {expense.installments && expense.installments > 1 ? `${expense.installments}x` : "À vista"}
                   </TableCell>
                   <TableCell className="text-right">
                     <Button
@@ -666,7 +722,7 @@ const TransactionsPage = () => {
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={5} className="h-24 text-center text-muted-foreground">
+                <TableCell colSpan={6} className="h-24 text-center text-muted-foreground">
                   Nenhum gasto futuro encontrado.
                 </TableCell>
               </TableRow>

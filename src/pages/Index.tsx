@@ -2,16 +2,16 @@
 
 import React from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { DollarSign, TrendingUp, TrendingDown, CalendarClock, ShoppingBag, Utensils, Target } from "lucide-react"; // Import new icons
+import { DollarSign, TrendingUp, TrendingDown, CalendarClock, ShoppingBag, Utensils, Target, ArrowUp, ArrowDown } from "lucide-react"; // Import new icons
 import { useTransactionContext } from "@/context/TransactionContext"; // Import the context hook
-import { format } from "date-fns";
+import { format, subMonths, startOfMonth, endOfMonth, parseISO } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { Progress } from "@/components/ui/progress"; // Import Progress component
 import DashboardCharts from "@/components/DashboardCharts"; // Import DashboardCharts
-// import FinancialAssistant from "@/components/FinancialAssistant"; // REMOVIDO
 
 const Index = () => {
   const {
+    transactions, // Adicionado para cálculo do comparativo
     totalBalance,
     totalIncome,
     totalExpenses,
@@ -31,6 +31,41 @@ const Index = () => {
     if (progress >= 80) return "bg-yellow-500";
     return "bg-primary";
   };
+
+  // Cálculo do comparativo de gastos mensais
+  const currentMonth = new Date();
+  const previousMonth = subMonths(currentMonth, 1);
+
+  const currentMonthExpenses = transactions
+    .filter(t => t.type === "expense" && parseISO(t.date).getMonth() === currentMonth.getMonth() && parseISO(t.date).getFullYear() === currentMonth.getFullYear())
+    .reduce((sum, t) => sum + Math.abs(t.amount), 0);
+
+  const previousMonthExpenses = transactions
+    .filter(t => t.type === "expense" && parseISO(t.date).getMonth() === previousMonth.getMonth() && parseISO(t.date).getFullYear() === previousMonth.getFullYear())
+    .reduce((sum, t) => sum + Math.abs(t.amount), 0);
+
+  let expenseComparisonMessage = "Nenhum dado para comparar.";
+  let expenseComparisonIcon = null;
+  let expenseComparisonColor = "text-muted-foreground";
+
+  if (previousMonthExpenses > 0) {
+    const percentageChange = ((currentMonthExpenses - previousMonthExpenses) / previousMonthExpenses) * 100;
+    if (percentageChange < 0) {
+      expenseComparisonMessage = `Você gastou ${Math.abs(percentageChange).toFixed(0)}% menos que no mês passado.`;
+      expenseComparisonIcon = <ArrowDown className="h-4 w-4 text-green-500" />;
+      expenseComparisonColor = "text-green-500";
+    } else if (percentageChange > 0) {
+      expenseComparisonMessage = `Você gastou ${percentageChange.toFixed(0)}% mais que no mês passado.`;
+      expenseComparisonIcon = <ArrowUp className="h-4 w-4 text-red-500" />;
+      expenseComparisonColor = "text-red-500";
+    } else {
+      expenseComparisonMessage = "Você gastou o mesmo que no mês passado.";
+      expenseComparisonColor = "text-muted-foreground";
+    }
+  } else if (currentMonthExpenses > 0) {
+    expenseComparisonMessage = "Você teve gastos este mês, mas não no mês passado.";
+  }
+
 
   return (
     <div className="space-y-6">
@@ -101,6 +136,19 @@ const Index = () => {
             </p>
           </CardContent>
         </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Comparativo Mensal</CardTitle>
+            {expenseComparisonIcon}
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">R${currentMonthExpenses.toFixed(2)}</div>
+            <p className={cn("text-xs", expenseComparisonColor)}>
+              {expenseComparisonMessage}
+            </p>
+          </CardContent>
+        </Card>
       </div>
 
       <h2 className="text-2xl font-bold mt-8 mb-4">Orçamentos Atuais</h2>
@@ -136,8 +184,6 @@ const Index = () => {
 
       <h2 className="text-2xl font-bold mt-8 mb-4">Análise de Gastos</h2>
       <DashboardCharts />
-
-      {/* FinancialAssistant removido */}
 
       <Card>
         <CardHeader>

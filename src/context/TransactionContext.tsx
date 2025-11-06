@@ -24,6 +24,8 @@ interface FutureExpense {
   description: string;
   amount: number;
   category: string;
+  installments?: number; // Novo campo
+  term_months?: number; // Novo campo
   user_id: string; // Adicionado user_id
 }
 
@@ -53,6 +55,27 @@ interface Goal {
   due_date: string;
   created_at: string;
   updated_at: string;
+}
+
+interface Debt {
+  id: string;
+  user_id: string;
+  name: string;
+  total_amount: number;
+  paid_amount: number;
+  installments: number;
+  current_installment: number;
+  due_date: string; // Due date for the *current* installment
+  status: string; // e.g., 'pending', 'paid', 'overdue'
+  created_at: string;
+  updated_at: string;
+}
+
+interface UserProfile {
+  id: string;
+  first_name: string | null;
+  last_name: string | null;
+  avatar_url: string | null;
 }
 
 interface TransactionContextType {
@@ -86,6 +109,14 @@ interface TransactionContextType {
   addGoal: (goal: Omit<Goal, "id" | "user_id" | "created_at" | "updated_at">) => void;
   updateGoal: (id: string, updates: Partial<Omit<Goal, "id" | "user_id" | "created_at">>) => void;
   deleteGoal: (id: string) => void;
+
+  debts: Debt[];
+  addDebt: (debt: Omit<Debt, "id" | "user_id" | "created_at" | "updated_at">) => void;
+  updateDebt: (id: string, updates: Partial<Omit<Debt, "id" | "user_id" | "created_at">>) => void;
+  deleteDebt: (id: string) => void;
+
+  userProfile: UserProfile | null;
+  updateUserProfile: (updates: Partial<Omit<UserProfile, "id">>) => void;
 }
 
 const TransactionContext = createContext<TransactionContextType | undefined>(undefined);
@@ -99,6 +130,8 @@ export const TransactionProvider = ({ children }: { children: ReactNode }) => {
   const [miscCategories, setMiscCategoriesState] = useState<string[]>([]);
   const [foodCategories, setFoodCategoriesState] = useState<string[]>([]);
   const [goals, setGoals] = useState<Goal[]>([]); // Novo estado para metas
+  const [debts, setDebts] = useState<Debt[]>([]); // Novo estado para dívidas
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null); // Novo estado para perfil do usuário
   const [loading, setLoading] = useState(true);
 
   const { user, loading: sessionLoading } = useSession(); // Obter user e loading da sessão
@@ -213,13 +246,62 @@ export const TransactionProvider = ({ children }: { children: ReactNode }) => {
     setLoading(false);
   }, [user?.id]);
 
+  const fetchDebts = useCallback(async () => {
+    if (!user?.id) {
+      setDebts([]);
+      return;
+    }
+    setLoading(true);
+    const { data, error } = await supabase.from('debts').select('*').eq('user_id', user.id);
+    if (error) {
+      toast.error("Erro ao carregar dívidas: " + error.message);
+      console.error("Erro ao carregar dívidas:", error);
+    } else {
+      setDebts(data || []);
+    }
+    setLoading(false);
+  }, [user?.id]);
+
+  const fetchUserProfile = useCallback(async () => {
+    if (!user?.id) {
+      setUserProfile(null);
+      return;
+    }
+    setLoading(true);
+    const { data, error } = await supabase.from('profiles').select('*').eq('id', user.id).single();
+    if (error) {
+      // If profile doesn't exist, create a basic one
+      if (error.code === 'PGRST116') { // No rows found
+        const { data: newProfile, error: insertError } = await supabase
+          .from('profiles')
+          .insert({ id: user.id, first_name: user.user_metadata.first_name || null, last_name: user.user_metadata.last_name || null })
+          .select()
+          .single();
+        if (insertError) {
+          toast.error("Erro ao criar perfil do usuário: " + insertError.message);
+          console.error("Erro ao criar perfil:", insertError);
+        } else {
+          setUserProfile(newProfile as UserProfile);
+        }
+      } else {
+        toast.error("Erro ao carregar perfil do usuário: " + error.message);
+        console.error("Erro ao carregar perfil:", error);
+      }
+    } else {
+      setUserProfile(data as UserProfile);
+    }
+    setLoading(false);
+  }, [user?.id]);
+
   useEffect(() => {
     if (!sessionLoading && user?.id) {
       fetchTransactions();
       fetchFutureExpenses();
       fetchSavedCategories();
       fetchBudgets();
-      fetchGoals(); // Chamar fetchGoals
+      fetchGoals();
+      fetchDebts(); // Chamar fetchDebts
+      fetchUserProfile(); // Chamar fetchUserProfile
     } else if (!sessionLoading && !user?.id) {
       // Clear data if user logs out
       setTransactions([]);
@@ -229,10 +311,12 @@ export const TransactionProvider = ({ children }: { children: ReactNode }) => {
       setFoodExpensesLimitState(0);
       setMiscCategoriesState([]);
       setFoodCategoriesState([]);
-      setGoals([]); // Limpar metas ao deslogar
+      setGoals([]);
+      setDebts([]); // Limpar dívidas ao deslogar
+      setUserProfile(null); // Limpar perfil ao deslogar
       setLoading(false);
     }
-  }, [sessionLoading, user?.id, fetchTransactions, fetchFutureExpenses, fetchSavedCategories, fetchBudgets, fetchGoals]);
+  }, [sessionLoading, user?.id, fetchTransactions, fetchFutureExpenses, fetchSavedCategories, fetchBudgets, fetchGoals, fetchDebts, fetchUserProfile]);
 
   const addTransaction = async (transaction: Omit<Transaction, "id" | "user_id">) => {
     if (!user?.id) {
@@ -476,6 +560,66 @@ export const TransactionProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  const addDebt = async (debt: Omit<Debt, "id" | "user_id" | "created_at" | "updated_at">) => {
+    if (!user?.id) {
+      toast.error("Você precisa estar logado para adicionar dívidas.");
+      return;
+    }
+    const { data, error } = await supabase.from('debts').insert({ ...debt, user_id: user.id }).select();
+    if (error) {
+      toast.error("Erro ao adicionar dívida: " + error.message);
+      console.error("Erro ao adicionar dívida:", error);
+    } else if (data) {
+      setDebts((prev) => [...prev, data[0] as Debt]);
+      toast.success("Dívida adicionada com sucesso!");
+    }
+  };
+
+  const updateDebt = async (id: string, updates: Partial<Omit<Debt, "id" | "user_id" | "created_at">>) => {
+    if (!user?.id) {
+      toast.error("Você precisa estar logado para atualizar dívidas.");
+      return;
+    }
+    const { error } = await supabase.from('debts').update({ ...updates, updated_at: new Date().toISOString() }).eq('id', id).eq('user_id', user.id);
+    if (error) {
+      toast.error("Erro ao atualizar dívida: " + error.message);
+      console.error("Erro ao atualizar dívida:", error);
+    } else {
+      setDebts((prev) => prev.map((d) => (d.id === id ? { ...d, ...updates, updated_at: new Date().toISOString() } : d)));
+      toast.success("Dívida atualizada com sucesso!");
+    }
+  };
+
+  const deleteDebt = async (id: string) => {
+    if (!user?.id) {
+      toast.error("Você precisa estar logado para excluir dívidas.");
+      return;
+    }
+    const { error } = await supabase.from('debts').delete().eq('id', id).eq('user_id', user.id);
+    if (error) {
+      toast.error("Erro ao excluir dívida: " + error.message);
+      console.error("Erro ao excluir dívida:", error);
+    } else {
+      setDebts((prev) => prev.filter((d) => d.id !== id));
+      toast.success("Dívida excluída com sucesso!");
+    }
+  };
+
+  const updateUserProfile = async (updates: Partial<Omit<UserProfile, "id">>) => {
+    if (!user?.id) {
+      toast.error("Você precisa estar logado para atualizar seu perfil.");
+      return;
+    }
+    const { error } = await supabase.from('profiles').update(updates).eq('id', user.id);
+    if (error) {
+      toast.error("Erro ao atualizar perfil: " + error.message);
+      console.error("Erro ao atualizar perfil:", error);
+    } else {
+      setUserProfile((prev) => (prev ? { ...prev, ...updates } : null));
+      toast.success("Perfil atualizado com sucesso!");
+    }
+  };
+
   const totalIncome = transactions
     .filter((t) => t.type === "income")
     .reduce((sum, t) => sum + t.amount, 0);
@@ -521,10 +665,16 @@ export const TransactionProvider = ({ children }: { children: ReactNode }) => {
         currentMiscExpenses,
         currentFoodExpenses,
         loading,
-        goals, // Adicionado goals
-        addGoal, // Adicionado addGoal
-        updateGoal, // Adicionado updateGoal
-        deleteGoal, // Adicionado deleteGoal
+        goals,
+        addGoal,
+        updateGoal,
+        deleteGoal,
+        debts, // Adicionado debts
+        addDebt, // Adicionado addDebt
+        updateDebt, // Adicionado updateDebt
+        deleteDebt, // Adicionado deleteDebt
+        userProfile, // Adicionado userProfile
+        updateUserProfile, // Adicionado updateUserProfile
       }}
     >
       {children}

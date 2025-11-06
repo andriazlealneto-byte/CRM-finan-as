@@ -12,7 +12,10 @@ import Index from "@/pages/Index";
 import TransactionsPage from "@/pages/TransactionsPage";
 import CategoryManagementPage from "@/pages/CategoryManagementPage";
 import BudgetManagementPage from "@/pages/BudgetManagementPage";
-import GoalsPage from "@/pages/GoalsPage"; // Importar GoalsPage
+import GoalsPage from "@/pages/GoalsPage";
+import FinancialEducationPage from "@/pages/FinancialEducationPage"; // Importar FinancialEducationPage
+import DebtsPage from "@/pages/DebtsPage"; // Importar DebtsPage
+import ProfilePage from "@/pages/ProfilePage"; // Importar ProfilePage
 import LoginPage from "@/pages/LoginPage";
 import SignupPage from "@/pages/SignupPage";
 import NotFound from "@/pages/NotFound";
@@ -38,7 +41,10 @@ function App() {
                   <Route path="/transactions" element={<TransactionsPage />} />
                   <Route path="/categories" element={<CategoryManagementPage />} />
                   <Route path="/budgets" element={<BudgetManagementPage />} />
-                  <Route path="/goals" element={<GoalsPage />} /> {/* Nova rota para Metas */}
+                  <Route path="/goals" element={<GoalsPage />} />
+                  <Route path="/education" element={<FinancialEducationPage />} /> {/* Nova rota */}
+                  <Route path="/debts" element={<DebtsPage />} /> {/* Nova rota */}
+                  <Route path="/profile" element={<ProfilePage />} /> {/* Nova rota */}
                 </Route>
               </Route>
               <Route path="*" element={<NotFound />} />
