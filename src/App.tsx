@@ -4,7 +4,7 @@ import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Toaster } from "sonner";
 
-import { ThemeProvider } from "@/components/ThemeProvider";
+// import { ThemeProvider } from "@/components/ThemeProvider"; // REMOVIDO
 import Layout from "@/components/Layout";
 import ProtectedRoute from "@/components/ProtectedRoute";
 
@@ -23,28 +23,27 @@ import { TransactionProvider } from "@/context/TransactionContext";
 function App() {
   return (
     <BrowserRouter>
-      <ThemeProvider defaultTheme="dark"> {/* Alterado para dark e removido storageKey */}
-        <Toaster richColors />
-        <SessionProvider>
-          <AuthProvider>
-            <TransactionProvider>
-              <Routes>
-                <Route path="/login" element={<LoginPage />} />
-                <Route path="/signup" element={<SignupPage />} />
-                <Route element={<ProtectedRoute />}>
-                  <Route element={<Layout />}>
-                    <Route path="/" element={<Index />} />
-                    <Route path="/transactions" element={<TransactionsPage />} />
-                    <Route path="/categories" element={<CategoryManagementPage />} />
-                    <Route path="/budgets" element={<BudgetManagementPage />} />
-                  </Route>
+      {/* ThemeProvider removido, tema escuro agora é padrão via CSS global */}
+      <Toaster richColors />
+      <SessionProvider>
+        <AuthProvider>
+          <TransactionProvider>
+            <Routes>
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/signup" element={<SignupPage />} />
+              <Route element={<ProtectedRoute />}>
+                <Route element={<Layout />}>
+                  <Route path="/" element={<Index />} />
+                  <Route path="/transactions" element={<TransactionsPage />} />
+                  <Route path="/categories" element={<CategoryManagementPage />} />
+                  <Route path="/budgets" element={<BudgetManagementPage />} />
                 </Route>
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </TransactionProvider>
-          </AuthProvider>
-        </SessionProvider>
-      </ThemeProvider>
+              </Route>
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </TransactionProvider>
+        </AuthProvider>
+      </SessionProvider>
     </BrowserRouter>
   );
 }
