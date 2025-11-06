@@ -8,7 +8,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Menu } from "lucide-react";
-import { ThemeToggle } from "./ThemeToggle"; // Import ThemeToggle
+// import { ThemeToggle } from "./ThemeToggle"; // Import ThemeToggle - REMOVIDO
 
 const Layout = () => {
   const isMobile = useIsMobile();
@@ -31,17 +31,17 @@ const Layout = () => {
           </SheetTrigger>
           <SheetContent side="left" className="p-0 w-64">
             <Sidebar isMobile={isMobile} onLinkClick={handleLinkClick} />
-            <div className="absolute bottom-4 left-4">
-              <ThemeToggle />
-            </div>
+            {/* <div className="absolute bottom-4 left-4">
+              <ThemeToggle /> // REMOVIDO
+            </div> */}
           </SheetContent>
         </Sheet>
       ) : (
         <aside className="w-64 border-r bg-sidebar text-sidebar-foreground flex flex-col">
           <Sidebar isMobile={isMobile} />
-          <div className="mt-auto p-4 border-t border-sidebar-border">
-            <ThemeToggle />
-          </div>
+          {/* <div className="mt-auto p-4 border-t border-sidebar-border">
+            <ThemeToggle /> // REMOVIDO
+          </div> */}
         </aside>
       )}
       <main className="flex-1 flex flex-col">

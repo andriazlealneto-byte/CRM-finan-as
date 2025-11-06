@@ -11,10 +11,10 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { useAuth } from "@/context/AuthContext";
 import { useNavigate, Link } from "react-router-dom";
 import { MadeWithDyad } from "@/components/made-with-dyad";
-import { ThemeToggle } from "@/components/ThemeToggle";
+// import { ThemeToggle } from "@/components/ThemeToggle"; // REMOVIDO
 import { useSession } from "@/context/SessionContext";
 import { toast } from "sonner";
-import { Eye, EyeOff } from "lucide-react"; // Importar ícones de olho
+import { Eye, EyeOff } from "lucide-react";
 
 const signupFormSchema = z.object({
   email: z.string().email("Digite um email válido.").min(1, "O email é obrigatório."),
@@ -29,8 +29,8 @@ const SignupPage = () => {
   const { signup } = useAuth();
   const { loading, session } = useSession();
   const navigate = useNavigate();
-  const [showPassword, setShowPassword] = React.useState(false); // Estado para alternar visibilidade da senha
-  const [showConfirmPassword, setShowConfirmPassword] = React.useState(false); // Estado para alternar visibilidade da confirmação de senha
+  const [showPassword, setShowPassword] = React.useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = React.useState(false);
 
   const form = useForm<z.infer<typeof signupFormSchema>>({
     resolver: zodResolver(signupFormSchema),
@@ -65,9 +65,9 @@ const SignupPage = () => {
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-background p-4">
-      <div className="absolute top-4 right-4">
-        <ThemeToggle />
-      </div>
+      {/* <div className="absolute top-4 right-4">
+        <ThemeToggle /> // REMOVIDO
+      </div> */}
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl">Criar Nova Conta</CardTitle>
