@@ -54,7 +54,7 @@ const Index = () => {
           </CardContent>
         </Card>
 
-        {/* Novo Card para o resumo de Gastos Futuros */}
+        {/* Card para o resumo de Gastos Futuros */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Gastos Futuros</CardTitle>
@@ -68,38 +68,6 @@ const Index = () => {
           </CardContent>
         </Card>
       </div>
-
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center">
-            <CalendarClock className="mr-2 h-5 w-5" />
-            Detalhes dos Próximos Gastos Futuros
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          {futureExpenses.length > 0 ? (
-            <div className="space-y-4">
-              {futureExpenses
-                .sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime())
-                .map((expense) => (
-                  <div key={expense.id} className="flex items-center justify-between border-b pb-2 last:border-b-0 last:pb-0">
-                    <div>
-                      <p className="font-medium">{expense.description}</p>
-                      <p className="text-sm text-muted-foreground">
-                        {format(new Date(expense.dueDate), "dd/MM/yyyy", { locale: ptBR })} - {expense.category}
-                      </p>
-                    </div>
-                    <p className="font-bold text-red-600">
-                      - {expense.amount.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
-                    </p>
-                  </div>
-                ))}
-            </div>
-          ) : (
-            <p className="text-muted-foreground">Nenhum gasto futuro registrado. Adicione um!</p>
-          )}
-        </CardContent>
-      </Card>
 
       <Card>
         <CardHeader>

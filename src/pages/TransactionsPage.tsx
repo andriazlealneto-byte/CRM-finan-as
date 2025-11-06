@@ -19,6 +19,7 @@ import * as z from "zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { toast } from "sonner";
 import { useTransactionContext } from "@/context/TransactionContext"; // Import useTransactionContext
+import { Checkbox } from "@/components/ui/checkbox"; // Import Checkbox
 
 interface Transaction {
   id: string;
@@ -27,6 +28,7 @@ interface Transaction {
   amount: number;
   type: "income" | "expense";
   category: string;
+  isFixed?: boolean;
 }
 
 interface FutureExpense {
@@ -50,12 +52,11 @@ const transactionFormSchema = z.object({
     required_error: "O tipo é obrigatório.",
   }),
   category: z.string().min(1, "A categoria é obrigatória."),
+  isFixed: z.boolean().default(false), // Novo campo para gasto fixo
 });
 
 const futureExpenseFormSchema = z.object({
-  dueDate: z.date({
-    required_error: "A data de vencimento é obrigatória.",
-  }),
+  dueDates: z.array(z.date()).min(1, "Selecione pelo menos uma data de vencimento."), // Alterado para array de datas
   description: z.string().min(1, "A descrição é obrigatória."),
   amount: z.preprocess(
     (val) => Number(val),
@@ -79,6 +80,7 @@ const TransactionsPage = () => {
       type: "expense",
       category: "",
       date: new Date(),
+      isFixed: false,
     },
   });
 
@@ -88,7 +90,7 @@ const TransactionsPage = () => {
       description: "",
       amount: 0,
       category: "",
-      dueDate: new Date(),
+      dueDates: [], // Inicializa como array vazio
     },
   });
 
@@ -99,6 +101,7 @@ const TransactionsPage = () => {
       amount: values.type === "expense" ? -values.amount : values.amount,
       type: values.type,
       category: values.category,
+      isFixed: values.isFixed,
     });
     toast.success("Transação adicionada com sucesso!");
     transactionForm.reset();
@@ -111,13 +114,15 @@ const TransactionsPage = () => {
   };
 
   const handleAddFutureExpense = (values: z.infer<typeof futureExpenseFormSchema>) => {
-    addFutureExpense({
-      dueDate: format(values.dueDate, "yyyy-MM-dd"),
-      description: values.description,
-      amount: values.amount,
-      category: values.category,
+    values.dueDates.forEach(date => {
+      addFutureExpense({
+        dueDate: format(date, "yyyy-MM-dd"),
+        description: values.description,
+        amount: values.amount,
+        category: values.category,
+      });
     });
-    toast.success("Gasto futuro adicionado com sucesso!");
+    toast.success("Gasto(s) futuro(s) adicionado(s) com sucesso!");
     futureExpenseForm.reset();
     setIsAddFutureExpenseDialogOpen(false);
   };
@@ -328,6 +333,28 @@ const TransactionsPage = () => {
                       </FormItem>
                     )}
                   />
+                  <FormField
+                    control={transactionForm.control}
+                    name="isFixed"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                        <FormControl>
+                          <Checkbox
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                          />
+                        </FormControl>
+                        <div className="space-y-1 leading-none">
+                          <FormLabel>
+                            Gasto Fixo
+                          </FormLabel>
+                          <FormDescription>
+                            Marque se esta for uma despesa recorrente (ex: aluguel, mensalidade).
+                          </FormDescription>
+                        </div>
+                      </FormItem>
+                    )}
+                  />
                   <DialogFooter>
                     <Button type="submit">Salvar Transação</Button>
                   </DialogFooter>
@@ -347,17 +374,17 @@ const TransactionsPage = () => {
               <DialogHeader>
                 <DialogTitle>Adicionar Novo Gasto Futuro</DialogTitle>
                 <DialogDescription>
-                  Preencha os detalhes do seu gasto futuro.
+                  Preencha os detalhes do seu gasto futuro e selecione as datas de vencimento.
                 </DialogDescription>
               </DialogHeader>
               <Form {...futureExpenseForm}>
                 <form onSubmit={futureExpenseForm.handleSubmit(handleAddFutureExpense)} className="grid gap-4 py-4">
                   <FormField
                     control={futureExpenseForm.control}
-                    name="dueDate"
+                    name="dueDates"
                     render={({ field }) => (
                       <FormItem className="flex flex-col">
-                        <FormLabel>Data de Vencimento</FormLabel>
+                        <FormLabel>Datas de Vencimento</FormLabel>
                         <Popover>
                           <PopoverTrigger asChild>
                             <FormControl>
@@ -365,17 +392,21 @@ const TransactionsPage = () => {
                                 variant={"outline"}
                                 className={cn(
                                   "w-full justify-start text-left font-normal",
-                                  !field.value && "text-muted-foreground"
+                                  !field.value || field.value.length === 0 && "text-muted-foreground"
                                 )}
                               >
                                 <CalendarIcon className="mr-2 h-4 w-4" />
-                                {field.value ? format(field.value, "PPP", { locale: ptBR }) : <span>Escolha uma data</span>}
+                                {field.value && field.value.length > 0 ? (
+                                  `${field.value.length} data(s) selecionada(s)`
+                                ) : (
+                                  <span>Escolha as datas</span>
+                                )}
                               </Button>
                             </FormControl>
                           </PopoverTrigger>
                           <PopoverContent className="w-auto p-0" align="start">
                             <Calendar
-                              mode="single"
+                              mode="multiple" // Alterado para seleção múltipla
                               selected={field.value}
                               onSelect={field.onChange}
                               initialFocus
@@ -427,7 +458,7 @@ const TransactionsPage = () => {
                     )}
                   />
                   <DialogFooter>
-                    <Button type="submit">Salvar Gasto Futuro</Button>
+                    <Button type="submit">Salvar Gasto(s) Futuro(s)</Button>
                   </DialogFooter>
                 </form>
               </Form>
@@ -453,7 +484,7 @@ const TransactionsPage = () => {
               filteredTransactions.map((transaction) => (
                 <TableRow key={transaction.id}>
                   <TableCell>{format(new Date(transaction.date), "dd/MM/yyyy", { locale: ptBR })}</TableCell>
-                  <TableCell>{transaction.description}</TableCell>
+                  <TableCell>{transaction.description} {transaction.isFixed && <span className="text-xs text-muted-foreground">(Fixo)</span>}</TableCell>
                   <TableCell>{transaction.category}</TableCell>
                   <TableCell className={`text-right ${transaction.amount > 0 ? "text-green-600" : "text-red-600"}`}>
                     {transaction.amount > 0 ? "+" : ""}{transaction.amount.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}

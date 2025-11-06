@@ -11,6 +11,7 @@ interface Transaction {
   amount: number;
   type: "income" | "expense";
   category: string;
+  isFixed?: boolean; // Adicionando a propriedade isFixed
 }
 
 interface FutureExpense {
@@ -37,10 +38,10 @@ const TransactionContext = createContext<TransactionContextType | undefined>(und
 
 export const TransactionProvider = ({ children }: { children: ReactNode }) => {
   const [transactions, setTransactions] = useLocalStorage<Transaction[]>("finance-transactions", [
-    { id: "1", date: "2023-10-26", description: "Salário", amount: 3000, type: "income", category: "Trabalho" },
-    { id: "2", date: "2023-10-25", description: "Compras de Supermercado", amount: -120.50, type: "expense", category: "Alimentação" },
-    { id: "3", date: "2023-10-24", description: "Projeto Freelance", amount: 500, type: "income", category: "Trabalho" },
-    { id: "4", date: "2023-10-23", description: "Aluguel", amount: -800, type: "expense", category: "Moradia" },
+    { id: "1", date: "2023-10-26", description: "Salário", amount: 3000, type: "income", category: "Trabalho", isFixed: false },
+    { id: "2", date: "2023-10-25", description: "Compras de Supermercado", amount: -120.50, type: "expense", category: "Alimentação", isFixed: false },
+    { id: "3", date: "2023-10-24", description: "Projeto Freelance", amount: 500, type: "income", category: "Trabalho", isFixed: false },
+    { id: "4", date: "2023-10-23", description: "Aluguel", amount: -800, type: "expense", category: "Moradia", isFixed: true },
   ]);
 
   const [futureExpenses, setFutureExpenses] = useLocalStorage<FutureExpense[]>("finance-future-expenses", [
