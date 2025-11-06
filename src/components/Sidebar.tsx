@@ -2,9 +2,10 @@
 
 import React from "react";
 import { Link } from "react-router-dom";
-import { Home, DollarSign, ListChecks } from "lucide-react"; // Import ListChecks icon
+import { Home, DollarSign, ListChecks, LogOut } from "lucide-react"; // Import ListChecks and LogOut icon
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/context/AuthContext"; // Import useAuth
 
 interface SidebarProps extends React.HTMLAttributes<HTMLDivElement> {
   isMobile: boolean;
@@ -12,6 +13,8 @@ interface SidebarProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 const Sidebar = ({ className, isMobile, onLinkClick }: SidebarProps) => {
+  const { logout } = useAuth(); // Use the logout function
+
   const navItems = [
     {
       name: "Painel",
@@ -53,6 +56,19 @@ const Sidebar = ({ className, isMobile, onLinkClick }: SidebarProps) => {
               </Button>
             ))}
           </div>
+        </div>
+        <div className="px-3 py-2">
+          <Button
+            variant="ghost"
+            className="w-full justify-start text-red-500 hover:text-red-700"
+            onClick={() => {
+              logout();
+              if (onLinkClick) onLinkClick(); // Close mobile sidebar on logout
+            }}
+          >
+            <LogOut className="mr-2 h-4 w-4" />
+            Sair
+          </Button>
         </div>
       </div>
     </div>

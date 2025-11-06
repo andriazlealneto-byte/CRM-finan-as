@@ -10,6 +10,9 @@ import NotFound from "./pages/NotFound";
 import Layout from "./components/Layout"; // New layout component
 import { ThemeProvider } from "./components/ThemeProvider"; // Import ThemeProvider
 import { TransactionProvider } from "./context/TransactionContext"; // Import TransactionProvider
+import { AuthProvider } from "./context/AuthContext"; // Import AuthProvider
+import LoginPage from "./pages/LoginPage"; // Import LoginPage
+import ProtectedRoute from "./components/ProtectedRoute"; // Import ProtectedRoute
 
 const queryClient = new QueryClient();
 
@@ -20,17 +23,22 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter>
-          <TransactionProvider> {/* Wrap with TransactionProvider */}
-            <Routes>
-              <Route path="/" element={<Layout />}>
-                <Route index element={<Index />} /> {/* Dashboard */}
-                <Route path="transactions" element={<TransactionsPage />} /> {/* Transactions */}
-                <Route path="categories" element={<CategoryManagementPage />} /> {/* Category Management */}
-                {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-                <Route path="*" element={<NotFound />} />
-              </Route>
-            </Routes>
-          </TransactionProvider>
+          <AuthProvider> {/* Wrap the entire app with AuthProvider */}
+            <TransactionProvider> {/* Wrap with TransactionProvider */}
+              <Routes>
+                <Route path="/login" element={<LoginPage />} />
+                <Route element={<ProtectedRoute />}> {/* Protect these routes */}
+                  <Route path="/" element={<Layout />}>
+                    <Route index element={<Index />} /> {/* Dashboard */}
+                    <Route path="transactions" element={<TransactionsPage />} /> {/* Transactions */}
+                    <Route path="categories" element={<CategoryManagementPage />} /> {/* Category Management */}
+                    {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                    <Route path="*" element={<NotFound />} />
+                  </Route>
+                </Route>
+              </Routes>
+            </TransactionProvider>
+          </AuthProvider>
         </BrowserRouter>
       </TooltipProvider>
     </ThemeProvider>
