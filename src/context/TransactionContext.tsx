@@ -44,6 +44,17 @@ interface UserBudget {
   updated_at: string;
 }
 
+interface Goal {
+  id: string;
+  user_id: string;
+  name: string;
+  target_amount: number;
+  current_amount: number;
+  due_date: string;
+  created_at: string;
+  updated_at: string;
+}
+
 interface TransactionContextType {
   transactions: Transaction[];
   addTransaction: (transaction: Omit<Transaction, "id" | "user_id">) => void;
@@ -70,6 +81,11 @@ interface TransactionContextType {
   currentMiscExpenses: number;
   currentFoodExpenses: number;
   loading: boolean;
+
+  goals: Goal[];
+  addGoal: (goal: Omit<Goal, "id" | "user_id" | "created_at" | "updated_at">) => void;
+  updateGoal: (id: string, updates: Partial<Omit<Goal, "id" | "user_id" | "created_at">>) => void;
+  deleteGoal: (id: string) => void;
 }
 
 const TransactionContext = createContext<TransactionContextType | undefined>(undefined);
@@ -82,6 +98,7 @@ export const TransactionProvider = ({ children }: { children: ReactNode }) => {
   const [foodExpensesLimit, setFoodExpensesLimitState] = useState<number>(0);
   const [miscCategories, setMiscCategoriesState] = useState<string[]>([]);
   const [foodCategories, setFoodCategoriesState] = useState<string[]>([]);
+  const [goals, setGoals] = useState<Goal[]>([]); // Novo estado para metas
   const [loading, setLoading] = useState(true);
 
   const { user, loading: sessionLoading } = useSession(); // Obter user e loading da sessão
@@ -180,12 +197,29 @@ export const TransactionProvider = ({ children }: { children: ReactNode }) => {
     setLoading(false);
   }, [user?.id]);
 
+  const fetchGoals = useCallback(async () => {
+    if (!user?.id) {
+      setGoals([]);
+      return;
+    }
+    setLoading(true);
+    const { data, error } = await supabase.from('goals').select('*').eq('user_id', user.id);
+    if (error) {
+      toast.error("Erro ao carregar metas: " + error.message);
+      console.error("Erro ao carregar metas:", error);
+    } else {
+      setGoals(data || []);
+    }
+    setLoading(false);
+  }, [user?.id]);
+
   useEffect(() => {
     if (!sessionLoading && user?.id) {
       fetchTransactions();
       fetchFutureExpenses();
       fetchSavedCategories();
       fetchBudgets();
+      fetchGoals(); // Chamar fetchGoals
     } else if (!sessionLoading && !user?.id) {
       // Clear data if user logs out
       setTransactions([]);
@@ -195,9 +229,10 @@ export const TransactionProvider = ({ children }: { children: ReactNode }) => {
       setFoodExpensesLimitState(0);
       setMiscCategoriesState([]);
       setFoodCategoriesState([]);
+      setGoals([]); // Limpar metas ao deslogar
       setLoading(false);
     }
-  }, [sessionLoading, user?.id, fetchTransactions, fetchFutureExpenses, fetchSavedCategories, fetchBudgets]);
+  }, [sessionLoading, user?.id, fetchTransactions, fetchFutureExpenses, fetchSavedCategories, fetchBudgets, fetchGoals]);
 
   const addTransaction = async (transaction: Omit<Transaction, "id" | "user_id">) => {
     if (!user?.id) {
@@ -396,6 +431,51 @@ export const TransactionProvider = ({ children }: { children: ReactNode }) => {
     updateBudgetsInSupabase({ food_categories: categories });
   };
 
+  const addGoal = async (goal: Omit<Goal, "id" | "user_id" | "created_at" | "updated_at">) => {
+    if (!user?.id) {
+      toast.error("Você precisa estar logado para adicionar metas.");
+      return;
+    }
+    const { data, error } = await supabase.from('goals').insert({ ...goal, user_id: user.id }).select();
+    if (error) {
+      toast.error("Erro ao adicionar meta: " + error.message);
+      console.error("Erro ao adicionar meta:", error);
+    } else if (data) {
+      setGoals((prev) => [...prev, data[0] as Goal]);
+      toast.success("Meta adicionada com sucesso!");
+    }
+  };
+
+  const updateGoal = async (id: string, updates: Partial<Omit<Goal, "id" | "user_id" | "created_at">>) => {
+    if (!user?.id) {
+      toast.error("Você precisa estar logado para atualizar metas.");
+      return;
+    }
+    const { error } = await supabase.from('goals').update({ ...updates, updated_at: new Date().toISOString() }).eq('id', id).eq('user_id', user.id);
+    if (error) {
+      toast.error("Erro ao atualizar meta: " + error.message);
+      console.error("Erro ao atualizar meta:", error);
+    } else {
+      setGoals((prev) => prev.map((g) => (g.id === id ? { ...g, ...updates, updated_at: new Date().toISOString() } : g)));
+      toast.success("Meta atualizada com sucesso!");
+    }
+  };
+
+  const deleteGoal = async (id: string) => {
+    if (!user?.id) {
+      toast.error("Você precisa estar logado para excluir metas.");
+      return;
+    }
+    const { error } = await supabase.from('goals').delete().eq('id', id).eq('user_id', user.id);
+    if (error) {
+      toast.error("Erro ao excluir meta: " + error.message);
+      console.error("Erro ao excluir meta:", error);
+    } else {
+      setGoals((prev) => prev.filter((g) => g.id !== id));
+      toast.success("Meta excluída com sucesso!");
+    }
+  };
+
   const totalIncome = transactions
     .filter((t) => t.type === "income")
     .reduce((sum, t) => sum + t.amount, 0);
@@ -441,6 +521,10 @@ export const TransactionProvider = ({ children }: { children: ReactNode }) => {
         currentMiscExpenses,
         currentFoodExpenses,
         loading,
+        goals, // Adicionado goals
+        addGoal, // Adicionado addGoal
+        updateGoal, // Adicionado updateGoal
+        deleteGoal, // Adicionado deleteGoal
       }}
     >
       {children}

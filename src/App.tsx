@@ -12,6 +12,7 @@ import Index from "@/pages/Index";
 import TransactionsPage from "@/pages/TransactionsPage";
 import CategoryManagementPage from "@/pages/CategoryManagementPage";
 import BudgetManagementPage from "@/pages/BudgetManagementPage";
+import GoalsPage from "@/pages/GoalsPage"; // Importar GoalsPage
 import LoginPage from "@/pages/LoginPage";
 import SignupPage from "@/pages/SignupPage";
 import NotFound from "@/pages/NotFound";
@@ -37,6 +38,7 @@ function App() {
                   <Route path="/transactions" element={<TransactionsPage />} />
                   <Route path="/categories" element={<CategoryManagementPage />} />
                   <Route path="/budgets" element={<BudgetManagementPage />} />
+                  <Route path="/goals" element={<GoalsPage />} /> {/* Nova rota para Metas */}
                 </Route>
               </Route>
               <Route path="*" element={<NotFound />} />

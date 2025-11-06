@@ -2,7 +2,7 @@
 
 import React from "react";
 import { Link } from "react-router-dom";
-import { Home, DollarSign, ListChecks, LogOut, Wallet } from "lucide-react";
+import { Home, DollarSign, ListChecks, LogOut, Wallet, Target } from "lucide-react"; // Importar o ícone Target
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/context/AuthContext";
@@ -35,6 +35,11 @@ const Sidebar = ({ className, isMobile, onLinkClick }: SidebarProps) => {
       name: "Orçamentos",
       href: "/budgets",
       icon: <Wallet className="mr-2 h-4 w-4" />,
+    },
+    {
+      name: "Metas", // Novo item de navegação
+      href: "/goals",
+      icon: <Target className="mr-2 h-4 w-4" />, // Ícone para Metas
     },
   ];
 
