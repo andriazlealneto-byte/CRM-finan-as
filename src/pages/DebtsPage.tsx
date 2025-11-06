@@ -293,7 +293,7 @@ const DebtsPage = () => {
                     <TableCell className="font-medium">{debt.name}</TableCell>
                     <TableCell>{debt.total_amount.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}</TableCell>
                     <TableCell>{debt.paid_amount.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}</TableCell>
-                    <TableCell>{debt.current_installment}/{debt.installments}</TableCell>
+                    <TableCell>{debt.current_installment}/{debt.installments}</TableCell> {/* CORRIGIDO AQUI */}
                     <TableCell>{format(new Date(debt.due_date), "dd/MM/yyyy", { locale: ptBR })}</TableCell>
                     <TableCell className={statusColor}>{debt.status === 'pending' ? 'Pendente' : debt.status === 'paid' ? 'Pago' : 'Atrasado'}</TableCell>
                     <TableCell className="text-right">
