@@ -101,12 +101,12 @@ const LandingPage = () => {
               <Button variant="ghost" disabled>Carregando...</Button>
             ) : session ? (
               userProfile?.is_premium ? (
-                <Button asChild><Link to="/app">Ir para o App</Link></Button>
+                <Button asChild className="rounded-xl"><Link to="/app">Ir para o App</Link></Button>
               ) : (
-                <Button asChild><Link to="/subscribe">Assinar Agora</Link></Button>
+                <Button asChild className="rounded-xl"><Link to="/subscribe">Assinar Agora</Link></Button>
               )
             ) : (
-              <Button asChild><Link to="/login">Login</Link></Button>
+              <Button asChild className="rounded-xl"><Link to="/login">Login</Link></Button>
             )}
           </div>
           <div className="md:hidden flex items-center gap-2">
@@ -124,15 +124,15 @@ const LandingPage = () => {
                   <Button variant="ghost" asChild onClick={() => setIsMobileMenuOpen(false)}><Link to="#testimonials">Depoimentos</Link></Button>
                   <div className="pt-4">
                     {loading ? (
-                      <Button className="w-full" disabled>Carregando...</Button>
+                      <Button className="w-full rounded-xl" disabled>Carregando...</Button>
                     ) : session ? (
                       userProfile?.is_premium ? (
-                        <Button asChild className="w-full"><Link to="/app">Ir para o App</Link></Button>
+                        <Button asChild className="w-full rounded-xl"><Link to="/app">Ir para o App</Link></Button>
                       ) : (
-                        <Button asChild className="w-full"><Link to="/subscribe">Assinar Agora</Link></Button>
+                        <Button asChild className="w-full rounded-xl"><Link to="/subscribe">Assinar Agora</Link></Button>
                       )
                     ) : (
-                      <Button asChild className="w-full"><Link to="/login">Login</Link></Button>
+                      <Button asChild className="w-full rounded-xl"><Link to="/login">Login</Link></Button>
                     )}
                   </div>
                 </div>
@@ -153,10 +153,10 @@ const LandingPage = () => {
             Comece hoje a construir um futuro financeiro sólido!
           </p>
           <div className="flex flex-col sm:flex-row justify-center gap-4 pt-4">
-            <Button size="lg" className="bg-white text-primary hover:bg-gray-100" onClick={() => handleSubscriptionClick('monthly')}>
+            <Button size="lg" className="rounded-xl bg-white text-primary hover:bg-gray-100" onClick={() => handleSubscriptionClick('monthly')}>
               Começar Agora (Mensal)
             </Button>
-            <Button size="lg" variant="outline" className="border-primary text-primary hover:bg-primary hover:text-primary-foreground" onClick={() => handleSubscriptionClick('annual')}>
+            <Button size="lg" className="rounded-xl bg-primary text-primary-foreground hover:bg-primary/90" onClick={() => handleSubscriptionClick('annual')}>
               Economize 20% (Anual)
             </Button>
           </div>
@@ -200,7 +200,7 @@ const LandingPage = () => {
                 <li className="flex items-center gap-2 text-muted-foreground"><CheckCircle className="h-5 w-5 text-green-500" /> Cancelamento a qualquer momento</li>
               </ul>
             </CardContent>
-            <Button size="lg" className="w-full" onClick={() => handleSubscriptionClick('monthly')}>
+            <Button size="lg" className="w-full rounded-xl" onClick={() => handleSubscriptionClick('monthly')}>
               Assinar Plano Mensal
             </Button>
           </Card>
@@ -219,7 +219,7 @@ const LandingPage = () => {
                 <li className="flex items-center gap-2 text-muted-foreground"><CheckCircle className="h-5 w-5 text-green-500" /> Estabilidade e planejamento a longo prazo</li>
               </ul>
             </CardContent>
-            <Button size="lg" variant="outline" className="w-full" onClick={() => handleSubscriptionClick('annual')}>
+            <Button size="lg" className="w-full rounded-xl bg-primary text-primary-foreground hover:bg-primary/90" onClick={() => handleSubscriptionClick('annual')}>
               Assinar Plano Anual
             </Button>
           </Card>
@@ -251,7 +251,7 @@ const LandingPage = () => {
         <p className="text-xl opacity-90 max-w-2xl mx-auto">
           Junte-se a milhares de usuários que estão no controle de sua vida financeira com o GPF.
         </p>
-        <Button size="lg" className="bg-white text-primary hover:bg-gray-100" onClick={() => handleSubscriptionClick('monthly')}>
+        <Button size="lg" className="w-full rounded-xl bg-white text-primary hover:bg-gray-100" onClick={() => handleSubscriptionClick('monthly')}>
           Começar Agora
         </Button>
       </section>
