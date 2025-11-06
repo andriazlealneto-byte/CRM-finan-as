@@ -16,7 +16,7 @@ import { useTransactionContext } from "@/context/TransactionContext";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
-import { format } from "date-fns";
+import { format, parseISO } from "date-fns"; // Importar parseISO
 import { ptBR } from "date-fns/locale";
 import { cn } from "@/lib/utils";
 import { Progress } from "@/components/ui/progress";
@@ -62,7 +62,7 @@ const GoalsPage = () => {
         name: editingGoal.name,
         target_amount: editingGoal.target_amount,
         current_amount: editingGoal.current_amount,
-        due_date: new Date(editingGoal.due_date),
+        due_date: parseISO(editingGoal.due_date), // Usar parseISO
       });
     }
   }, [editingGoal, editForm]);
@@ -217,7 +217,7 @@ const GoalsPage = () => {
               goals.map((goal) => {
                 const progress = (goal.current_amount / goal.target_amount) * 100;
                 const isCompleted = goal.current_amount >= goal.target_amount;
-                const isOverdue = new Date(goal.due_date) < new Date() && !isCompleted;
+                const isOverdue = parseISO(goal.due_date) < new Date() && !isCompleted; // Usar parseISO
 
                 return (
                   <TableRow key={goal.id}>
@@ -239,7 +239,7 @@ const GoalsPage = () => {
                       {goal.current_amount.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
                     </TableCell>
                     <TableCell className="text-right">
-                      {format(new Date(goal.due_date), "dd/MM/yyyy", { locale: ptBR })}
+                      {format(parseISO(goal.due_date), "dd/MM/yyyy", { locale: ptBR })}
                     </TableCell>
                     <TableCell className="text-right">
                       <Dialog open={isEditDialogOpen && editingGoal?.id === goal.id} onOpenChange={(open) => {

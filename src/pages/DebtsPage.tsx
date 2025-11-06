@@ -16,7 +16,7 @@ import { useTransactionContext } from "@/context/TransactionContext";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
-import { format } from "date-fns";
+import { format, parseISO } from "date-fns"; // Importar parseISO
 import { ptBR } from "date-fns/locale";
 import { cn } from "@/lib/utils";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -75,7 +75,7 @@ const DebtsPage = () => {
         paid_amount: editingDebt.paid_amount,
         installments: editingDebt.installments,
         current_installment: editingDebt.current_installment,
-        due_date: new Date(editingDebt.due_date),
+        due_date: parseISO(editingDebt.due_date), // Usar parseISO
         status: editingDebt.status,
       });
     }
@@ -285,7 +285,7 @@ const DebtsPage = () => {
             {debts.length > 0 ? (
               debts.map((debt) => {
                 const remainingAmount = debt.total_amount - debt.paid_amount;
-                const isOverdue = new Date(debt.due_date) < new Date() && debt.status === 'pending';
+                const isOverdue = parseISO(debt.due_date) < new Date() && debt.status === 'pending'; // Usar parseISO
                 const statusColor = isOverdue ? "text-red-500" : debt.status === 'paid' ? "text-green-500" : "text-yellow-500";
 
                 return (
@@ -293,8 +293,8 @@ const DebtsPage = () => {
                     <TableCell className="font-medium">{debt.name}</TableCell>
                     <TableCell>{debt.total_amount.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}</TableCell>
                     <TableCell>{debt.paid_amount.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}</TableCell>
-                    <TableCell>{debt.current_installment}/{debt.installments}</TableCell> {/* CORRIGIDO AQUI */}
-                    <TableCell>{format(new Date(debt.due_date), "dd/MM/yyyy", { locale: ptBR })}</TableCell>
+                    <TableCell>{debt.current_installment}/{debt.installments}</TableCell>
+                    <TableCell>{format(parseISO(debt.due_date), "dd/MM/yyyy", { locale: ptBR })}</TableCell> {/* Usar parseISO */}
                     <TableCell className={statusColor}>{debt.status === 'pending' ? 'Pendente' : debt.status === 'paid' ? 'Pago' : 'Atrasado'}</TableCell>
                     <TableCell className="text-right">
                       <Dialog open={isEditDialogOpen && editingDebt?.id === debt.id} onOpenChange={(open) => {

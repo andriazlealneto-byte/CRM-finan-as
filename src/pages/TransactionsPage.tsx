@@ -10,7 +10,7 @@ import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
-import { format } from "date-fns";
+import { format, parseISO } from "date-fns"; // Importar parseISO
 import { ptBR } from "date-fns/locale";
 import { cn } from "@/lib/utils";
 import { useForm } from "react-hook-form";
@@ -20,8 +20,8 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDes
 import { toast } from "sonner";
 import { useTransactionContext } from "@/context/TransactionContext";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"; // Import Select components
-import { Switch } from "@/components/ui/switch"; // Import Switch
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
 
 interface Transaction {
   id: string;
@@ -39,8 +39,8 @@ interface FutureExpense {
   description: string;
   amount: number;
   category: string;
-  installments?: number; // Novo campo
-  term_months?: number; // Novo campo
+  installments?: number;
+  term_months?: number;
 }
 
 const NEW_CATEGORY_OPTION = "ADICIONAR_NOVA_CATEGORIA";
@@ -56,7 +56,7 @@ const transactionFormSchema = z.object({
   }),
   category: z.string().min(1, "A categoria é obrigatória."),
   isFixed: z.boolean().default(false),
-  saveNewCategory: z.boolean().optional(), // Campo opcional para salvar nova categoria
+  saveNewCategory: z.boolean().optional(),
 });
 
 const futureExpenseFormSchema = z.object({
@@ -64,9 +64,9 @@ const futureExpenseFormSchema = z.object({
   description: z.string().min(1, "A descrição é obrigatória."),
   amount: z.coerce.number().positive("O valor deve ser positivo."),
   category: z.string().min(1, "A categoria é obrigatória."),
-  installments: z.coerce.number().min(1, "O número de parcelas deve ser no mínimo 1.").optional(), // Novo campo
-  term_months: z.coerce.number().min(1, "O prazo em meses deve ser no mínimo 1.").optional(), // Novo campo
-  saveNewCategory: z.boolean().optional(), // Campo opcional para salvar nova categoria
+  installments: z.coerce.number().min(1, "O número de parcelas deve ser no mínimo 1.").optional(),
+  term_months: z.coerce.number().min(1, "O prazo em meses deve ser no mínimo 1.").optional(),
+  saveNewCategory: z.boolean().optional(),
 }).superRefine((data, ctx) => {
   if (data.installments && data.installments > 1 && !data.term_months) {
     ctx.addIssue({
@@ -104,7 +104,7 @@ const TransactionsPage = () => {
       amount: "",
       category: "",
       dueDates: [],
-      installments: 1, // Default para 1 parcela
+      installments: 1,
       term_months: undefined,
       saveNewCategory: false,
     },
@@ -149,8 +149,8 @@ const TransactionsPage = () => {
         description: values.description,
         amount: values.amount,
         category: values.category,
-        installments: values.installments, // Passar parcelas
-        term_months: values.term_months, // Passar prazo
+        installments: values.installments,
+        term_months: values.term_months,
       });
     });
 
@@ -181,7 +181,7 @@ const TransactionsPage = () => {
       transaction.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
       transaction.category.toLowerCase().includes(searchTerm.toLowerCase());
 
-    const transactionDate = new Date(transaction.date);
+    const transactionDate = parseISO(transaction.date); // Usar parseISO
     const matchesDate = selectedFilterDate
       ? transactionDate.toDateString() === selectedFilterDate.toDateString()
       : true;
@@ -194,7 +194,7 @@ const TransactionsPage = () => {
       expense.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
       expense.category.toLowerCase().includes(searchTerm.toLowerCase());
 
-    const expenseDate = new Date(expense.dueDate);
+    const expenseDate = parseISO(expense.dueDate); // Usar parseISO
     const matchesDate = selectedFilterDate
       ? expenseDate.toDateString() === selectedFilterDate.toDateString()
       : true;
@@ -653,7 +653,7 @@ const TransactionsPage = () => {
             {filteredTransactions.length > 0 ? (
               filteredTransactions.map((transaction) => (
                 <TableRow key={transaction.id}>
-                  <TableCell>{format(new Date(transaction.date), "dd/MM/yyyy", { locale: ptBR })}</TableCell>
+                  <TableCell>{format(parseISO(transaction.date), "dd/MM/yyyy", { locale: ptBR })}</TableCell>
                   <TableCell>{transaction.description} {transaction.isFixed && <span className="text-xs text-muted-foreground">(Fixo)</span>}</TableCell>
                   <TableCell>{transaction.category}</TableCell>
                   <TableCell className={`text-right ${transaction.amount > 0 ? "text-green-600" : "text-red-600"}`}>
@@ -699,7 +699,7 @@ const TransactionsPage = () => {
             {filteredFutureExpenses.length > 0 ? (
               filteredFutureExpenses.map((expense) => (
                 <TableRow key={expense.id}>
-                  <TableCell>{format(new Date(expense.dueDate), "dd/MM/yyyy", { locale: ptBR })}</TableCell>
+                  <TableCell>{format(parseISO(expense.dueDate), "dd/MM/yyyy", { locale: ptBR })}</TableCell>
                   <TableCell>{expense.description}</TableCell>
                   <TableCell>{expense.category}</TableCell>
                   <TableCell className="text-right text-red-600">
