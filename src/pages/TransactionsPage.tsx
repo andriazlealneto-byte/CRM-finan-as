@@ -18,6 +18,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { toast } from "sonner"; // Using sonner for toasts
+import { useLocalStorage } from "@/hooks/use-local-storage"; // Import useLocalStorage
 
 interface Transaction {
   id: string;
@@ -44,7 +45,7 @@ const formSchema = z.object({
 });
 
 const TransactionsPage = () => {
-  const [transactions, setTransactions] = React.useState<Transaction[]>([
+  const [transactions, setTransactions] = useLocalStorage<Transaction[]>("finance-transactions", [
     { id: "1", date: "2023-10-26", description: "Salário", amount: 3000, type: "income", category: "Trabalho" },
     { id: "2", date: "2023-10-25", description: "Compras de Supermercado", amount: 120.50, type: "expense", category: "Alimentação" },
     { id: "3", date: "2023-10-24", description: "Projeto Freelance", amount: 500, type: "income", category: "Trabalho" },
@@ -67,7 +68,7 @@ const TransactionsPage = () => {
 
   const handleAddTransaction = (values: z.infer<typeof formSchema>) => {
     const newTransaction: Transaction = {
-      id: String(transactions.length + 1), // Simple ID generation
+      id: String(Date.now()), // More robust ID generation
       date: format(values.date, "yyyy-MM-dd"),
       description: values.description,
       amount: values.type === "expense" ? -values.amount : values.amount,
