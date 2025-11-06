@@ -15,6 +15,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { PlusCircle, Edit, Trash2, Wallet } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"; // Adicionado importação da tabela
 
 const defaultBudgetFormSchema = z.object({
   miscBudgetName: z.string().min(1, "O nome do orçamento é obrigatório.").max(50, "O nome não pode ter mais de 50 caracteres."),
