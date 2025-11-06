@@ -153,15 +153,13 @@ const LandingPage = () => {
       </header>
 
       {/* Hero Section */}
-      <section className="relative h-[calc(100vh-64px)] flex items-center justify-center text-center bg-background text-white p-8">
+      <section className="relative h-[calc(100vh-64px)] flex items-center justify-center text-center bg-background p-8">
         <AnimatedBlob />
         <div className="max-w-4xl space-y-8 relative z-10">
-          {/* ATENÇÃO: Mudar esta cor para 'text-black' fará o texto ficar invisível no fundo escuro. */}
-          {/* Por favor, considere manter 'text-white' ou mudar o fundo da seção para uma cor clara. */}
-          <h1 className="text-6xl font-extrabold leading-tight tracking-tight">
+          <h1 className="text-6xl font-extrabold leading-tight tracking-tight text-foreground">
             Assuma o Controle das Suas Finanças Pessoais
           </h1>
-          <p className="text-2xl opacity-90 max-w-3xl mx-auto">
+          <p className="text-2xl opacity-90 max-w-3xl mx-auto text-foreground">
             O GPF é a sua ferramenta completa para gerenciar receitas, despesas, metas e dívidas. Comece hoje a construir um futuro financeiro sólido!
           </p>
           <div className="flex flex-col sm:flex-row justify-center gap-4 pt-4">
@@ -259,7 +257,7 @@ const LandingPage = () => {
 
       {/* Call to Action */}
       <section className="py-16 text-center bg-background">
-        <div className="max-w-3xl mx-auto p-12 bg-primary text-white space-y-6 rounded-[30%_70%_70%_30%_/_30%_30%_70%_70%] shadow-lg">
+        <div className="max-w-3xl mx-auto p-12 bg-primary text-white space-y-6 rounded-[40%_60%_60%_40%_/_40%_40%_60%_60%] shadow-lg">
           <h2 className="text-4xl font-bold">Pronto para Transformar Suas Finanças?</h2>
           <p className="text-xl opacity-90 max-w-2xl mx-auto">
             Junte-se a milhares de usuários que estão no controle de sua vida financeira com o GPF.
