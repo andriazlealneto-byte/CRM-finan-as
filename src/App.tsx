@@ -1,10 +1,50 @@
-`.
+"use client";
 
-**Passos para atualizar no GitHub:**
+import React from "react";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { Toaster } from "sonner";
 
-1.  **Abra o GitHub:** Vá para o seu repositório do projeto no GitHub (por exemplo, `github.com/seu-usuario/seu-projeto`).
-2.  **Navegue até o arquivo:** Clique na pasta `src`, depois no arquivo `App.tsx`.
-3.  **Edite o arquivo:** No GitHub, você verá o conteúdo do `App.tsx`. Procure por um ícone de lápis (geralmente no canto superior direito do arquivo) para "Editar este arquivo".
-4.  **Copie e Cole:**
-    *   Volte para a minha resposta anterior aqui no Dyad.
-    *   Copie **todo o conteúdo** do bloco de código que começa com `<dyad-write path="src/App.tsx" ...>` e termina com `
+import { ThemeProvider } from "@/components/ThemeProvider";
+import Layout from "@/components/Layout";
+import ProtectedRoute from "@/components/ProtectedRoute";
+
+import Index from "@/pages/Index";
+import TransactionsPage from "@/pages/TransactionsPage";
+import CategoryManagementPage from "@/pages/CategoryManagementPage";
+import BudgetManagementPage from "@/pages/BudgetManagementPage";
+import LoginPage from "@/pages/LoginPage";
+import NotFound from "@/pages/NotFound";
+
+import { SessionProvider } from "@/context/SessionContext";
+import { AuthProvider } from "@/context/AuthContext";
+import { TransactionProvider } from "@/context/TransactionContext";
+
+function App() {
+  return (
+    <BrowserRouter>
+      <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
+        <Toaster richColors />
+        <SessionProvider>
+          <AuthProvider>
+            <TransactionProvider>
+              <Routes>
+                <Route path="/login" element={<LoginPage />} />
+                <Route element={<ProtectedRoute />}>
+                  <Route element={<Layout />}>
+                    <Route path="/" element={<Index />} />
+                    <Route path="/transactions" element={<TransactionsPage />} />
+                    <Route path="/categories" element={<CategoryManagementPage />} />
+                    <Route path="/budgets" element={<BudgetManagementPage />} />
+                  </Route>
+                </Route>
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </TransactionProvider>
+          </AuthProvider>
+        </SessionProvider>
+      </ThemeProvider>
+    </BrowserRouter>
+  );
+}
+
+export default App;
