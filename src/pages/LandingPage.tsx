@@ -11,6 +11,7 @@ import { useSession } from "@/context/SessionContext";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
 import { useTransactionContext } from "@/context/TransactionContext"; // Import useTransactionContext
+import AnimatedBlob from "@/components/AnimatedBlob"; // Importar o novo componente
 
 const LandingPage = () => {
   const { session, loading } = useSession();
@@ -151,12 +152,13 @@ const LandingPage = () => {
       </header>
 
       {/* Hero Section */}
-      <section className="relative h-[calc(100vh-64px)] flex items-center justify-center text-center animated-gradient-background text-white p-8">
-        <div className="max-w-4xl space-y-8"> {/* Increased max-width and space-y */}
-          <h1 className="text-6xl font-extrabold leading-tight tracking-tight"> {/* Increased text size and added tracking */}
+      <section className="relative h-[calc(100vh-64px)] flex items-center justify-center text-center bg-background text-white p-8 overflow-hidden">
+        <AnimatedBlob /> {/* O novo componente de fundo animado */}
+        <div className="max-w-4xl space-y-8 relative z-10"> {/* Conteúdo principal com z-index maior */}
+          <h1 className="text-6xl font-extrabold leading-tight tracking-tight">
             Assuma o Controle das Suas Finanças Pessoais
           </h1>
-          <p className="text-2xl opacity-90 max-w-3xl mx-auto"> {/* Increased text size and added max-width */}
+          <p className="text-2xl opacity-90 max-w-3xl mx-auto">
             O GPF é a sua ferramenta completa para gerenciar receitas, despesas, metas e dívidas.
             Comece hoje a construir um futuro financeiro sólido!
           </p>
