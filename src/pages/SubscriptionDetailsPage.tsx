@@ -16,6 +16,7 @@ import { useNavigate } from "react-router-dom";
 import { format, parseISO, addMonths } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
+// Tentativa de correção de erro de parsing: re-escrita do arquivo.
 const paymentCardFormSchema = z.object({
   cardNumber: z.string().min(16, "Número do cartão inválido.").max(16, "Número do cartão inválido."),
   cardName: z.string().min(1, "Nome no cartão é obrigatório."),
@@ -23,7 +24,7 @@ const paymentCardFormSchema = z.object({
   cvv: z.string().min(3, "CVV inválido.").max(4, "CVV inválido."),
 });
 
-const SubscriptionDetailsPage = () => { // Alterado de React.FC para um componente funcional padrão
+const SubscriptionDetailsPage = () => {
   const { userProfile, updateUserProfile } = useTransactionContext();
   const navigate = useNavigate();
 
