@@ -44,6 +44,7 @@ const Index = () => {
     debts, // Obter dívidas do contexto
     subscriptions, // Obter assinaturas do contexto
     userProfile, // Obter perfil do usuário para visibilidade
+    customBudgets, // Obter orçamentos personalizados
   } = useTransactionContext();
 
   const miscProgress = (currentMiscExpenses / miscExpensesLimit) * 100;
@@ -116,6 +117,13 @@ const Index = () => {
     ffProgress = (ffProjectedValue / ffTargetCapital) * 100;
     ffIsAchieved = ffProjectedValue >= ffTargetCapital;
   }
+
+  // Calcular gastos atuais para orçamentos personalizados
+  const calculateCustomBudgetExpenses = (budgetCategories: string[]) => {
+    return transactions
+      .filter(t => t.type === "expense" && budgetCategories.includes(t.category))
+      .reduce((sum, t) => sum + Math.abs(t.amount), 0);
+  };
 
   return (
     <div className="space-y-6">
@@ -229,7 +237,7 @@ const Index = () => {
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-2">
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Gastos Bestas</CardTitle>
+                <CardTitle className="text-sm font-medium">{userProfile?.misc_budget_name || "Gastos Bestas"}</CardTitle>
                 <ShoppingBag className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
@@ -243,7 +251,7 @@ const Index = () => {
 
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Gastos com Comida</CardTitle>
+                <CardTitle className="text-sm font-medium">{userProfile?.food_budget_name || "Comida"}</CardTitle>
                 <Utensils className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
@@ -254,6 +262,26 @@ const Index = () => {
                 </p>
               </CardContent>
             </Card>
+
+            {customBudgets.map((budget) => {
+              const currentCustomExpenses = calculateCustomBudgetExpenses(budget.categories);
+              const customProgress = (currentCustomExpenses / budget.limit) * 100;
+              return (
+                <Card key={budget.id}>
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">{budget.name}</CardTitle>
+                    <Wallet className="h-4 w-4 text-muted-foreground" />
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold">R${currentCustomExpenses.toFixed(2)} / R${budget.limit.toFixed(2)}</div>
+                    <Progress value={customProgress} className="mt-2" indicatorClassName={getProgressBarColor(customProgress)} />
+                    <p className="text-xs text-muted-foreground mt-1">
+                      {customProgress > 100 ? "Limite excedido!" : `${(budget.limit - currentCustomExpenses).toFixed(2)} restantes`}
+                    </p>
+                  </CardContent>
+                </Card>
+              );
+            })}
           </div>
         </>
       )}

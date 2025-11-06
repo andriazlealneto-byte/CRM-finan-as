@@ -35,6 +35,13 @@ interface SavedCategory {
   user_id: string; // Adicionado user_id
 }
 
+interface Budget { // Nova interface para orçamentos personalizados
+  id: string;
+  name: string;
+  limit: number;
+  categories: string[];
+}
+
 interface UserBudget {
   id: string;
   user_id: string;
@@ -42,6 +49,7 @@ interface UserBudget {
   food_expenses_limit: number;
   misc_categories: string[];
   food_categories: string[];
+  custom_budgets: Budget[]; // Novo campo para orçamentos personalizados
   created_at: string;
   updated_at: string;
 }
@@ -100,6 +108,8 @@ interface UserProfile {
   show_debts: boolean; // Novo campo para visibilidade do menu
   show_subscriptions: boolean; // Novo campo para visibilidade do menu
   show_monthly_review: boolean; // Novo campo para visibilidade do menu
+  misc_budget_name: string; // Novo campo para nome do orçamento de gastos bestas
+  food_budget_name: string; // Novo campo para nome do orçamento de comida
 }
 
 interface TransactionContextType {
@@ -146,6 +156,11 @@ interface TransactionContextType {
 
   userProfile: UserProfile | null;
   updateUserProfile: (updates: Partial<Omit<UserProfile, "id">>) => void;
+
+  customBudgets: Budget[]; // Novo estado para orçamentos personalizados
+  addCustomBudget: (budget: Omit<Budget, "id">) => Promise<void>;
+  updateCustomBudget: (id: string, updates: Partial<Omit<Budget, "id"> | { categories: string[] }>) => Promise<void>;
+  deleteCustomBudget: (id: string) => Promise<void>;
 }
 
 const TransactionContext = createContext<TransactionContextType | undefined>(undefined);
@@ -162,6 +177,7 @@ export const TransactionProvider = ({ children }: { children: ReactNode }) => {
   const [debts, setDebts] = useState<Debt[]>([]); // Novo estado para dívidas
   const [subscriptions, setSubscriptions] = useState<Subscription[]>([]); // Novo estado para assinaturas
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null); // Novo estado para perfil do usuário
+  const [customBudgets, setCustomBudgets] = useState<Budget[]>([]); // Novo estado para orçamentos personalizados
   const [loading, setLoading] = useState(true);
 
   const { user, loading: sessionLoading } = useSession(); // Obter user e loading da sessão
@@ -221,6 +237,7 @@ export const TransactionProvider = ({ children }: { children: ReactNode }) => {
       setFoodExpensesLimitState(0);
       setMiscCategoriesState([]);
       setFoodCategoriesState([]);
+      setCustomBudgets([]); // Limpar orçamentos personalizados
       return;
     }
     setLoading(true);
@@ -234,6 +251,7 @@ export const TransactionProvider = ({ children }: { children: ReactNode }) => {
       setFoodExpensesLimitState(budget.food_expenses_limit);
       setMiscCategoriesState(budget.misc_categories || []);
       setFoodCategoriesState(budget.food_categories || []);
+      setCustomBudgets(budget.custom_budgets || []); // Carregar orçamentos personalizados
     } else {
       // Initialize default budget if none exists for the current user
       const { data: newBudget, error: insertError } = await supabase
@@ -244,6 +262,7 @@ export const TransactionProvider = ({ children }: { children: ReactNode }) => {
           food_expenses_limit: 500,
           misc_categories: ["Lazer", "Outros"],
           food_categories: ["Alimentação"],
+          custom_budgets: [], // Inicializar com array vazio
         })
         .select('*');
       if (insertError) {
@@ -255,6 +274,7 @@ export const TransactionProvider = ({ children }: { children: ReactNode }) => {
         setFoodExpensesLimitState(budget.food_expenses_limit);
         setMiscCategoriesState(budget.misc_categories || []);
         setFoodCategoriesState(budget.food_categories || []);
+        setCustomBudgets(budget.custom_budgets || []);
       }
     }
     setLoading(false);
@@ -334,6 +354,8 @@ export const TransactionProvider = ({ children }: { children: ReactNode }) => {
             show_debts: true, // Default to true
             show_subscriptions: true, // Default to true
             show_monthly_review: true, // Default to true
+            misc_budget_name: "Gastos Bestas", // Default name
+            food_budget_name: "Comida", // Default name
           })
           .select()
           .single();
@@ -348,7 +370,11 @@ export const TransactionProvider = ({ children }: { children: ReactNode }) => {
         console.error("Erro ao carregar perfil:", error);
       }
     } else {
-      setUserProfile(data as UserProfile);
+      // Ensure default names if they are null in DB (for existing users before this change)
+      const profileData = data as UserProfile;
+      if (!profileData.misc_budget_name) profileData.misc_budget_name = "Gastos Bestas";
+      if (!profileData.food_budget_name) profileData.food_budget_name = "Comida";
+      setUserProfile(profileData);
     }
     setLoading(false);
   }, [user?.id]);
@@ -376,6 +402,7 @@ export const TransactionProvider = ({ children }: { children: ReactNode }) => {
       setDebts([]);
       setSubscriptions([]); // Limpar assinaturas ao deslogar
       setUserProfile(null);
+      setCustomBudgets([]); // Limpar orçamentos personalizados ao deslogar
       setLoading(false);
     }
   }, [sessionLoading, user?.id, fetchTransactions, fetchFutureExpenses, fetchSavedCategories, fetchBudgets, fetchGoals, fetchDebts, fetchSubscriptions, fetchUserProfile]);
@@ -487,6 +514,11 @@ export const TransactionProvider = ({ children }: { children: ReactNode }) => {
         // Update budget categories if the category is renamed
         setMiscCategoriesState((prev) => prev.map(cat => cat === oldCategory ? newCategory : cat));
         setFoodCategoriesState((prev) => prev.map(cat => cat === oldCategory ? newCategory : cat));
+        // Update custom budget categories if the category is renamed
+        setCustomBudgets((prev) => prev.map(budget => ({
+          ...budget,
+          categories: budget.categories.map(cat => cat === oldCategory ? newCategory : cat)
+        })));
         toast.success("Categoria editada com sucesso!");
       }
     }
@@ -506,6 +538,11 @@ export const TransactionProvider = ({ children }: { children: ReactNode }) => {
       // Remover a categoria das listas de orçamento se ela for excluída
       setMiscCategoriesState((prev) => prev.filter((cat) => cat !== categoryToDelete));
       setFoodCategoriesState((prev) => prev.filter((cat) => cat !== categoryToDelete));
+      // Remover a categoria dos orçamentos personalizados se ela for excluída
+      setCustomBudgets((prev) => prev.map(budget => ({
+        ...budget,
+        categories: budget.categories.filter(cat => cat !== categoryToDelete)
+      })));
       toast.success(`Categoria "${categoryToDelete}" excluída com sucesso!`);
     }
   };
@@ -549,6 +586,7 @@ export const TransactionProvider = ({ children }: { children: ReactNode }) => {
           food_expenses_limit: updates.food_expenses_limit || foodExpensesLimit,
           misc_categories: updates.misc_categories || miscCategories,
           food_categories: updates.food_categories || foodCategories,
+          custom_budgets: updates.custom_budgets || customBudgets,
         });
       if (error) {
         toast.error("Erro ao criar orçamento: " + error.message);
@@ -575,6 +613,56 @@ export const TransactionProvider = ({ children }: { children: ReactNode }) => {
   const setFoodCategories = (categories: string[]) => {
     setFoodCategoriesState(categories);
     updateBudgetsInSupabase({ food_categories: categories });
+  };
+
+  const updateCustomBudgetsInSupabase = async (budgets: Budget[]) => {
+    if (!user?.id) {
+      toast.error("Você precisa estar logado para atualizar orçamentos personalizados.");
+      return;
+    }
+    const { data: existingBudget, error: fetchError } = await supabase
+      .from('user_budgets')
+      .select('id')
+      .eq('user_id', user.id)
+      .limit(1);
+
+    if (fetchError || !existingBudget || existingBudget.length === 0) {
+      toast.error("Erro ao buscar orçamento base para atualização de orçamentos personalizados.");
+      console.error("Erro ao buscar orçamento base:", fetchError);
+      return;
+    }
+
+    const budgetId = existingBudget[0].id;
+    const { error } = await supabase
+      .from('user_budgets')
+      .update({ custom_budgets: budgets })
+      .eq('id', budgetId)
+      .eq('user_id', user.id);
+    if (error) {
+      toast.error("Erro ao atualizar orçamentos personalizados: " + error.message);
+      console.error("Erro ao atualizar orçamentos personalizados:", error);
+    } else {
+      setCustomBudgets(budgets);
+    }
+  };
+
+  const addCustomBudget = async (budget: Omit<Budget, "id">) => {
+    const newBudget = { ...budget, id: crypto.randomUUID() }; // Generate client-side ID for now
+    const updatedBudgets = [...customBudgets, newBudget];
+    await updateCustomBudgetsInSupabase(updatedBudgets);
+    toast.success("Orçamento personalizado adicionado com sucesso!");
+  };
+
+  const updateCustomBudget = async (id: string, updates: Partial<Omit<Budget, "id"> | { categories: string[] }>) => {
+    const updatedBudgets = customBudgets.map(b => b.id === id ? { ...b, ...updates } : b);
+    await updateCustomBudgetsInSupabase(updatedBudgets);
+    toast.success("Orçamento personalizado atualizado com sucesso!");
+  };
+
+  const deleteCustomBudget = async (id: string) => {
+    const updatedBudgets = customBudgets.filter(b => b.id !== id);
+    await updateCustomBudgetsInSupabase(updatedBudgets);
+    toast.success("Orçamento personalizado excluído com sucesso!");
   };
 
   const addGoal = async (goal: Omit<Goal, "id" | "user_id" | "created_at" | "updated_at">) => {
@@ -712,32 +800,6 @@ export const TransactionProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  const updateUserProfile = async (updates: Partial<Omit<UserProfile, "id">>) => {
-    if (!user?.id) {
-      toast.error("Você precisa estar logado para atualizar seu perfil.");
-      return;
-    }
-
-    const profileUpdates: Partial<UserProfile> = { ...updates };
-
-    if (updates.is_premium === false) {
-      profileUpdates.subscription_type = null;
-      profileUpdates.subscription_end_date = null;
-      profileUpdates.data_retention_until = format(addMonths(new Date(), 1), "yyyy-MM-dd"); // Retém dados por 1 mês
-    } else if (updates.is_premium === true) {
-      profileUpdates.data_retention_until = null; // Limpa a data de retenção se reativar
-    }
-
-    const { error } = await supabase.from('profiles').update(profileUpdates).eq('id', user.id);
-    if (error) {
-      toast.error("Erro ao atualizar perfil: " + error.message);
-      console.error("Erro ao atualizar perfil:", error);
-    } else {
-      setUserProfile((prev) => (prev ? { ...prev, ...profileUpdates } : null));
-      toast.success("Perfil atualizado com sucesso!");
-    }
-  };
-
   const totalIncome = transactions
     .filter((t) => t.type === "income")
     .reduce((sum, t) => sum + t.amount, 0);
@@ -797,6 +859,10 @@ export const TransactionProvider = ({ children }: { children: ReactNode }) => {
         deleteSubscription, // Adicionado deleteSubscription
         userProfile,
         updateUserProfile,
+        customBudgets, // Adicionado customBudgets
+        addCustomBudget, // Adicionado addCustomBudget
+        updateCustomBudget, // Adicionado updateCustomBudget
+        deleteCustomBudget, // Adicionado deleteCustomBudget
       }}
     >
       {children}
