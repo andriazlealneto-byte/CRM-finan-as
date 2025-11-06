@@ -24,8 +24,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     if (!loading) {
       setIsAuthenticated(!!session);
       if (session && (window.location.pathname === "/login" || window.location.pathname === "/signup")) {
-        navigate("/");
-      } else if (!session && window.location.pathname !== "/login" && window.location.pathname !== "/signup") {
+        navigate("/app"); // Redireciona para /app se já logado e tentando acessar login/signup
+      } else if (!session && window.location.pathname.startsWith("/app")) { // Se não logado e tentando acessar /app/*
         navigate("/login");
       }
     }
@@ -73,7 +73,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       console.error("Erro de logout:", error);
     } else {
       toast.info("Você foi desconectado.");
-      // O useEffect acima cuidará da navegação após a sessão ser atualizada
+      navigate("/"); // Redireciona explicitamente para a Landing Page
     }
   };
 
