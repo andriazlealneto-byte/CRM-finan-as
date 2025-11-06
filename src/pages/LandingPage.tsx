@@ -41,11 +41,6 @@ const LandingPage = () => {
       description: "Mantenha suas dívidas e parcelamentos sob controle.",
     },
     {
-      icon: <CheckCircle className="h-6 w-6 text-primary" />,
-      title: "Orçamentos Personalizados",
-      description: "Crie orçamentos para categorias específicas e evite gastos excessivos.",
-    },
-    {
       icon: <Menu className="h-6 w-6 text-primary" />,
       title: "Assinaturas e Recorrências",
       description: "Gerencie todos os seus serviços de assinatura em um só lugar.",
@@ -129,7 +124,7 @@ const LandingPage = () => {
       </header>
 
       {/* Hero Section */}
-      <section className="relative h-[calc(100vh-64px)] flex items-center justify-center text-center bg-gradient-to-br from-primary to-purple-600 text-white p-8">
+      <section className="relative h-[calc(100vh-64px)] flex items-center justify-center text-center animated-gradient-background text-white p-8">
         <div className="max-w-4xl space-y-8"> {/* Increased max-width and space-y */}
           <h1 className="text-6xl font-extrabold leading-tight tracking-tight"> {/* Increased text size and added tracking */}
             Assuma o Controle das Suas Finanças Pessoais
@@ -142,7 +137,7 @@ const LandingPage = () => {
             <Button size="lg" className="bg-white text-primary hover:bg-gray-100" onClick={() => handleSubscriptionClick('monthly')}>
               Começar Agora (Mensal)
             </Button>
-            <Button size="lg" variant="outline" className="border-white text-white hover:bg-white hover:text-primary" onClick={() => handleSubscriptionClick('annual')}>
+            <Button size="lg" variant="outline" className="hover:bg-white hover:text-primary" onClick={() => handleSubscriptionClick('annual')}>
               Economize 20% (Anual)
             </Button>
           </div>

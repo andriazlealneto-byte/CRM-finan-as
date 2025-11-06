@@ -13,7 +13,8 @@
     --popover: 220 10% 10%; /* Dark charcoal */
     --popover-foreground: 210 40% 98%; /* Off-white */
 
-    --primary: 250 80% 60%; /* Softer purple */
+    --primary: 250 70% 50%; /* Softer, slightly darker purple for dark mode */
+    --primary-gradient-end: 250 60% 40%; /* Even darker purple for gradient end in dark mode */
     --primary-foreground: 210 40% 98%; /* Off-white */
 
     --secondary: 220 10% 20%; /* Darker gray */
@@ -31,8 +32,6 @@
     --border: 220 10% 25%; /* Darker gray */
     --input: 220 10% 25%; /* Darker gray */
     --ring: 250 80% 60%; /* Primary purple */
-
-    --radius: 0.75rem; /* Slightly more rounded corners */
 
     --sidebar-background: 220 10% 5%; /* Even darker gray/black */
     --sidebar-foreground: 210 40% 98%; /* Off-white */
@@ -56,7 +55,8 @@
     --popover: 0 0% 100%; /* White */
     --popover-foreground: 222.2 84% 4.9%; /* Black */
 
-    --primary: 250 80% 60%; /* Softer purple */
+    --primary: 250 80% 60%; /* Original brighter purple for light mode */
+    --primary-gradient-end: 250 70% 50%; /* Slightly darker for gradient end in light mode */
     --primary-foreground: 210 40% 98%; /* Off-white */
 
     --secondary: 210 40% 96.1%; /* Light gray */
@@ -88,6 +88,12 @@
   }
 }
 
+@keyframes gradient-shift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
 @layer base {
   * {
     @apply border-border;
@@ -95,5 +101,11 @@
 
   body {
     @apply bg-background text-foreground min-h-screen;
+  }
+
+  .animated-gradient-background {
+    background: linear-gradient(90deg, hsl(var(--primary)), hsl(var(--primary-gradient-end)), hsl(var(--primary)));
+    background-size: 200% 200%;
+    animation: gradient-shift 10s ease infinite;
   }
 }
