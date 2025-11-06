@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { useAuth } from "@/context/AuthContext";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom"; // Importar Link
 import { MadeWithDyad } from "@/components/made-with-dyad";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { useSession } from "@/context/SessionContext"; // Import useSession
@@ -96,6 +96,12 @@ const LoginPage = () => {
               </Button>
             </form>
           </Form>
+          <p className="mt-4 text-center text-sm text-muted-foreground">
+            Não tem uma conta?{" "}
+            <Link to="/signup" className="text-primary hover:underline">
+              Cadastre-se
+            </Link>
+          </p>
         </CardContent>
       </Card>
       <MadeWithDyad />
