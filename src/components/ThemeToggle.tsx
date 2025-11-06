@@ -18,7 +18,7 @@ export function ThemeToggle() {
       <Button
         variant="ghost"
         size="icon"
-        className={`h-8 w-8 ${theme === 'light' ? 'bg-accent text-accent-foreground' : ''}`}
+        className={`h-8 w-8 ${theme === 'light' ? 'bg-primary text-primary-foreground' : ''}`}
         onClick={() => {
           setTheme("light");
           console.log("Definindo tema para claro");
@@ -30,7 +30,7 @@ export function ThemeToggle() {
       <Button
         variant="ghost"
         size="icon"
-        className={`h-8 w-8 ${theme === 'dark' ? 'bg-accent text-accent-foreground' : ''}`}
+        className={`h-8 w-8 ${theme === 'dark' ? 'bg-primary text-primary-foreground' : ''}`}
         onClick={() => {
           setTheme("dark");
           console.log("Definindo tema para escuro");
