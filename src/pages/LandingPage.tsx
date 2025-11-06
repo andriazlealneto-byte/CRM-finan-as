@@ -121,7 +121,8 @@ const LandingPage = () => {
                       <Button asChild className="w-full"><Link to="/login">Login</Link></Button>
                     )}
                   </div>
-                </SheetContent>
+                </div>
+              </SheetContent>
             </Sheet>
           </div>
         </div>
