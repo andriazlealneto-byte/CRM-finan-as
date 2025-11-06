@@ -10,7 +10,7 @@ import * as z from "zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from "@/components/ui/form";
 import { useTransactionContext } from "@/context/TransactionContext";
 import { toast } from "sonner";
-import { User, Palette, Shirt, LayoutDashboard, Mail, Lock, Eye, EyeOff, CreditCard } from "lucide-react"; // Importar novos ícones
+import { User, Palette, Shirt, LayoutDashboard, Mail, Lock, Eye, EyeOff } from "lucide-react"; // Importar novos ícones
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { supabase } from "@/lib/supabase";
@@ -187,16 +187,6 @@ const ProfilePage = () => {
       toast.success("Senha alterada com sucesso!");
       passwordForm.reset();
     }
-  };
-
-  const handleCancelSubscription = async () => {
-    await updateUserProfile({
-      is_premium: false,
-      subscription_type: null,
-      subscription_end_date: null,
-    });
-    toast.success("Sua assinatura foi cancelada com sucesso.");
-    navigate("/subscribe");
   };
 
   return (
@@ -408,67 +398,6 @@ const ProfilePage = () => {
           <Button type="submit">Salvar Alterações do Perfil</Button>
         </form>
       </Form>
-
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <CreditCard className="h-5 w-5" /> Gerenciar Assinatura GPF
-          </CardTitle>
-          <CardDescription>
-            Gerencie o status da sua assinatura premium do GPF.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-2">
-          {userProfile?.is_premium ? (
-            <>
-              <p>
-                Você está no plano{" "}
-                <span className="font-semibold">
-                  {userProfile.subscription_type === "monthly" ? "Mensal" : "Anual"}
-                </span>
-                .
-              </p>
-              {userProfile.subscription_end_date && (
-                <p>
-                  Sua assinatura é válida até{" "}
-                  <span className="font-semibold">
-                    {format(parseISO(userProfile.subscription_end_date), "dd/MM/yyyy", { locale: ptBR })}
-                  </span>
-                  .
-                </p>
-              )}
-              <AlertDialog>
-                <AlertDialogTrigger asChild>
-                  <Button variant="destructive" className="mt-4">
-                    Cancelar Assinatura
-                  </Button>
-                </AlertDialogTrigger>
-                <AlertDialogContent>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>Tem certeza que deseja cancelar?</AlertDialogTitle>
-                    <AlertDialogDescription>
-                      Ao cancelar, você perderá o acesso aos recursos premium do GPF após a data de vencimento da sua assinatura.
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel>Não, Manter Assinatura</AlertDialogCancel>
-                    <AlertDialogAction onClick={handleCancelSubscription}>
-                      Sim, Cancelar
-                    </AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
-            </>
-          ) : (
-            <>
-              <p>Você não possui uma assinatura ativa do GPF Premium.</p>
-              <Button className="mt-4" onClick={() => navigate("/subscribe")}>
-                Assinar Agora
-              </Button>
-            </>
-          )}
-        </CardContent>
-      </Card>
 
       <Card className="w-full max-w-md">
         <CardHeader>

@@ -23,6 +23,7 @@ import SignupPage from "@/pages/SignupPage";
 import NotFound from "@/pages/NotFound";
 import PaymentPage from "@/pages/PaymentPage"; // Nova página de pagamento
 import SubscriptionRequiredPage from "@/pages/SubscriptionRequiredPage"; // Nova página de assinatura necessária
+import SubscriptionDetailsPage from "@/pages/SubscriptionDetailsPage"; // Importar a nova página de detalhes da assinatura
 
 import { SessionProvider } from "@/context/SessionContext";
 import { AuthProvider } from "@/context/AuthContext";
@@ -56,6 +57,7 @@ function App() {
                     {/* REMOVIDO: <Route path="/app/behavioral-analysis" element={<BehavioralAnalysisPage />} /> */}
                     <Route path="/app/monthly-review" element={<MonthlyReviewPage />} />
                     <Route path="/app/profile" element={<ProfilePage />} />
+                    <Route path="/app/subscription-details" element={<SubscriptionDetailsPage />} /> {/* Nova rota */}
                   </Route>
                 </Route>
                 <Route path="*" element={<NotFound />} />
