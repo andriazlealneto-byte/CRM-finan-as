@@ -811,6 +811,8 @@ export const TransactionProvider = ({ children }: { children: ReactNode }) => {
       return;
     }
 
+    setLoading(true); // Set loading to true at the start of profile update
+
     // Special handling for cancellation: set data_retention_until
     if (updates.is_premium === false && userProfile?.is_premium === true) {
       updates.data_retention_until = format(addMonths(new Date(), 1), "yyyy-MM-dd");
@@ -830,14 +832,20 @@ export const TransactionProvider = ({ children }: { children: ReactNode }) => {
       toast.error("Erro ao atualizar perfil: " + error.message);
       console.error("Erro ao atualizar perfil:", error);
     } else if (data) {
-      setUserProfile(data as UserProfile);
+      setUserProfile(data as UserProfile); // This updates the state
       toast.success("Perfil atualizado com sucesso!");
     }
+    setLoading(false); // Set loading to false at the end of profile update
   }, [user?.id, userProfile, setUserProfile]);
 
   // NEW: Effect to handle subscription expiration and grace period
   useEffect(() => {
-    if (!userProfile || !user?.id || !userProfile.is_premium) return;
+    let intervalId: NodeJS.Timeout;
+    if (!userProfile || !user?.id || !userProfile.is_premium) {
+      // If user is not premium, or profile not loaded, clear any grace period related toasts
+      toast.dismiss("grace-period-warning");
+      return;
+    }
 
     const checkSubscriptionStatus = async () => {
       const now = new Date();
@@ -847,6 +855,7 @@ export const TransactionProvider = ({ children }: { children: ReactNode }) => {
       // Case 1: Subscription has ended, and we need to start grace period
       if (subscriptionEndDate && subscriptionEndDate < now && !gracePeriodStartDate) {
         console.log("Subscription ended, initiating grace period.");
+        // Update profile to set grace_period_start_date. This will trigger a re-render and re-run this effect.
         await updateUserProfile({ grace_period_start_date: format(subscriptionEndDate, "yyyy-MM-dd") });
         // No toast here, toast will be handled by Layout component
       }
@@ -870,7 +879,7 @@ export const TransactionProvider = ({ children }: { children: ReactNode }) => {
 
     // Run check immediately and then every hour (or more frequently if needed)
     checkSubscriptionStatus();
-    const intervalId = setInterval(checkSubscriptionStatus, 60 * 60 * 1000); // Check every hour
+    intervalId = setInterval(checkSubscriptionStatus, 60 * 60 * 1000); // Check every hour
 
     return () => clearInterval(intervalId);
   }, [userProfile, user?.id, updateUserProfile]);
