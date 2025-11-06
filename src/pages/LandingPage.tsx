@@ -103,10 +103,15 @@ const LandingPage = () => {
               userProfile?.is_premium ? (
                 <Button asChild className="rounded-xl"><Link to="/app">Ir para o App</Link></Button>
               ) : (
+                // Logged in but not premium, offer to subscribe
                 <Button asChild className="rounded-xl"><Link to="/subscribe">Assinar Agora</Link></Button>
               )
             ) : (
-              <Button asChild className="rounded-xl"><Link to="/login">Login</Link></Button>
+              // Not logged in, offer login or signup/subscribe
+              <>
+                <Button asChild variant="ghost" className="rounded-xl"><Link to="/login">Login</Link></Button>
+                <Button asChild className="rounded-xl"><Link to="/signup">Assinar Agora</Link></Button> {/* Changed to signup */}
+              </>
             )}
           </div>
           <div className="md:hidden flex items-center gap-2">
@@ -132,7 +137,10 @@ const LandingPage = () => {
                         <Button asChild className="w-full rounded-xl"><Link to="/subscribe">Assinar Agora</Link></Button>
                       )
                     ) : (
-                      <Button asChild className="w-full rounded-xl"><Link to="/login">Login</Link></Button>
+                      <>
+                        <Button asChild variant="ghost" className="w-full rounded-xl" onClick={() => setIsMobileMenuOpen(false)}><Link to="/login">Login</Link></Button>
+                        <Button asChild className="w-full rounded-xl" onClick={() => setIsMobileMenuOpen(false)}><Link to="/signup">Assinar Agora</Link></Button>
+                      </>
                     )}
                   </div>
                 </div>

@@ -13,7 +13,8 @@ const ProtectedRoute = () => {
     return <Navigate to="/login" replace />;
   }
 
-  if (profileLoading) {
+  // Se o perfil ainda estiver carregando ou for nulo, mostre um indicador de carregamento
+  if (profileLoading || userProfile === null) {
     return (
       <div className="flex min-h-screen items-center justify-center">
         <p>Carregando perfil...</p>
@@ -21,8 +22,8 @@ const ProtectedRoute = () => {
     );
   }
 
-  // Se o usuário não for premium, redireciona para a página de assinatura
-  if (userProfile && !userProfile.is_premium) {
+  // Agora que userProfile é garantido como não nulo, podemos verificar is_premium
+  if (!userProfile.is_premium) {
     return <Navigate to="/subscribe" replace />;
   }
 
