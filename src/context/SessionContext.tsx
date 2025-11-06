@@ -13,7 +13,7 @@ interface SessionContextType {
 
 const SessionContext = createContext<SessionContextType | undefined>(undefined);
 
-export const SessionProvider = ({ children }: { children: ReactNode }) => {
+export const SessionProvider = ({ children }: { ReactNode }) => {
   const [session, setSession] = useState<Session | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
