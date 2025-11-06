@@ -34,6 +34,8 @@ interface TransactionContextType {
   totalExpenses: number;
   savedCategories: string[]; // Nova propriedade para categorias salvas
   addSavedCategory: (category: string) => void; // Nova função para adicionar categoria
+  editSavedCategory: (oldCategory: string, newCategory: string) => void; // Função para editar categoria
+  deleteSavedCategory: (categoryToDelete: string) => void; // Função para excluir categoria
 }
 
 const TransactionContext = createContext<TransactionContextType | undefined>(undefined);
@@ -79,6 +81,25 @@ export const TransactionProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  const editSavedCategory = (oldCategory: string, newCategory: string) => {
+    if (newCategory && newCategory !== oldCategory && !savedCategories.includes(newCategory)) {
+      setSavedCategories((prev) =>
+        prev.map((cat) => (cat === oldCategory ? newCategory : cat))
+      );
+      // Optionally, update existing transactions/future expenses with the new category name
+      // For simplicity, this example does not update existing transactions/future expenses.
+      // If this is desired, you would iterate through transactions and futureExpenses
+      // and update their category fields.
+    }
+  };
+
+  const deleteSavedCategory = (categoryToDelete: string) => {
+    setSavedCategories((prev) => prev.filter((cat) => cat !== categoryToDelete));
+    // Optionally, handle transactions/future expenses that used this category.
+    // For simplicity, this example does not modify existing transactions/future expenses.
+    // You might want to set their category to "Outros" or a default, or prompt the user.
+  };
+
   const totalIncome = transactions
     .filter((t) => t.type === "income")
     .reduce((sum, t) => sum + t.amount, 0);
@@ -103,6 +124,8 @@ export const TransactionProvider = ({ children }: { children: ReactNode }) => {
         totalExpenses,
         savedCategories,
         addSavedCategory,
+        editSavedCategory,
+        deleteSavedCategory,
       }}
     >
       {children}

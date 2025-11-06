@@ -2,7 +2,7 @@
 
 import React from "react";
 import { Link } from "react-router-dom";
-import { Home, DollarSign } from "lucide-react";
+import { Home, DollarSign, ListChecks } from "lucide-react"; // Import ListChecks icon
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -22,6 +22,11 @@ const Sidebar = ({ className, isMobile, onLinkClick }: SidebarProps) => {
       name: "Transações",
       href: "/transactions",
       icon: <DollarSign className="mr-2 h-4 w-4" />,
+    },
+    {
+      name: "Categorias", // New navigation item
+      href: "/categories",
+      icon: <ListChecks className="mr-2 h-4 w-4" />,
     },
   ];
 
