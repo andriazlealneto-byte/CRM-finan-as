@@ -5,6 +5,7 @@ import { useLocalStorage } from "@/hooks/use-local-storage"; // Still used for a
 import { format } from "date-fns";
 import { supabase } from "@/lib/supabase";
 import { toast } from "sonner";
+import { useSession } from "./SessionContext"; // Import useSession
 
 interface Transaction {
   id: string;
@@ -14,6 +15,7 @@ interface Transaction {
   type: "income" | "expense";
   category: string;
   isFixed?: boolean;
+  user_id: string; // Adicionado user_id
 }
 
 interface FutureExpense {
@@ -22,14 +24,32 @@ interface FutureExpense {
   description: string;
   amount: number;
   category: string;
+  user_id: string; // Adicionado user_id
+}
+
+interface SavedCategory {
+  id: string;
+  name: string;
+  user_id: string; // Adicionado user_id
+}
+
+interface UserBudget {
+  id: string;
+  user_id: string;
+  misc_expenses_limit: number;
+  food_expenses_limit: number;
+  misc_categories: string[];
+  food_categories: string[];
+  created_at: string;
+  updated_at: string;
 }
 
 interface TransactionContextType {
   transactions: Transaction[];
-  addTransaction: (transaction: Omit<Transaction, "id">) => void;
+  addTransaction: (transaction: Omit<Transaction, "id" | "user_id">) => void;
   deleteTransaction: (id: string) => void;
   futureExpenses: FutureExpense[];
-  addFutureExpense: (expense: Omit<FutureExpense, "id">) => void;
+  addFutureExpense: (expense: Omit<FutureExpense, "id" | "user_id">) => void;
   deleteFutureExpense: (id: string) => void;
   totalBalance: number;
   totalIncome: number;
@@ -49,7 +69,7 @@ interface TransactionContextType {
   setFoodCategories: (categories: string[]) => void;
   currentMiscExpenses: number;
   currentFoodExpenses: number;
-  loading: boolean; // Add loading state
+  loading: boolean;
 }
 
 const TransactionContext = createContext<TransactionContextType | undefined>(undefined);
@@ -64,10 +84,16 @@ export const TransactionProvider = ({ children }: { children: ReactNode }) => {
   const [foodCategories, setFoodCategoriesState] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
 
+  const { user, loading: sessionLoading } = useSession(); // Obter user e loading da sessão
+
   // Fetch data from Supabase
   const fetchTransactions = useCallback(async () => {
+    if (!user?.id) {
+      setTransactions([]);
+      return;
+    }
     setLoading(true);
-    const { data, error } = await supabase.from('transactions').select('*');
+    const { data, error } = await supabase.from('transactions').select('*').eq('user_id', user.id);
     if (error) {
       toast.error("Erro ao carregar transações: " + error.message);
       console.error("Erro ao carregar transações:", error);
@@ -75,11 +101,15 @@ export const TransactionProvider = ({ children }: { children: ReactNode }) => {
       setTransactions(data || []);
     }
     setLoading(false);
-  }, []);
+  }, [user?.id]);
 
   const fetchFutureExpenses = useCallback(async () => {
+    if (!user?.id) {
+      setFutureExpenses([]);
+      return;
+    }
     setLoading(true);
-    const { data, error } = await supabase.from('future_expenses').select('*');
+    const { data, error } = await supabase.from('future_expenses').select('*').eq('user_id', user.id);
     if (error) {
       toast.error("Erro ao carregar gastos futuros: " + error.message);
       console.error("Erro ao carregar gastos futuros:", error);
@@ -87,11 +117,15 @@ export const TransactionProvider = ({ children }: { children: ReactNode }) => {
       setFutureExpenses(data || []);
     }
     setLoading(false);
-  }, []);
+  }, [user?.id]);
 
   const fetchSavedCategories = useCallback(async () => {
+    if (!user?.id) {
+      setSavedCategories([]);
+      return;
+    }
     setLoading(true);
-    const { data, error } = await supabase.from('saved_categories').select('name');
+    const { data, error } = await supabase.from('saved_categories').select('name').eq('user_id', user.id);
     if (error) {
       toast.error("Erro ao carregar categorias: " + error.message);
       console.error("Erro ao carregar categorias:", error);
@@ -99,25 +133,33 @@ export const TransactionProvider = ({ children }: { children: ReactNode }) => {
       setSavedCategories(data.map(item => item.name) || []);
     }
     setLoading(false);
-  }, []);
+  }, [user?.id]);
 
   const fetchBudgets = useCallback(async () => {
+    if (!user?.id) {
+      setMiscExpensesLimitState(0);
+      setFoodExpensesLimitState(0);
+      setMiscCategoriesState([]);
+      setFoodCategoriesState([]);
+      return;
+    }
     setLoading(true);
-    const { data, error } = await supabase.from('user_budgets').select('*').limit(1);
+    const { data, error } = await supabase.from('user_budgets').select('*').eq('user_id', user.id).limit(1);
     if (error) {
       toast.error("Erro ao carregar orçamentos: " + error.message);
       console.error("Erro ao carregar orçamentos:", error);
     } else if (data && data.length > 0) {
-      const budget = data[0];
+      const budget = data[0] as UserBudget;
       setMiscExpensesLimitState(budget.misc_expenses_limit);
       setFoodExpensesLimitState(budget.food_expenses_limit);
       setMiscCategoriesState(budget.misc_categories || []);
       setFoodCategoriesState(budget.food_categories || []);
     } else {
-      // Initialize default budget if none exists
+      // Initialize default budget if none exists for the current user
       const { data: newBudget, error: insertError } = await supabase
         .from('user_budgets')
         .insert({
+          user_id: user.id,
           misc_expenses_limit: 200,
           food_expenses_limit: 500,
           misc_categories: ["Lazer", "Outros"],
@@ -128,7 +170,7 @@ export const TransactionProvider = ({ children }: { children: ReactNode }) => {
         toast.error("Erro ao inicializar orçamento: " + insertError.message);
         console.error("Erro ao inicializar orçamento:", insertError);
       } else if (newBudget && newBudget.length > 0) {
-        const budget = newBudget[0];
+        const budget = newBudget[0] as UserBudget;
         setMiscExpensesLimitState(budget.misc_expenses_limit);
         setFoodExpensesLimitState(budget.food_expenses_limit);
         setMiscCategoriesState(budget.misc_categories || []);
@@ -136,28 +178,48 @@ export const TransactionProvider = ({ children }: { children: ReactNode }) => {
       }
     }
     setLoading(false);
-  }, []);
+  }, [user?.id]);
 
   useEffect(() => {
-    fetchTransactions();
-    fetchFutureExpenses();
-    fetchSavedCategories();
-    fetchBudgets();
-  }, [fetchTransactions, fetchFutureExpenses, fetchSavedCategories, fetchBudgets]);
+    if (!sessionLoading && user?.id) {
+      fetchTransactions();
+      fetchFutureExpenses();
+      fetchSavedCategories();
+      fetchBudgets();
+    } else if (!sessionLoading && !user?.id) {
+      // Clear data if user logs out
+      setTransactions([]);
+      setFutureExpenses([]);
+      setSavedCategories([]);
+      setMiscExpensesLimitState(0);
+      setFoodExpensesLimitState(0);
+      setMiscCategoriesState([]);
+      setFoodCategoriesState([]);
+      setLoading(false);
+    }
+  }, [sessionLoading, user?.id, fetchTransactions, fetchFutureExpenses, fetchSavedCategories, fetchBudgets]);
 
-  const addTransaction = async (transaction: Omit<Transaction, "id">) => {
-    const { data, error } = await supabase.from('transactions').insert(transaction).select();
+  const addTransaction = async (transaction: Omit<Transaction, "id" | "user_id">) => {
+    if (!user?.id) {
+      toast.error("Você precisa estar logado para adicionar transações.");
+      return;
+    }
+    const { data, error } = await supabase.from('transactions').insert({ ...transaction, user_id: user.id }).select();
     if (error) {
       toast.error("Erro ao adicionar transação: " + error.message);
       console.error("Erro ao adicionar transação:", error);
     } else if (data) {
-      setTransactions((prev) => [...prev, data[0]]);
+      setTransactions((prev) => [...prev, data[0] as Transaction]);
       toast.success("Transação adicionada com sucesso!");
     }
   };
 
   const deleteTransaction = async (id: string) => {
-    const { error } = await supabase.from('transactions').delete().eq('id', id);
+    if (!user?.id) {
+      toast.error("Você precisa estar logado para excluir transações.");
+      return;
+    }
+    const { error } = await supabase.from('transactions').delete().eq('id', id).eq('user_id', user.id);
     if (error) {
       toast.error("Erro ao excluir transação: " + error.message);
       console.error("Erro ao excluir transação:", error);
@@ -167,19 +229,27 @@ export const TransactionProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  const addFutureExpense = async (expense: Omit<FutureExpense, "id">) => {
-    const { data, error } = await supabase.from('future_expenses').insert(expense).select();
+  const addFutureExpense = async (expense: Omit<FutureExpense, "id" | "user_id">) => {
+    if (!user?.id) {
+      toast.error("Você precisa estar logado para adicionar gastos futuros.");
+      return;
+    }
+    const { data, error } = await supabase.from('future_expenses').insert({ ...expense, user_id: user.id }).select();
     if (error) {
       toast.error("Erro ao adicionar gasto futuro: " + error.message);
       console.error("Erro ao adicionar gasto futuro:", error);
     } else if (data) {
-      setFutureExpenses((prev) => [...prev, data[0]]);
+      setFutureExpenses((prev) => [...prev, data[0] as FutureExpense]);
       toast.success("Gasto futuro adicionado com sucesso!");
     }
   };
 
   const deleteFutureExpense = async (id: string) => {
-    const { error } = await supabase.from('future_expenses').delete().eq('id', id);
+    if (!user?.id) {
+      toast.error("Você precisa estar logado para excluir gastos futuros.");
+      return;
+    }
+    const { error } = await supabase.from('future_expenses').delete().eq('id', id).eq('user_id', user.id);
     if (error) {
       toast.error("Erro ao excluir gasto futuro: " + error.message);
       console.error("Erro ao excluir gasto futuro:", error);
@@ -190,25 +260,33 @@ export const TransactionProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const addSavedCategory = async (category: string) => {
+    if (!user?.id) {
+      toast.error("Você precisa estar logado para adicionar categorias.");
+      return;
+    }
     if (category && !savedCategories.includes(category)) {
-      const { data, error } = await supabase.from('saved_categories').insert({ name: category }).select();
+      const { data, error } = await supabase.from('saved_categories').insert({ name: category, user_id: user.id }).select();
       if (error) {
         toast.error("Erro ao adicionar categoria: " + error.message);
         console.error("Erro ao adicionar categoria:", error);
       } else if (data) {
-        setSavedCategories((prev) => [...prev, data[0].name]);
+        setSavedCategories((prev) => [...prev, (data[0] as SavedCategory).name]);
         toast.success("Categoria adicionada com sucesso!");
       }
     }
   };
 
   const editSavedCategory = async (oldCategory: string, newCategory: string) => {
+    if (!user?.id) {
+      toast.error("Você precisa estar logado para editar categorias.");
+      return;
+    }
     if (newCategory && newCategory !== oldCategory && !savedCategories.includes(newCategory)) {
-      // Find the ID of the old category
       const { data: oldCatData, error: fetchError } = await supabase
         .from('saved_categories')
         .select('id')
         .eq('name', oldCategory)
+        .eq('user_id', user.id) // Filtrar por user_id
         .single();
 
       if (fetchError || !oldCatData) {
@@ -217,7 +295,7 @@ export const TransactionProvider = ({ children }: { children: ReactNode }) => {
         return;
       }
 
-      const { error } = await supabase.from('saved_categories').update({ name: newCategory }).eq('id', oldCatData.id);
+      const { error } = await supabase.from('saved_categories').update({ name: newCategory }).eq('id', oldCatData.id).eq('user_id', user.id);
       if (error) {
         toast.error("Erro ao editar categoria: " + error.message);
         console.error("Erro ao editar categoria:", error);
@@ -234,7 +312,11 @@ export const TransactionProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const deleteSavedCategory = async (categoryToDelete: string) => {
-    const { error } = await supabase.from('saved_categories').delete().eq('name', categoryToDelete);
+    if (!user?.id) {
+      toast.error("Você precisa estar logado para excluir categorias.");
+      return;
+    }
+    const { error } = await supabase.from('saved_categories').delete().eq('name', categoryToDelete).eq('user_id', user.id);
     if (error) {
       toast.error("Erro ao excluir categoria: " + error.message);
       console.error("Erro ao excluir categoria:", error);
@@ -247,10 +329,15 @@ export const TransactionProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  const updateBudgetsInSupabase = async (updates: Partial<TransactionContextType>) => {
+  const updateBudgetsInSupabase = async (updates: Partial<UserBudget>) => {
+    if (!user?.id) {
+      toast.error("Você precisa estar logado para atualizar orçamentos.");
+      return;
+    }
     const { data: existingBudget, error: fetchError } = await supabase
       .from('user_budgets')
       .select('id')
+      .eq('user_id', user.id) // Filtrar por user_id
       .limit(1);
 
     if (fetchError) {
@@ -264,21 +351,23 @@ export const TransactionProvider = ({ children }: { children: ReactNode }) => {
       const { error } = await supabase
         .from('user_budgets')
         .update(updates)
-        .eq('id', budgetId);
+        .eq('id', budgetId)
+        .eq('user_id', user.id); // Garantir que a atualização é para o orçamento do usuário
       if (error) {
         toast.error("Erro ao atualizar orçamento: " + error.message);
         console.error("Erro ao atualizar orçamento:", error);
       }
     } else {
-      // This case should ideally be handled by fetchBudgets initializing a default
-      // but as a fallback, insert if no budget exists
+      // Este caso deve ser tratado pelo fetchBudgets inicializando um padrão
+      // mas como fallback, insere se nenhum orçamento existir
       const { error } = await supabase
         .from('user_budgets')
         .insert({
-          misc_expenses_limit: updates.miscExpensesLimit || miscExpensesLimit,
-          food_expenses_limit: updates.foodExpensesLimit || foodExpensesLimit,
-          misc_categories: updates.miscCategories || miscCategories,
-          food_categories: updates.foodCategories || foodCategories,
+          user_id: user.id, // Adicionar user_id aqui
+          misc_expenses_limit: updates.misc_expenses_limit || miscExpensesLimit,
+          food_expenses_limit: updates.food_expenses_limit || foodExpensesLimit,
+          misc_categories: updates.misc_categories || miscCategories,
+          food_categories: updates.food_categories || foodCategories,
         });
       if (error) {
         toast.error("Erro ao criar orçamento: " + error.message);
