@@ -6,6 +6,7 @@ import { useTransactionContext } from "@/context/TransactionContext";
 import { format, subMonths, startOfMonth, endOfMonth, parseISO, isSameMonth, isSameYear } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { Lightbulb, CheckCircle, XCircle, TrendingUp, TrendingDown } from "lucide-react";
+import { Progress } from "@/components/ui/progress"; // Certifique-se de que Progress está importado
 
 const MonthlyReviewPage = () => {
   const { transactions, goals, miscExpensesLimit, foodExpensesLimit, miscCategories, foodCategories } = useTransactionContext();
@@ -39,9 +40,9 @@ const MonthlyReviewPage = () => {
 
   // Insight 1: Balanço Geral
   if (totalIncomePreviousMonth > totalExpensesPreviousMonth) {
-    insights.push({ type: "success", message: `Parabéns! Em ${formattedPreviousMonth}, suas receitas superaram suas despesas em ${format(totalIncomePreviousMonth - totalExpensesPreviousMonth, "R$ #,##0.00", { locale: ptBR })}. Ótimo trabalho!` });
+    insights.push({ type: "success", message: `Parabéns! Em ${formattedPreviousMonth}, suas receitas superaram suas despesas em ${ (totalIncomePreviousMonth - totalExpensesPreviousMonth).toLocaleString("pt-BR", { style: "currency", currency: "BRL" }) }. Ótimo trabalho!` });
   } else if (totalExpensesPreviousMonth > totalIncomePreviousMonth) {
-    insights.push({ type: "improvement", message: `Em ${formattedPreviousMonth}, suas despesas (${format(totalExpensesPreviousMonth, "R$ #,##0.00", { locale: ptBR })}) foram maiores que suas receitas (${format(totalIncomePreviousMonth, "R$ #,##0.00", { locale: ptBR })}). Vamos analisar onde podemos ajustar.` });
+    insights.push({ type: "improvement", message: `Em ${formattedPreviousMonth}, suas despesas (${totalExpensesPreviousMonth.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}) foram maiores que suas receitas (${totalIncomePreviousMonth.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}). Vamos analisar onde podemos ajustar.` });
     consistencyScore -= 20;
   } else {
     insights.push({ type: "improvement", message: `Em ${formattedPreviousMonth}, suas receitas e despesas foram equilibradas. Considere buscar formas de aumentar a receita ou reduzir despesas para construir reservas.` });
@@ -53,7 +54,7 @@ const MonthlyReviewPage = () => {
     if (miscExpensesPreviousMonth <= miscExpensesLimit) {
       insights.push({ type: "success", message: `Você se manteve dentro do seu orçamento de Gastos Bestas em ${formattedPreviousMonth}. Excelente controle!` });
     } else {
-      insights.push({ type: "improvement", message: `Seu orçamento de Gastos Bestas foi excedido em ${format(miscExpensesPreviousMonth - miscExpensesLimit, "R$ #,##0.00", { locale: ptBR })} em ${formattedPreviousMonth}. Que tal revisar essa categoria para o próximo mês?` });
+      insights.push({ type: "improvement", message: `Seu orçamento de Gastos Bestas foi excedido em ${ (miscExpensesPreviousMonth - miscExpensesLimit).toLocaleString("pt-BR", { style: "currency", currency: "BRL" }) } em ${formattedPreviousMonth}. Que tal revisar essa categoria para o próximo mês?` });
       consistencyScore -= 15;
     }
   }
@@ -63,7 +64,7 @@ const MonthlyReviewPage = () => {
     if (foodExpensesPreviousMonth <= foodExpensesLimit) {
       insights.push({ type: "success", message: `Você gerenciou bem seus gastos com Comida em ${formattedPreviousMonth}, ficando dentro do limite. Continue assim!` });
     } else {
-      insights.push({ type: "improvement", message: `Os gastos com Comida excederam o limite em ${format(foodExpensesPreviousMonth - foodExpensesLimit, "R$ #,##0.00", { locale: ptBR })} em ${formattedPreviousMonth}. Pequenas mudanças podem ajudar a economizar aqui.` });
+      insights.push({ type: "improvement", message: `Os gastos com Comida excederam o limite em ${ (foodExpensesPreviousMonth - foodExpensesLimit).toLocaleString("pt-BR", { style: "currency", currency: "BRL" }) } em ${formattedPreviousMonth}. Pequenas mudanças podem ajudar a economizar aqui.` });
       consistencyScore -= 15;
     }
   }
